@@ -1,15 +1,17 @@
 
 .centreText {
     text-align: center;
-}
-
-h1 {
-    font-size: 150px;
+    margin-top: 50px;
 }
 
 .dropZone {
     height: 50vh;
     border-style: dashed;
+}
+
+.centreText textarea {
+    height: 300px;
+    width: 500px;
 }
 
 .image {
