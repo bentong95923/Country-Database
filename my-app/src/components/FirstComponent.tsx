@@ -1,7 +1,6 @@
 import * as React from "react";
 interface ICountryDetails {
-        countryList : {},
-        length : 0
+        countryList : any[]
 }
 
 export default class FirstComponent extends React.Component<{}, ICountryDetails> {
@@ -9,8 +8,7 @@ export default class FirstComponent extends React.Component<{}, ICountryDetails>
         constructor(props: any) {
                 super(props)
                 this.state = {
-                        countryList : {},
-                        length : 0
+                        countryList : []
                 }
         }
 
@@ -19,35 +17,38 @@ export default class FirstComponent extends React.Component<{}, ICountryDetails>
                         <div className="centreText">
                                 {/* React components must have a wrapper node/element */}
                                 <div className="textareaFirst">
-                                        Finding Country details: 
+                                        <h3>Finding Country details:</h3>
                                         <input type="text/plain" id="countryName" onKeyUp={this.handleOnKeyUp} placeholder="Enter country name"
                                         />
                                 </div>
                                 <div className="displayCountry">
-                                        {this.state.length}
-                                        {JSON.stringify(this.state.countryList)}
+                                        {this.state.countryList}
                                 </div>
                         </div>
                 );
         }
 
-        public handleOnKeyUp = (event: any) => {
-                this.setState({length : event.target.value.length });                
+        public handleOnKeyUp = (event: any) => {              
                 if (event.target.value.length >= 3) {
                         this.searchCountry(event.target.value);
                 } else {
-                        this.setState({countryList : {} });
+                        this.setState({countryList : [] });
                 }
         }
 
         public searchCountry = (country: string) => {
-                /* Calling api */
+                /* Calling api from REST Countries website */
                 const url = 'https://restcountries.eu/rest/v2/name/'+encodeURI(country);
                 fetch(url)
                 .then(response => response.json())
                 .then((out) => {
                         if (out.status !== 404) {
-                                this.setState({countryList : out});
+                                const content = out.map((value: any) => 
+                                        <div key={value.alpha3Code}>
+                                                <h4>{value.name}</h4>
+                                        </div>
+                                );                                
+                                this.setState({countryList : content});
                         } else {
                                 // 404 Not result found
                                 this.setState({countryList : out.message});
@@ -56,5 +57,6 @@ export default class FirstComponent extends React.Component<{}, ICountryDetails>
                 .catch(err => alert(err));
 
         }
+        
 
 }
