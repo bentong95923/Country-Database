@@ -1,6 +1,7 @@
 import * as React from "react";
 interface ICountryDetails {
-        countryList : {}
+        countryList : {},
+        length : 0
 }
 
 export default class FirstComponent extends React.Component<{}, ICountryDetails> {
@@ -8,7 +9,8 @@ export default class FirstComponent extends React.Component<{}, ICountryDetails>
         constructor(props: any) {
                 super(props)
                 this.state = {
-                        countryList : {}
+                        countryList : {},
+                        length : 0
                 }
         }
 
@@ -18,19 +20,23 @@ export default class FirstComponent extends React.Component<{}, ICountryDetails>
                                 {/* React components must have a wrapper node/element */}
                                 <div className="textareaFirst">
                                         Finding Country details: 
-                                        <input type="text/plain" id="countryName" onKeyDown={this.handleOnChange} placeholder="Enter country name"
+                                        <input type="text/plain" id="countryName" onKeyUp={this.handleOnKeyUp} placeholder="Enter country name"
                                         />
                                 </div>
                                 <div className="displayCountry">
+                                        {this.state.length}
                                         {JSON.stringify(this.state.countryList)}
                                 </div>
                         </div>
                 );
         }
 
-        public handleOnChange = (event: any) => {                
-                if (event.target.value.length > 2) {
+        public handleOnKeyUp = (event: any) => {
+                this.setState({length : event.target.value.length });                
+                if (event.target.value.length >= 3) {
                         this.searchCountry(event.target.value);
+                } else {
+                        this.setState({countryList : {} });
                 }
         }
 
