@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Link } from 'react-router-dom';
+
 interface ICountryDetails {
         countryList : any[]
 }
@@ -16,6 +18,7 @@ export default class FirstComponent extends React.Component<{}, ICountryDetails>
                 return (
                         <div className="centreText">
                                 {/* React components must have a wrapper node/element */}
+                                <h2><Link to="/CountryDetails"> CountryDetails </Link></h2>
                                 <div className="textareaFirst">
                                         <h3>Finding Country details:</h3>
                                         <input type="text/plain" id="countryName" onKeyUp={this.handleOnKeyUp} placeholder="Enter country name"
