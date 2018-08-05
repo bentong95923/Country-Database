@@ -27,7 +27,8 @@ export default class FirstComponent extends React.Component<{}, ISearchCountry> 
     public render() {
         if (this.state.confirmedQuery) {
             return (
-                <div>                
+                <div>
+                    {/* Passing state to CountryDetails component*/}
                     <CContext.Provider value={this.state}>
                         <CountryDetails />
                     </CContext.Provider>
@@ -50,10 +51,12 @@ export default class FirstComponent extends React.Component<{}, ISearchCountry> 
     }
 
     public handleOnKeyUp = (event: any) => {
+        // Remove anyspace from both sides of the input
+        const countryInput = event.target.value.trim();
         // User are required to input at least 3 letters to display any results
-        if (event.target.value.length >= 3) {
-            this.SearchCountries(event.target.value);
-        } else if (event.target.value.length > 0){
+        if (countryInput.length >= 3) {
+            this.SearchCountries(countryInput);
+        } else if (countryInput.length > 0){
             this.setState({ countryOptions: ["Keep typing..."], resultFound: false});
         } else {
             this.setState({ countryOptions: [], resultFound: false});
