@@ -24,3 +24,15 @@
 .dank {
     padding-top: 20px;
 }
+
+.countryOptions {
+    cursor: pointer;
+}
+
+.countryOptions:hover {
+    color: purple;
+}
+
+iframe.iframeTriggerOnly {
+    display: none;
+}
