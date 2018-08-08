@@ -61,25 +61,20 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                 {JSON.stringify(this.state.countryDetailsList)}
 
                 <AppBar position="static" color="default">
-                    {this.state.countryDetailsList.map((value) => {
-                        return (
-                            <Tabs
-                                key={value.name}
-                                value={this.state.value}
-                                onChange={this.handleChange}
-                                scrollable={true}
-                                scrollButtons="on"
-                                indicatorColor="primary"
-                                textColor="primary"
-                            >
-                                <Tab label="General Info" icon={<PhoneIcon />} />
-                                <Tab label="Location, Area &amp; Borders" icon={<FavoriteIcon />} />
-                                <Tab label="Economy" icon={<PersonPinIcon />} />
-                                <Tab label="Also Known As" icon={<ShoppingBasket />} />
-                                <Tab label="Code/Domain" icon={<ThumbDown />} />
-                            </Tabs>
-                        );
-                    })}
+                    <Tabs
+                        value={this.state.value}
+                        onChange={this.handleChange}
+                        scrollable={true}
+                        scrollButtons="on"
+                        indicatorColor="primary"
+                        textColor="primary"
+                    >
+                        <Tab label="General Info" icon={<PhoneIcon />} />
+                        <Tab label="Location, Area &amp; Borders" icon={<FavoriteIcon />} />
+                        <Tab label="Economy" icon={<PersonPinIcon />} />
+                        <Tab label="Also Known As" icon={<ShoppingBasket />} />
+                        <Tab label="Code/Domain" icon={<ThumbDown />} />
+                    </Tabs>
                 </AppBar>
                 {this.state.countryDetailsList.map((val) => {
                     const country = val.data;
@@ -201,9 +196,11 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                     <Typography>
                         Currencies:
                         {currencies.map((v: any) => {
-                            return <div key={v.code}>
-                                {v.name} &mdash; {v.code} &#40;{v.symbol}&#41;
-                            </div>
+                            return (
+                                <div key={v.code}>
+                                    {v.name} &mdash; {v.code} &#40;{v.symbol}&#41;
+                                </div>
+                            );
                         })}
                     </Typography>
                 </ExpansionPanelDetails>
@@ -211,11 +208,6 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                 <ExpansionPanelDetails>
                     <Typography>
                         Regional Trade BLOCS:
-                        {regionBlocs.map((v: any) => {
-                            return <div key={v.code}>
-                                {v.acronym} &mdash; {v.code} &#40;{v.symbol}&#41;
-                            </div>
-                        })}
                     </Typography>
                 </ExpansionPanelDetails>
             </ExpansionPanel>

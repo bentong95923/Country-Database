@@ -37,6 +37,7 @@ export default class FirstComponent extends React.Component<{}, ISearchCountry> 
         } else {
             return (
                 <div className="centreText">
+                {JSON.stringify(this.state.countryOptions)}
                     {/* React components must have a wrapper node/element */}
                     <div className="textareaFirst">
                         <h3>Finding Country details:</h3>
