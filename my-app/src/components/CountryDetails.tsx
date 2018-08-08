@@ -92,15 +92,12 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                                 </TabContainer>}
                             {this.state.value === 2 &&
                                 <TabContainer>
-
-                                    {this.renderEconmonyContent(country.gini, country.currencies, country.regionBlocs)}
+                                    {this.renderEconmonyContent(country.gini, country.currencies, country.regionalBlocs)}
                                 </TabContainer>}
                             {this.state.value === 3 && <TabContainer>Item Four</TabContainer>}
                         </div>
                     );
                 })}
-
-
             </div>
         );
     }
@@ -179,7 +176,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
         );
     }
 
-    public renderEconmonyContent(gini: number, currencies: any[], regionBlocs: any[]) {
+    public renderEconmonyContent(gini: number, currencies: any[], regionalBlocs: any[]) {
         return (
             <ExpansionPanel defaultExpanded={true}>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -193,22 +190,25 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                 </ExpansionPanelDetails>
 
                 <ExpansionPanelDetails>
-                    <Typography>
-                        Currencies:
+                    Currencies:
                         {currencies.map((v: any) => {
-                            return (
-                                <div key={v.code}>
-                                    {v.name} &mdash; {v.code} &#40;{v.symbol}&#41;
-                                </div>
-                            );
-                        })}
-                    </Typography>
+                        return (
+                            <Typography key={v.code}>
+                                {v.name} &mdash; {v.code} &#40;{v.symbol}&#41;
+                            </Typography>
+                        );
+                    })}
                 </ExpansionPanelDetails>
 
                 <ExpansionPanelDetails>
-                    <Typography>
-                        Regional Trade BLOCS:
-                    </Typography>
+                    Regional Trade BLOCs:
+                        {regionalBlocs.length > 0 ? regionalBlocs.map((v: any) => {
+                        return (
+                            <Typography key={v.acronym}>
+                                {v.acronym} &mdash; {v.name}
+                            </Typography>
+                        );
+                    }) : "None"}
                 </ExpansionPanelDetails>
             </ExpansionPanel>
         );
