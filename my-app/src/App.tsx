@@ -50,6 +50,18 @@ export default class Index extends React.Component<{}, ISearchCountry> {
         }
     }
 
+    // Clear state variable when refreshing the page (only after user confirmed the query)
+    public componentWillReceiveProps() {
+        if (this.state.confirmedQuery) {
+            this.setState({
+                countryOptions: [],
+                selectedCountry3Code: "None",
+                resultFound: false,
+                confirmedQuery: false
+            });
+        }
+    }
+
     public handleOnInput = (event: any) => {
         // Remove anyspace from both sides of the input
         const countryInput = event.target.value.trim();

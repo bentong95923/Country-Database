@@ -57,8 +57,6 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                     {state => <iframe className="iframeTriggerOnly" id={state.selectedCountry3Code} onLoad={this.searchCountryDetails} />}
                 </CContext.Consumer>
                 {/* React components must have a wrapper node/element */}
-                <h2>Country Details:</h2>
-                {/* JSON.stringify(this.state.countryDetailsList) */}
 
                 <AppBar position="static" color="default">
                     <Tabs
@@ -183,15 +181,6 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
         );
     }
 
-    // Clear state variable when refreshing the page
-    public componentWillReceiveProps() {
-        this.setState({
-            countryDetailsList: [],
-            borderFullName: [],
-            value: 0
-        });
-    }
-
     // Will be called if there is any component(s) updated for re-rendering
     public componentDidUpdate() {
         let temp = new Array();
@@ -202,10 +191,6 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
         if (temp.length !== 0 && temp.length !== this.state.borderFullName.length) {
             this.getCountryFullNameArray(temp);
         }
-    }
-    
-    public componentWillUnmount() {
-        this.setState({countryDetailsList: []});
     }
 
     public async getCountryFullNameArray(countryArray: string[]) {
