@@ -1,10 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
-import App from './App'
-import CountryDetails from './components/CountryDetails';
-import FirstComponent from './components/FirstComponent';
+import Index from './App';
 import { Header } from './components/Header';
-import SecondComponent from './components/SecondComponent';
 import './css/styles.css';
 
 export const AppRouter: React.StatelessComponent<{}> = () => {
@@ -14,10 +11,7 @@ export const AppRouter: React.StatelessComponent<{}> = () => {
             <div>
                 <Header />
                 <main>
-                    <Route exact={true} path="/" component={App} />
-                    <Route path="/FirstComponent" component={FirstComponent} />
-                    <Route path="/SecondComponent" component={SecondComponent} />
-                    <Route path="/CountryDetails" component={CountryDetails} />
+                    <Route exact={true} path="/" component={Index} />
                 </main>
             </div>
         </BrowserRouter>

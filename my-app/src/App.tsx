@@ -1,85 +1,119 @@
-import CircularProgress from '@material-ui/core/CircularProgress';
-import * as React from 'react'
-import Dropzone from 'react-dropzone'
-// import Loader from 'react-loader-spinner';
-import './App.css';
+import * as React from "react";
+import CountryDetails from "./components/CountryDetails";
 
-interface IState {
-    imageFiles: any[],
-    results: any,
-    dropzone: any
+// Exporting CContext so other Components can import this context for its use.
+// Context with a component tag will render its content to the current component.
+export const CContext = React.createContext({selectedCountry3Code: "None"});
+
+interface ISearchCountry {
+    countryOptions: any[],
+    selectedCountry3Code: string,
+    resultFound: boolean // Flag indicates if results are found.
+    confirmedQuery: boolean // Flag indicates if user confirms the input for the query
 }
 
-export default class App extends React.Component<{}, IState> {
+export default class Index extends React.Component<{}, ISearchCountry> {
+
     constructor(props: any) {
-        super(props)
+        super(props);
         this.state = {
-            imageFiles: [],
-            results: "",
-            dropzone: this.onDrop.bind(this)
+            countryOptions: [],
+            selectedCountry3Code: "None",
+            resultFound: false,
+            confirmedQuery: false
         }
     }
 
     public render() {
-        return (
-            <div className="container-fluid">
+        if (this.state.confirmedQuery) {
+            return (
+                <div>
+                    {/* Passing state to CountryDetails component*/}
+                    <CContext.Provider value={this.state}>
+                        <CountryDetails />
+                    </CContext.Provider>
+                </div>
+            );
+        } else {
+            return (
                 <div className="centreText">
-                    <div className="dropZone">
-                        <Dropzone onDrop={this.state.dropzone} style={{ position: "relative" }}>
-                            <div style={{ height: '50vh' }}>
-                                {
-                                    this.state.imageFiles.length > 0 ?
-                                        <div>{this.state.imageFiles.map((file) => <img className="image" key={file.name} src={file.preview} />)}</div> :
-                                        <p>Try dropping some files here, or click to select files to upload.</p>
-                                }
-                            </div>
-                        </Dropzone>
+                    {/* React components must have a wrapper node/element */}
+                    <div className="textareaFirst">
+                        <h3>Finding Country details:</h3>
+                        <input type="text/plain" id="countryName" onInput={this.handleOnInput} placeholder="Enter country name" />
                     </div>
-                    <div className="dank">
-                        {
-                            this.state.results === "" && this.state.imageFiles.length > 0 ?
-                                <CircularProgress thickness={3} /> :
-                                <p>{this.state.results}</p>
-                        }
+                    <div className="displayCountry">
+                        {this.renderCountryList(this.state.countryOptions, this.state.resultFound)}
                     </div>
                 </div>
-            </div>
+            );
+        }
+    }
+
+    public handleOnInput = (event: any) => {
+        // Remove anyspace from both sides of the input
+        const countryInput = event.target.value.trim();
+        // User are required to input at least 3 letters to display any results
+        if (countryInput.length >= 3) {
+            this.SearchCountries(countryInput);
+        } else if (countryInput.length > 0){
+            this.setState({ countryOptions: ["Keep typing..."], resultFound: false});
+        } else {
+            this.setState({ countryOptions: [], resultFound: false});
+        }
+    }
+
+    public SearchCountries = (country: string) => {
+        /* Calling api from REST Countries website */
+        const url = 'https://restcountries.eu/rest/v2/name/' + encodeURI(country);
+        fetch(url)
+            .then(response => response.json())
+            .then((out) => {
+                if (out.status !== 404) {
+                    const output = new Array();
+                    // Retrieve the alpha 3 code (Primary key) and the country name from the result
+                    out.map((value: any) => {
+                        output.push({
+                            id: value.alpha3Code,
+                            name: value.name
+                        })
+                    });
+                    this.setState({ countryOptions: output,  resultFound: true });
+                } else {
+                    // 404 Not result found error, store the received message
+                    this.setState({ countryOptions: out.message, resultFound: false });
+                }
+            })
+            .catch(err => alert(err)
         );
+
     }
 
-    public onDrop(files: any) {
-        this.setState({
-            imageFiles: files,
-            results: ""
-        })
-        const file = files[0]
-        const reader = new FileReader();
-        reader.onload = (readerEvt) => {
-            const binaryString = readerEvt.target!!.result; // checking if result is not null
-            this.upload(btoa(binaryString))
-        };
-
-        reader.readAsBinaryString(file);
+    public renderCountryList = (countryJSON: any[], resultFound: boolean) => {
+        // Display result if results are found
+        if (resultFound) {
+            const content = countryJSON.map((value: any) =>
+                // key field is a unique key required for map to display JSON
+                <div key={value.id}>
+                    <h4 id={value.id} className="countryOptions" onClick={this.handleOnClickCountry}>{value.name}</h4>
+                </div>
+            );
+            return content;
+        } else {
+            // Display the no found message to user.
+            return <h4>{countryJSON}</h4>;
+        }
     }
 
-    public upload(base64String: string) {
-        fetch('https://danktrigger.azurewebsites.net/api/dank', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain',
-            },
-            body: JSON.stringify({
-                file: base64String,
-            })
-        })
-            .then((response: any) => { // => is short hand for function declaration
-                if (!response.ok) {
-                    this.setState({ results: response.statusText })
-                }
-                else {
-                    response.json().then((data: any) => this.setState({ results: data[0].class }))
-                }
-                return response
-            })
+    public handleOnClickCountry = (event: any) => {
+        // need to paste the full country name back to the input field
+        /* const temp = this.state.countryOptions.find((value: any) => {
+            return value.id === event.target.id;
+        });*/
+        this.setState({selectedCountry3Code: event.target.id, confirmedQuery: true});
+        // alert(event.target.id);
+        return;
     }
+
+
 }

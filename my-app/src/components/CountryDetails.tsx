@@ -3,7 +3,7 @@ import * as React from "react";
     Curely brace import only work if, in this case, CContext
     contains a named export called CContext.
 */
-import { CContext } from "./FirstComponent";
+import { CContext } from "../App";
 
 import AppBar from '@material-ui/core/AppBar';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
@@ -183,12 +183,22 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
         );
     }
 
+    // Clear state variable when refreshing the page
+    public componentWillReceiveProps() {
+        this.setState({
+            countryDetailsList: [],
+            borderFullName: [],
+            value: 0
+        });
+    }
+
     // Will be called if there is any component(s) updated for re-rendering
     public componentDidUpdate() {
         let temp = new Array();
         this.state.countryDetailsList.map(val => {            
             temp = val.data.borders
         });
+        // Stop calling the API if countries name for all alpha3codes are all received
         if (temp.length !== 0 && temp.length !== this.state.borderFullName.length) {
             this.getCountryFullNameArray(temp);
         }
@@ -232,7 +242,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Gini Coefficient (%): {gini}
+                        Gini Coefficient (%): {gini !== null ? gini : "No data"}
                     </Typography>
                 </ExpansionPanelDetails>
 
