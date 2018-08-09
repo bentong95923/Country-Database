@@ -22,10 +22,9 @@ import ThumbDown from '@material-ui/icons/ThumbDown';
 
 interface ICountryDetails {
     countryDetailsList: any[],
+    borderFullName: any[],
     value: number
 }
-
-// const numTab = 10;
 
 function TabContainer(props: any) {
     return (
@@ -41,6 +40,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
         super(props);
         this.state = {
             countryDetailsList: [],
+            borderFullName: [],
             value: 0
         }
     }
@@ -58,7 +58,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                 </CContext.Consumer>
                 {/* React components must have a wrapper node/element */}
                 <h2>Country Details:</h2>
-                {JSON.stringify(this.state.countryDetailsList)}
+                {/* JSON.stringify(this.state.countryDetailsList) */}
 
                 <AppBar position="static" color="default">
                     <Tabs
@@ -72,8 +72,8 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                         <Tab label="General Info" icon={<PhoneIcon />} />
                         <Tab label="Location, Area &amp; Borders" icon={<FavoriteIcon />} />
                         <Tab label="Economy" icon={<PersonPinIcon />} />
-                        <Tab label="Also Known As" icon={<ShoppingBasket />} />
-                        <Tab label="Code/Domain" icon={<ThumbDown />} />
+                        <Tab label="Other Names" icon={<ShoppingBasket />} />
+                        <Tab label="Code / Domain" icon={<ThumbDown />} />
                     </Tabs>
                 </AppBar>
                 {this.state.countryDetailsList.map((val) => {
@@ -94,7 +94,14 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                                 <TabContainer>
                                     {this.renderEconmonyContent(country.gini, country.currencies, country.regionalBlocs)}
                                 </TabContainer>}
-                            {this.state.value === 3 && <TabContainer>Item Four</TabContainer>}
+                            {this.state.value === 3 &&
+                                <TabContainer>
+                                    {this.renderOtherNamesContent(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
+                                </TabContainer>}
+                            {this.state.value === 4 &&
+                                <TabContainer>
+                                    {this.renderCodeDomainContent(country.topLevelDomain, country.alpha2Code, country.alpha3Code, country.callingCodes, country.numericCode)}
+                                </TabContainer>}
                         </div>
                     );
                 })}
@@ -102,11 +109,11 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
         );
     }
 
-    public renderGeneralInfoContent(population: number, capital: string, demonym: string, timezones: any[], flag: string) {
+    public renderGeneralInfoContent(population: number, capital: string, demonym: string, timezones: string[], flag: string) {
         return (
             <ExpansionPanel defaultExpanded={true}>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Location Details and Population</Typography>
+                    <Typography>General Info</Typography>
                 </ExpansionPanelSummary>
 
                 <ExpansionPanelDetails>
@@ -123,7 +130,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Demonym: {demonym}
+                        Demonym: {demonym.length !== 0 ? demonym : "n/a"}
                     </Typography>
                 </ExpansionPanelDetails>
 
@@ -142,11 +149,11 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
         );
     }
 
-    public renderLocationContent(region: string, subregion: string, latlng: any[], area: number, borders: any[]) {
+    public renderLocationContent(region: string, subregion: string, latlng: number[], area: number, borders: string[]) {
         return (
             <ExpansionPanel defaultExpanded={true}>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Location Details and Population</Typography>
+                    <Typography>Location, Area &amp; Borders</Typography>
                 </ExpansionPanelSummary>
 
                 <ExpansionPanelDetails>
@@ -169,18 +176,58 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Border: {borders.length > 0 ? borders.toString().split(',\s') : "No Country Surrounded"}
+                        Country Border: {borders.length > 0 ? this.state.borderFullName.toString().split(',\s') : "No Country Surrounded"}
                     </Typography>
                 </ExpansionPanelDetails>
             </ExpansionPanel>
         );
     }
 
+    // Will be called if there is any component(s) updated for re-rendering
+    public componentDidUpdate() {
+        let temp = new Array();
+        this.state.countryDetailsList.map(val => {            
+            temp = val.data.borders
+        });
+        if (temp.length !== 0 && temp.length !== this.state.borderFullName.length) {
+            this.getCountryFullNameArray(temp);
+        }
+    }
+    
+    public componentWillUnmount() {
+        this.setState({countryDetailsList: []});
+    }
+
+    public async getCountryFullNameArray(countryArray: string[]) {
+        const tempArray = new Array();
+        /* Calling api from REST Countries website */
+        for (const i in countryArray) {
+            if (countryArray.length >= 0) {
+                const url = 'https://restcountries.eu/rest/v2/alpha/' + countryArray[i] + '?fields=name';
+                await fetch(url)
+                    .then(response => response.json())
+                    .then((out) => {
+                        if (out.status !== 404) {
+                            // Retrieve the alpha 3 code (Primary key) and the country name from the result
+                            tempArray.push(out.name);
+                        } else {
+                            // 404 Not result found error, but should not reach here
+                            tempArray.push(out.message);
+                        }
+                    })
+                    .catch(err => alert('async'+err)
+                    );
+
+            }
+        }        
+        this.setState({borderFullName: tempArray});
+    }
+
     public renderEconmonyContent(gini: number, currencies: any[], regionalBlocs: any[]) {
         return (
             <ExpansionPanel defaultExpanded={true}>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Location Details and Population</Typography>
+                    <Typography>Economy</Typography>
                 </ExpansionPanelSummary>
 
                 <ExpansionPanelDetails>
@@ -191,10 +238,11 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
                 <ExpansionPanelDetails>
                     Currencies:
-                        {currencies.map((v: any) => {
+                    {currencies.map((v: any) => {
                         return (
                             <Typography key={v.code}>
-                                {v.name} &mdash; {v.code} &#40;{v.symbol}&#41;
+                                {/* In case the server returns 'null' for currency symbol */}
+                                {v.name} &mdash; {v.code} {v.symbol !== null ? ' (' + v.symbol + ')' : ""}
                             </Typography>
                         );
                     })}
@@ -202,13 +250,85 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
                 <ExpansionPanelDetails>
                     Regional Trade BLOCs:
-                        {regionalBlocs.length > 0 ? regionalBlocs.map((v: any) => {
+                    {regionalBlocs.length > 0 ? regionalBlocs.map((v: any) => {
                         return (
                             <Typography key={v.acronym}>
                                 {v.acronym} &mdash; {v.name}
                             </Typography>
                         );
                     }) : "None"}
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+        );
+    }
+
+    public renderOtherNamesContent(name: string, altSpellings: string[], nativeName: string, translations: any[], languages: any[]) {
+        return (
+            <ExpansionPanel defaultExpanded={true}>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Other Names</Typography>
+                </ExpansionPanelSummary>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        {"Original / Official Name: " + name}
+                    </Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        {"Also know as: " + altSpellings.toString().split(',\s')}
+                    </Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        {"Native people will call their country: " + nativeName.toString().split(',\s')}
+                    </Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    They speak:
+                    {languages.map(value => {
+                        return (
+                            <Typography key={value.iso639_1}>
+                                {" " + value.name + ", "}
+                            </Typography>
+                        );
+                    })}
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+        );
+    }
+
+    public renderCodeDomainContent(topLevelDomain: string[], alpha2Code: string, alpha3Code: string, callingCodes: string[], numericCode: string) {
+        return (
+            <ExpansionPanel defaultExpanded={true}>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Code / Domain</Typography>
+                </ExpansionPanelSummary>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        Top Level Domain: {topLevelDomain.toString().length !== 0 ? topLevelDomain.toString().split(',\s') : "Not assigned yet"}
+                    </Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        ISO Code: {alpha2Code + " (Alpha-2 Code), " + alpha3Code + " (Alpha-3 Code), " + numericCode + " (Numeric Code / UN M49)"}
+                    </ Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    Calling Code:
+                    {callingCodes.map(value => {
+                        return (
+                            <Typography key={value}>
+                                {"+" + value}
+                            </Typography>
+                        );
+                    })}
                 </ExpansionPanelDetails>
             </ExpansionPanel>
         );

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter, Redirect, Route } from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import App from './App'
 import CountryDetails from './components/CountryDetails';
 import FirstComponent from './components/FirstComponent';
@@ -18,7 +18,6 @@ export const AppRouter: React.StatelessComponent<{}> = () => {
                     <Route path="/FirstComponent" component={FirstComponent} />
                     <Route path="/SecondComponent" component={SecondComponent} />
                     <Route path="/CountryDetails" component={CountryDetails} />
-                    <Redirect from='*' to='/' />
                 </main>
             </div>
         </BrowserRouter>
