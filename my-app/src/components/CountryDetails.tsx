@@ -93,10 +93,9 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                         <Tab label="Code / Domain" icon={<ThumbDown />} />
                     </Tabs>
                 </AppBar>
-                {this.state.countryDetailsList.map((val) => {
-                    const country = val.data;
+                {this.state.countryDetailsList.map((country) => {
                     return (
-                        <div key={val.id}>
+                        <div key={country.alpha3Code}>
                             {this.state.value === 0 &&
                                 <TabContainer>
                                     {country.name}
@@ -181,7 +180,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        <PinDrop /> Latitude &amp; Longitude: {latlng.toString().split(',\s')}
+                        <PinDrop /> Geo coordinates: {latlng.length > 0 ? 'Lat: ' + latlng[0].toFixed(1) + ', Long: ' + latlng[1].toFixed(1) : "No data"}
                     </Typography>
                 </ExpansionPanelDetails>
 
@@ -193,7 +192,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        <VerticalAlignCenter /> Country Border: {borders.length > 0 ? this.state.borderFullName.toString().split(',\s') : "No Country Surrounded"}
+                        <VerticalAlignCenter /> Country border(s): {borders.length > 0 ? this.state.borderFullName.toString().split(',\s') : "No Country Surrounded"}
                     </Typography>
                 </ExpansionPanelDetails>
             </ExpansionPanel>
@@ -236,7 +235,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                     {regionalBlocs.length > 0 ? regionalBlocs.map((v: any) => {
                         return (
                             <ExpansionPanelDetails key={v.acronym}>
-                                    <Assignment /> {v.acronym} &mdash; {v.name}
+                                <Assignment /> {v.acronym} &mdash; {v.name}
                             </ExpansionPanelDetails>
                         );
                     }) : <ExpansionPanelDetails><Typography>None</Typography></ExpansionPanelDetails>}
@@ -277,7 +276,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                     {languages.map(value => {
                         return (
                             <ExpansionPanelDetails key={value.iso639_1}>
-                                 <Done /> {value.name}
+                                <Done /> {value.name}
                             </ExpansionPanelDetails>
                         );
                     })}
@@ -327,12 +326,17 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
     public componentDidUpdate() {
         let temp = new Array();
         this.state.countryDetailsList.map(val => {
-            temp = val.data.borders
+            temp = val.borders
         });
         // Stop calling the API if countries name for all alpha3codes are all received
         if (temp.length !== 0 && temp.length !== this.state.borderFullName.length) {
             this.getCountryFullNameArray(temp);
         }
+    }
+
+    // Add commas for each thoudsand
+    public numberWithCommas(n: number) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     public async getCountryFullNameArray(countryArray: string[]) {
@@ -352,16 +356,12 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                             tempArray.push(out.message);
                         }
                     })
-                    .catch(err => alert('async' + err)
+                    .catch(err => alert('getCountryFullNameArray(): ' + err)
                     );
 
             }
         }
         this.setState({ borderFullName: tempArray });
-    }
-    // Add commas for each thoudsand
-    public numberWithCommas(n: number) {
-        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     public searchCountryDetails = (event: any) => {
@@ -373,14 +373,14 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                 if (out.status !== 404) {
                     const output = new Array();
                     // Retrieve the alpha 3 code (Primary key) and the country name from the result
-                    output.push({ id: 0, data: out });
+                    output.push(out);
                     this.setState({ countryDetailsList: output });
                 } else {
                     // 404 Not result found error, but should not reach here
                     this.setState({ countryDetailsList: out.message });
                 }
             })
-            .catch(err => alert(err)
+            .catch(err => alert('searchCountryDetails(): '+ err)
             );
 
     }

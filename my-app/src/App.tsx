@@ -45,6 +45,7 @@ export default class Index extends React.Component<{}, ISearchCountry> {
                     <div className="displayCountry">
                         {this.renderCountryList(this.state.countryOptions, this.state.resultFound)}
                     </div>
+
                 </div>
             );
         }
