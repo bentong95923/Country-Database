@@ -50,7 +50,7 @@ export default class Index extends React.Component<{}, ISearchCountry> {
         }
     }
 
-    // Clear state variable when refreshing the page (only after user confirmed the query)
+    // Clear state variable when refreshing the page (only after user had confirmed(and submitted) the query previosuly)
     public componentWillReceiveProps() {
         if (this.state.confirmedQuery) {
             this.setState({

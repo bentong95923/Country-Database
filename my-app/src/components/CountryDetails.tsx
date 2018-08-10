@@ -13,12 +13,31 @@ import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
 
+import AccessTime from '@material-ui/icons/AccessTime';
+import Assignment from '@material-ui/icons/Assignment';
+import Comment from '@material-ui/icons/Comment';
+import Done from '@material-ui/icons/Done';
+import EuroSymbol from '@material-ui/icons/EuroSymbol';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import PersonPinIcon from '@material-ui/icons/PersonPin';
-import PhoneIcon from '@material-ui/icons/Phone';
-import ShoppingBasket from '@material-ui/icons/ShoppingBasket';
+import Face from '@material-ui/icons/Face';
+import Flag from '@material-ui/icons/Flag';
+import Group from '@material-ui/icons/Group';
+import GTranslate from '@material-ui/icons/GTranslate';
+import Http from '@material-ui/icons/Http';
+import Info from '@material-ui/icons/Info';
+import Language from '@material-ui/icons/Language';
+import LocationCity from '@material-ui/icons/LocationCity';
+import MonetizationOn from '@material-ui/icons/MonetizationOn';
+import People from '@material-ui/icons/People';
+import Phone from '@material-ui/icons/Phone';
+import PinDrop from '@material-ui/icons/PinDrop';
+import Place from '@material-ui/icons/Place';
+import Public from '@material-ui/icons/Public';
 import ThumbDown from '@material-ui/icons/ThumbDown';
+import Timeline from '@material-ui/icons/Timeline';
+import Translate from '@material-ui/icons/Translate';
+import VerticalAlignCenter from '@material-ui/icons/VerticalAlignCenter';
+import ZoneOutMap from '@material-ui/icons/ZoomOutMap';
 
 interface ICountryDetails {
     countryDetailsList: any[],
@@ -67,10 +86,10 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                         indicatorColor="primary"
                         textColor="primary"
                     >
-                        <Tab label="General Info" icon={<PhoneIcon />} />
-                        <Tab label="Location, Area &amp; Borders" icon={<FavoriteIcon />} />
-                        <Tab label="Economy" icon={<PersonPinIcon />} />
-                        <Tab label="Other Names" icon={<ShoppingBasket />} />
+                        <Tab label="General Info" icon={<Info />} />
+                        <Tab label="Location, Area &amp; Borders" icon={<Place />} />
+                        <Tab label="Economy" icon={<EuroSymbol />} />
+                        <Tab label="Languages / Names" icon={<Translate />} />
                         <Tab label="Code / Domain" icon={<ThumbDown />} />
                     </Tabs>
                 </AppBar>
@@ -94,7 +113,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                                 </TabContainer>}
                             {this.state.value === 3 &&
                                 <TabContainer>
-                                    {this.renderOtherNamesContent(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
+                                    {this.renderLanguagesNamesContent(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
                                 </TabContainer>}
                             {this.state.value === 4 &&
                                 <TabContainer>
@@ -116,31 +135,31 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Population (estimate): {this.numberWithCommas(population)}
+                        <People /> Population (estimate): {this.numberWithCommas(population)}
                     </Typography>
                 </ExpansionPanelDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Capital: {capital}
+                        <LocationCity /> Capital: {capital}
                     </Typography>
                 </ExpansionPanelDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Demonym: {demonym.length !== 0 ? demonym : "n/a"}
+                        <Face /> Demonym: {demonym.length !== 0 ? demonym : "n/a"}
                     </Typography>
                 </ExpansionPanelDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Time Zone(s): {timezones.toString().split(',\s')}
+                        <AccessTime /> Time Zone(s): {timezones.toString().split(',\s')}
                     </Typography>
                 </ExpansionPanelDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Flag: {flag}
+                        <Flag /> Flag: {flag}
                     </Typography>
                 </ExpansionPanelDetails>
             </ExpansionPanel>
@@ -156,26 +175,149 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Region: {region} &mdash; {subregion}
+                        <Public /> Region: {region} &mdash; {subregion}
                     </Typography>
                 </ExpansionPanelDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Latitude &amp; Longitude: {latlng.toString().split(',\s')}
+                        <PinDrop /> Latitude &amp; Longitude: {latlng.toString().split(',\s')}
                     </Typography>
                 </ExpansionPanelDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Area: {this.numberWithCommas(area)} km<sup>2</sup>
+                        <ZoneOutMap /> Area: {this.numberWithCommas(area)} km<sup>2</sup>
                     </Typography>
                 </ExpansionPanelDetails>
 
                 <ExpansionPanelDetails>
                     <Typography>
-                        Country Border: {borders.length > 0 ? this.state.borderFullName.toString().split(',\s') : "No Country Surrounded"}
+                        <VerticalAlignCenter /> Country Border: {borders.length > 0 ? this.state.borderFullName.toString().split(',\s') : "No Country Surrounded"}
                     </Typography>
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+        );
+    }
+
+    public renderEconmonyContent(gini: number, currencies: any[], regionalBlocs: any[]) {
+        return (
+            <ExpansionPanel defaultExpanded={true}>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Economy</Typography>
+                </ExpansionPanelSummary>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <Timeline /> Gini Coefficient (%): {gini !== null ? gini : "No data"}
+                    </Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <MonetizationOn /> Currencies:
+                    </Typography>
+                    {currencies.map((v: any) => {
+                        return (
+                            <ExpansionPanelDetails key={v.code}>
+                                <Typography>
+                                    {/* In case the server returns 'null' for currency symbol */}
+                                    {v.name} &mdash; {v.code} {v.symbol !== null ? ' (' + v.symbol + ')' : ""}
+                                </Typography>
+                            </ExpansionPanelDetails>
+                        );
+                    })}
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <Group /> Regional Trade BLOCs:
+                    </Typography>
+                    {regionalBlocs.length > 0 ? regionalBlocs.map((v: any) => {
+                        return (
+                            <ExpansionPanelDetails key={v.acronym}>
+                                    <Assignment /> {v.acronym} &mdash; {v.name}
+                            </ExpansionPanelDetails>
+                        );
+                    }) : <ExpansionPanelDetails><Typography>None</Typography></ExpansionPanelDetails>}
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+        );
+    }
+
+    public renderLanguagesNamesContent(name: string, altSpellings: string[], nativeName: string, translations: any[], languages: any[]) {
+        return (
+            <ExpansionPanel defaultExpanded={true}>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Languages / Names</Typography>
+                </ExpansionPanelSummary>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <Public /> {"Original / Official Name: " + name}
+                    </Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <GTranslate /> {"Also know as: " + altSpellings.toString().split(',\s')}
+                    </Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <Comment /> {"Native people call their country: " + nativeName.toString().split(',\s')}
+                    </Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <Language /> Language they speak:
+                    </Typography>
+                    {languages.map(value => {
+                        return (
+                            <ExpansionPanelDetails key={value.iso639_1}>
+                                 <Done /> {value.name}
+                            </ExpansionPanelDetails>
+                        );
+                    })}
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+        );
+    }
+
+    public renderCodeDomainContent(topLevelDomain: string[], alpha2Code: string, alpha3Code: string, callingCodes: string[], numericCode: string) {
+        return (
+            <ExpansionPanel defaultExpanded={true}>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Code / Domain</Typography>
+                </ExpansionPanelSummary>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <Http /> Top Level Domain: {topLevelDomain.toString().length !== 0 ? topLevelDomain.toString().split(',\s') : "Not assigned yet"}
+                    </Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <Public /> ISO Code: {alpha2Code + " (Alpha-2), " + alpha3Code + " (Alpha-3), " + numericCode + " (UN M49)"}
+                    </ Typography>
+                </ExpansionPanelDetails>
+
+                <ExpansionPanelDetails>
+                    <Typography>
+                        <Phone /> Calling Code:
+                    </Typography>
+                    {callingCodes.map(value => {
+                        return (
+                            <ExpansionPanelDetails key={value}>
+                                <Typography>
+                                    {"+ " + value}
+                                </Typography>
+                            </ExpansionPanelDetails>
+                        );
+                    })}
                 </ExpansionPanelDetails>
             </ExpansionPanel>
         );
@@ -184,7 +326,7 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
     // Will be called if there is any component(s) updated for re-rendering
     public componentDidUpdate() {
         let temp = new Array();
-        this.state.countryDetailsList.map(val => {            
+        this.state.countryDetailsList.map(val => {
             temp = val.data.borders
         });
         // Stop calling the API if countries name for all alpha3codes are all received
@@ -210,125 +352,13 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                             tempArray.push(out.message);
                         }
                     })
-                    .catch(err => alert('async'+err)
+                    .catch(err => alert('async' + err)
                     );
 
             }
-        }        
-        this.setState({borderFullName: tempArray});
+        }
+        this.setState({ borderFullName: tempArray });
     }
-
-    public renderEconmonyContent(gini: number, currencies: any[], regionalBlocs: any[]) {
-        return (
-            <ExpansionPanel defaultExpanded={true}>
-                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Economy</Typography>
-                </ExpansionPanelSummary>
-
-                <ExpansionPanelDetails>
-                    <Typography>
-                        Gini Coefficient (%): {gini !== null ? gini : "No data"}
-                    </Typography>
-                </ExpansionPanelDetails>
-
-                <ExpansionPanelDetails>
-                    Currencies:
-                    {currencies.map((v: any) => {
-                        return (
-                            <Typography key={v.code}>
-                                {/* In case the server returns 'null' for currency symbol */}
-                                {v.name} &mdash; {v.code} {v.symbol !== null ? ' (' + v.symbol + ')' : ""}
-                            </Typography>
-                        );
-                    })}
-                </ExpansionPanelDetails>
-
-                <ExpansionPanelDetails>
-                    Regional Trade BLOCs:
-                    {regionalBlocs.length > 0 ? regionalBlocs.map((v: any) => {
-                        return (
-                            <Typography key={v.acronym}>
-                                {v.acronym} &mdash; {v.name}
-                            </Typography>
-                        );
-                    }) : "None"}
-                </ExpansionPanelDetails>
-            </ExpansionPanel>
-        );
-    }
-
-    public renderOtherNamesContent(name: string, altSpellings: string[], nativeName: string, translations: any[], languages: any[]) {
-        return (
-            <ExpansionPanel defaultExpanded={true}>
-                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Other Names</Typography>
-                </ExpansionPanelSummary>
-
-                <ExpansionPanelDetails>
-                    <Typography>
-                        {"Original / Official Name: " + name}
-                    </Typography>
-                </ExpansionPanelDetails>
-
-                <ExpansionPanelDetails>
-                    <Typography>
-                        {"Also know as: " + altSpellings.toString().split(',\s')}
-                    </Typography>
-                </ExpansionPanelDetails>
-
-                <ExpansionPanelDetails>
-                    <Typography>
-                        {"Native people will call their country: " + nativeName.toString().split(',\s')}
-                    </Typography>
-                </ExpansionPanelDetails>
-
-                <ExpansionPanelDetails>
-                    They speak:
-                    {languages.map(value => {
-                        return (
-                            <Typography key={value.iso639_1}>
-                                {" " + value.name + ", "}
-                            </Typography>
-                        );
-                    })}
-                </ExpansionPanelDetails>
-            </ExpansionPanel>
-        );
-    }
-
-    public renderCodeDomainContent(topLevelDomain: string[], alpha2Code: string, alpha3Code: string, callingCodes: string[], numericCode: string) {
-        return (
-            <ExpansionPanel defaultExpanded={true}>
-                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Code / Domain</Typography>
-                </ExpansionPanelSummary>
-
-                <ExpansionPanelDetails>
-                    <Typography>
-                        Top Level Domain: {topLevelDomain.toString().length !== 0 ? topLevelDomain.toString().split(',\s') : "Not assigned yet"}
-                    </Typography>
-                </ExpansionPanelDetails>
-
-                <ExpansionPanelDetails>
-                    <Typography>
-                        ISO Code: {alpha2Code + " (Alpha-2 Code), " + alpha3Code + " (Alpha-3 Code), " + numericCode + " (Numeric Code / UN M49)"}
-                    </ Typography>
-                </ExpansionPanelDetails>
-
-                <ExpansionPanelDetails>
-                    Calling Code:
-                    {callingCodes.map(value => {
-                        return (
-                            <Typography key={value}>
-                                {"+" + value}
-                            </Typography>
-                        );
-                    })}
-                </ExpansionPanelDetails>
-            </ExpansionPanel>
-        );
-    }
-
     // Add commas for each thoudsand
     public numberWithCommas(n: number) {
         return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
