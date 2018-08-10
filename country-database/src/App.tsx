@@ -39,7 +39,7 @@ export default class Index extends React.Component<{}, ISearchCountry> {
                 <div className="centreText">
                     {/* React components must have a wrapper node/element */}
                     <div className="textareaFirst">
-                        <h3>Finding Country details:</h3>
+                        <h3>Finding Country Information:</h3>
                         <input type="text/plain" id="countryName" onInput={this.handleOnInput} placeholder="Enter country name" />
                     </div>
                     <div className="displayCountry">
