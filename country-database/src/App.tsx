@@ -1,5 +1,6 @@
 import * as React from "react";
 import CountryDetails from "./components/CountryDetails";
+import SearchBar from "./components/SearchBar";
 
 // Exporting CContext so other Components can import this context for its use.
 // Context with a component tag will render its content to the current component.
@@ -45,6 +46,8 @@ export default class Index extends React.Component<{}, ISearchCountry> {
                     <div className="displayCountry">
                         {this.renderCountryList(this.state.countryOptions, this.state.resultFound)}
                     </div>
+
+                    <SearchBar />
 
                 </div>
             );

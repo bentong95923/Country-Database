@@ -15,3 +15,7 @@ intro
 
 4. React Bootstrap and React Router Bootstrap
 ### npm install --save @types/react-bootstrap @types/react-router-bootstrap react-bootstrap react-router-bootstrap
+
+5. React-Select
+### npm install --save @types/react-select
+### npm i react-select
