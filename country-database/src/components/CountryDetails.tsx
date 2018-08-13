@@ -125,13 +125,13 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                     <TableBody>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <People />Population (estimate):
+                                <People /> Population (estimate):
                             </TableCell>
                             <TableCell> {this.numberWithCommas(population)}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <LocationCity />Capital:
+                                <LocationCity /> Capital:
                             </TableCell>
                             <TableCell> {capital}</TableCell>
                         </TableRow>
@@ -143,13 +143,13 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <AccessTime />Time Zone(s):
+                                <AccessTime /> Time Zone(s):
                             </TableCell>
                             <TableCell> {timezones.toString().split(',\s')}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Flag />Flag:
+                                <Flag /> Flag:
                             </TableCell>
                             <TableCell> {flag}</TableCell>
                         </TableRow>
@@ -278,13 +278,13 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Comment />  Native people call their country:
+                                <Comment /> Native people call their country:
                             </TableCell>
                             <TableCell> {nativeName.toString().split(',\s')}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Language />Language they speak:
+                                <Language /> Language they speak:
                             </TableCell>
                             <TableCell component="th" scope="row">
                                 {languages.map(value => {
