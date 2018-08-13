@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import AsyncSelect from 'react-select/lib/Async';
-import CountryDetails from "./components/CountryDetails";
+import CountryDetails from './components/CountryDetails';
 
 interface IState {
     countryOptions: any[],
