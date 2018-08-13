@@ -5,5 +5,5 @@ body {
 }
 
 html {  
-  font-size: 16px;
+  font-size: 16px; /* MaterialUI uses this font-size for reference to style */
 }
