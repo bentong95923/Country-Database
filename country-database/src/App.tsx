@@ -1,32 +1,34 @@
-import * as React from "react";
+import * as React from 'react';
+import AsyncSelect from 'react-select/lib/Async';
 import CountryDetails from "./components/CountryDetails";
-import CountrySearchBar from "./components/CountrySearchBar";
+
+interface IState {
+    countryOptions: any[],
+    selectedCountry3Code: string,
+    responseReceived: boolean, // Flag indicates if results are found.
+    confirmedQuery: boolean
+};
+
+const minNumInput = 2;
+const placeholderString = 'Enter country name...';
 
 // Exporting CContext so other Components can import this context for its use.
 // Context with a component tag will render its content to the current component.
 export const CContext = React.createContext({ selectedCountry3Code: "None" });
 
-interface ISearchCountry {
-    countryOptions: any[],
-    selectedCountry3Code: string,
-    resultFound: boolean // Flag indicates if results are found.
-    confirmedQuery: boolean // Flag indicates if user confirms the input for the query
-}
-
-export default class Index extends React.Component<{}, ISearchCountry> {
-
+export default class CountrySearchBar extends React.Component<{}, IState> {
     constructor(props: any) {
         super(props);
         this.state = {
             countryOptions: [],
             selectedCountry3Code: "None",
-            resultFound: false,
+            responseReceived: false,
             confirmedQuery: false
         }
     }
 
     public render() {
-        if (this.state.confirmedQuery) {
+        if (this.state.selectedCountry3Code !== "None" && this.state.selectedCountry3Code.length === 3) {
             return (
                 <div>
                     {/* Passing state to CountryDetails component*/}
@@ -37,17 +39,16 @@ export default class Index extends React.Component<{}, ISearchCountry> {
             );
         } else {
             return (
-                <div>
-                    <div className="centreText">
-                        {/* React components must have a wrapper node/element */}
-                        <h3>Finding Country Information:</h3>
-                        <input type="text/plain" id="countryName" onInput={this.handleOnInput} placeholder="Enter country name" />
-                        <div className="displayCountry">
-                            {this.renderCountryList(this.state.countryOptions, this.state.resultFound)}
-                        </div>
-
-                    </div>
-                    <CountrySearchBar />
+                <div className="searchBar">
+                    <AsyncSelect
+                        cacheOptions={false}
+                        loadOptions={this.handleOnInput}
+                        defaultOptions={true}
+                        placeholder={placeholderString}
+                        noOptionsMessage={this.getNoOptText}
+                        isClearable={true}
+                        onChange={this.getCountryDetails}
+                    />
                 </div>
             );
         }
@@ -59,63 +60,74 @@ export default class Index extends React.Component<{}, ISearchCountry> {
             this.setState({
                 countryOptions: [],
                 selectedCountry3Code: "None",
-                resultFound: false,
+                responseReceived: false,
                 confirmedQuery: false
             });
         }
     }
 
-    public handleOnInput = (event: any) => {
-        // Remove anyspace from both sides of the input
-        const countryInput = event.target.value.trim();
+    public getCountryDetails = (selectedOptValue: any) => {
+        this.setState({
+            selectedCountry3Code: selectedOptValue.alpha3Code,
+            confirmedQuery: true
+        });
+    }
+
+    public getNoOptText = (data: any) => {
+        let noOptTxt = '';
+        const tempArray = new Array();
+        tempArray.push(data);
+        tempArray.map((value: any) => {
+            if (value.inputValue.trim().length === 0) {
+                noOptTxt = placeholderString;
+            } else if (value.inputValue.trim().length < minNumInput) {
+                noOptTxt = 'Keep typing...';
+            } else {
+                noOptTxt = 'Not Found';
+            }
+        });
+
+        return noOptTxt;
+    }
+
+    public handleOnInput = async (inputValue: string, callback: any) => {
+        // Remove any space from both sides of the input
+        const inputTrimmed = inputValue.trim();
+        // User are required to input at least 3 letters (no space on both sides) to display any results
+        if (inputTrimmed.length >= minNumInput) {
+            await this.getCountryList(inputTrimmed);
+        }
+        callback(this.loadOptions(inputTrimmed));
+    }
+
+    public loadOptions = (inputValue: string) => {
         // User are required to input at least 3 letters to display any results
-        if (countryInput.length >= 3) {
-            this.searchCountries(countryInput);
-        } else if (countryInput.length > 0) {
-            this.setState({ countryOptions: ["Keep typing..."], resultFound: false });
+        if (inputValue.length < minNumInput) {
+            return new Array();
         } else {
-            this.setState({ countryOptions: [], resultFound: false });
+            while (!this.state.responseReceived) { continue };
+            return this.state.countryOptions;
         }
     }
 
-    public searchCountries = (country: string) => {
+    public getCountryList = async (country: string) => {
         /* Calling api from REST Countries website */
-        const url = 'https://restcountries.eu/rest/v2/name/' + encodeURI(country)+'?fields=name;alpha3Code';
-        fetch(url)
+        const url = 'https://restcountries.eu/rest/v2/name/' + encodeURI(country) + '?fields=name;alpha3Code';
+        const output = new Array();
+        await fetch(url)
             .then(response => response.json())
             .then((out) => {
                 if (out.status !== 404) {
-                    this.setState({ countryOptions: out, resultFound: true });
-                } else {
-                    // 404 Not result found error, store the received message
-                    this.setState({ countryOptions: out.message, resultFound: false });
+                    out.map((value: any) => {
+                        output.push({
+                            alpha3Code: value.alpha3Code,
+                            label: value.name
+                        })
+                    });
                 }
+                this.setState({ countryOptions: output, responseReceived: true });
             })
             .catch(err => alert(err)
             );
-
     }
-
-    public renderCountryList = (countryJSON: any[], resultFound: boolean) => {
-        // Display result if results are found
-        if (resultFound) {
-            const content = countryJSON.map((value: any) =>
-                // key field is a unique key required for map to display JSON
-                <div key={value.alpha3Code}>
-                    <h4 id={value.alpha3Code} className="countryOptions" onClick={this.handleOnClickCountry}>{value.name}</h4>
-                </div>
-            );
-            return content;
-        } else {
-            // Display the no found message to user.
-            return <h4>{countryJSON}</h4>;
-        }
-    }
-
-    public handleOnClickCountry = (event: any) => {
-        this.setState({ selectedCountry3Code: event.target.id, confirmedQuery: true });
-        return;
-    }
-
-
 }
