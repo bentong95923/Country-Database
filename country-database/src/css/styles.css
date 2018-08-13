@@ -9,11 +9,6 @@
     border-style: dashed;
 }
 
-.centreText textarea {
-    height: 300px;
-    width: 500px;
-}
-
 .image {
     max-width: 100%;
     height: 50vh;
@@ -35,4 +30,8 @@
 
 iframe.iframeTriggerOnly {
     display: none;
+}
+
+.searchBar {
+    max-width: 40%;
 }

@@ -1,10 +1,10 @@
 import * as React from "react";
 import CountryDetails from "./components/CountryDetails";
-import SearchBar from "./components/SearchBar";
+import CountrySearchBar from "./components/CountrySearchBar";
 
 // Exporting CContext so other Components can import this context for its use.
 // Context with a component tag will render its content to the current component.
-export const CContext = React.createContext({selectedCountry3Code: "None"});
+export const CContext = React.createContext({ selectedCountry3Code: "None" });
 
 interface ISearchCountry {
     countryOptions: any[],
@@ -37,18 +37,17 @@ export default class Index extends React.Component<{}, ISearchCountry> {
             );
         } else {
             return (
-                <div className="centreText">
-                    {/* React components must have a wrapper node/element */}
-                    <div className="textareaFirst">
+                <div>
+                    <div className="centreText">
+                        {/* React components must have a wrapper node/element */}
                         <h3>Finding Country Information:</h3>
                         <input type="text/plain" id="countryName" onInput={this.handleOnInput} placeholder="Enter country name" />
-                    </div>
-                    <div className="displayCountry">
-                        {this.renderCountryList(this.state.countryOptions, this.state.resultFound)}
-                    </div>
+                        <div className="displayCountry">
+                            {this.renderCountryList(this.state.countryOptions, this.state.resultFound)}
+                        </div>
 
-                    <SearchBar />
-
+                    </div>
+                    <CountrySearchBar />
                 </div>
             );
         }
@@ -71,37 +70,29 @@ export default class Index extends React.Component<{}, ISearchCountry> {
         const countryInput = event.target.value.trim();
         // User are required to input at least 3 letters to display any results
         if (countryInput.length >= 3) {
-            this.SearchCountries(countryInput);
-        } else if (countryInput.length > 0){
-            this.setState({ countryOptions: ["Keep typing..."], resultFound: false});
+            this.searchCountries(countryInput);
+        } else if (countryInput.length > 0) {
+            this.setState({ countryOptions: ["Keep typing..."], resultFound: false });
         } else {
-            this.setState({ countryOptions: [], resultFound: false});
+            this.setState({ countryOptions: [], resultFound: false });
         }
     }
 
-    public SearchCountries = (country: string) => {
+    public searchCountries = (country: string) => {
         /* Calling api from REST Countries website */
-        const url = 'https://restcountries.eu/rest/v2/name/' + encodeURI(country);
+        const url = 'https://restcountries.eu/rest/v2/name/' + encodeURI(country)+'?fields=name;alpha3Code';
         fetch(url)
             .then(response => response.json())
             .then((out) => {
                 if (out.status !== 404) {
-                    const output = new Array();
-                    // Retrieve the alpha 3 code (Primary key) and the country name from the result
-                    out.map((value: any) => {
-                        output.push({
-                            id: value.alpha3Code,
-                            name: value.name
-                        })
-                    });
-                    this.setState({ countryOptions: output,  resultFound: true });
+                    this.setState({ countryOptions: out, resultFound: true });
                 } else {
                     // 404 Not result found error, store the received message
                     this.setState({ countryOptions: out.message, resultFound: false });
                 }
             })
             .catch(err => alert(err)
-        );
+            );
 
     }
 
@@ -110,8 +101,8 @@ export default class Index extends React.Component<{}, ISearchCountry> {
         if (resultFound) {
             const content = countryJSON.map((value: any) =>
                 // key field is a unique key required for map to display JSON
-                <div key={value.id}>
-                    <h4 id={value.id} className="countryOptions" onClick={this.handleOnClickCountry}>{value.name}</h4>
+                <div key={value.alpha3Code}>
+                    <h4 id={value.alpha3Code} className="countryOptions" onClick={this.handleOnClickCountry}>{value.name}</h4>
                 </div>
             );
             return content;
@@ -122,12 +113,7 @@ export default class Index extends React.Component<{}, ISearchCountry> {
     }
 
     public handleOnClickCountry = (event: any) => {
-        // need to paste the full country name back to the input field
-        /* const temp = this.state.countryOptions.find((value: any) => {
-            return value.id === event.target.id;
-        });*/
-        this.setState({selectedCountry3Code: event.target.id, confirmedQuery: true});
-        // alert(event.target.id);
+        this.setState({ selectedCountry3Code: event.target.id, confirmedQuery: true });
         return;
     }
 

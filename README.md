@@ -19,3 +19,6 @@ intro
 5. React-Select
 ### npm install --save @types/react-select
 ### npm i react-select
+
+6. Chroma.js
+### npm install --save @types/chroma-js

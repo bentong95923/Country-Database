@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^1.4.0",
     "@material-ui/icons": "^1.1.0",
+    "@types/chroma-js": "^1.3.5",
     "@types/prop-types": "^15.5.4",
     "@types/react-bootstrap": "^0.32.11",
     "@types/react-dropzone": "^4.2.0",
