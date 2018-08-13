@@ -366,7 +366,6 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
 
     public searchCountryDetails = (event: any) => {
         /* Calling api from REST Countries website */
-        alert(event.target.id);
         const url = 'https://restcountries.eu/rest/v2/alpha/' + event.target.id;
         fetch(url)
             .then(response => response.json())

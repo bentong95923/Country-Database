@@ -28,9 +28,9 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
     }
 
     public render() {
-        if (this.state.selectedCountry3Code !== "None" && this.state.selectedCountry3Code.length === 3) {
+        if (this.state.confirmedQuery) {
             return (
-                <div>
+                <div id='wrapper'>
                     {/* Passing state to CountryDetails component*/}
                     <CContext.Provider value={this.state}>
                         <CountryDetails />
@@ -39,7 +39,7 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
             );
         } else {
             return (
-                <div className="searchBar">
+                <div id="wrapper" className="searchBar">
                     <AsyncSelect
                         cacheOptions={false}
                         loadOptions={this.handleOnInput}
@@ -67,10 +67,14 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
     }
 
     public getCountryDetails = (selectedOptValue: any) => {
-        this.setState({
-            selectedCountry3Code: selectedOptValue.alpha3Code,
-            confirmedQuery: true
-        });
+        if (selectedOptValue.alpha3Code !== undefined) {
+            if (selectedOptValue.alpha3Code.length === 3) {
+                this.setState({
+                    selectedCountry3Code: selectedOptValue.alpha3Code,
+                    confirmedQuery: true
+                });
+            }
+        }
     }
 
     public getNoOptText = (data: any) => {
