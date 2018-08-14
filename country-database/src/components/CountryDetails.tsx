@@ -28,7 +28,9 @@ import {
 
 interface ICountryDetails {
     countryDetailsList: any[],
+    countryExtract: string,
     borderFullName: any[],
+    loaded: boolean[],
     value: number
 }
 
@@ -46,7 +48,10 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
         super(props);
         this.state = {
             countryDetailsList: [],
+            countryExtract: "",
             borderFullName: [],
+            // details, borderFullName, extract
+            loaded: [false, false, false],
             value: 0
         }
     }
@@ -83,9 +88,14 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
                 {this.state.countryDetailsList.map((country) => {
                     return (
                         <div key={country.alpha3Code}>
+                            <div>
+                                <h3>{country.name}</h3> medium size font + flag
+                                <div className="countryDescription">
+                                    {this.state.countryExtract}
+                                </div>
+                            </div>
                             {this.state.value === 0 &&
                                 <TabContainer>
-                                    {country.name}
                                     {this.renderGeneralInfoContent(country.population, country.capital, country.demonym, country.timezones, country.flag)}
                                 </TabContainer>
                             }
@@ -356,8 +366,14 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
             temp = val.borders
         });
         // Stop calling the API if countries name for all alpha3codes are all received
-        if (temp.length !== 0 && temp.length !== this.state.borderFullName.length) {
+        if (temp.length !== 0 && temp.length !== this.state.borderFullName.length && this.state.loaded) {
             this.getCountryFullNameArray(temp);
+        }
+        if (this.state.countryDetailsList.length > 0 && !this.state.loaded[1]) {
+            this.state.countryDetailsList.map(value => {
+                // Loading extract...
+                this.getExtract(value.name);
+            });
         }
     }
 
@@ -410,6 +426,31 @@ export default class CountryDetails extends React.Component<{}, ICountryDetails>
             .catch(err => alert('searchCountryDetails(): ' + err)
             );
 
+    }
+
+    public getExtract(countryName: string) {
+
+        const url = 'https://en.wikipedia.org/w/api.php?origin=*&action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&titles=' + countryName.replace(' ', '_');
+        fetch(url)
+            .then(response => response.json())
+            .then((out) => {
+                let extract = "";
+                // out.query.pages.extract cannot read length property
+                // alert(JSON.stringify(out));
+                if (out.query.pages !== undefined) {
+                    out.query.pages.map((data: any) => {
+                        if (data.extract.length > 0) {
+                            extract = data.extract;
+                        }
+                    });
+                }
+                this.setState({
+                    countryExtract: extract,
+                    loaded: [this.state.loaded[0], !this.state.loaded[1], this.state.loaded[2]]
+                });
+            })
+            .catch(err => alert('getExtract(): ' + err)
+            );
     }
 
 }

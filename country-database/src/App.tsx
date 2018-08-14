@@ -132,7 +132,7 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
                 }
                 this.setState({ countryOptions: output, responseReceived: true });
             })
-            .catch(err => alert(err)
+            .catch(err => alert('getCountryList(): '+ err)
             );
     }
 }

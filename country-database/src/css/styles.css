@@ -20,6 +20,10 @@ iframe.iframeTriggerOnly {
     width: 60%;
 }
 
+.countryDescription {
+    text-align: justify;
+}
+
 #wrapper {
     max-width: 70%;
     margin: 0 auto;
