@@ -10,6 +10,9 @@ import {
     IconButton
 } from '@material-ui/core';
 
+const API_KEY_PIXABAY = "***REMOVED***";
+
+// Material-UI style for Horizontal Grid List
 const styles = (theme: Theme) => createStyles({
     root: {
         display: 'flex',
@@ -50,7 +53,7 @@ const styles = (theme: Theme) => createStyles({
  * ];
  */
 
-const tileData = [
+/* const tileData = [
     {
         "largeImageURL": "https://pixabay.com/get/eb30b0082ef1023ed1584d05fb1d4092e375e7d418ac104496f4c27aa3eabcb9_1280.jpg",
         "webformatHeight": 426,
@@ -364,32 +367,72 @@ const tileData = [
         "previewURL": "https://cdn.pixabay.com/photo/2017/02/08/13/19/hammock-2048858_150.jpg"
     }
 ]
-
-function SingleLineGridList(props: any) {
-    const { classes } = props;
-
-    return (
-        <div className={classes.root}>
-            <GridList className={classes.gridList} cols={3}>
-                {tileData.map(tile => (
-                    <GridListTile key={tile.id}>
-                        <img src={tile.webformatURL} />
-                        <GridListTileBar
-                            classes={{
-                                root: classes.titleBar,
-                                title: classes.title,
-                            }}
-                            actionIcon={
-                                <IconButton>
-                                    <StarBorderIcon className={classes.title} />
-                                </IconButton>
-                            }
-                        />
-                    </GridListTile>
-                ))}
-            </GridList>
-        </div>
-    );
+ */
+interface IGallery {
+    imageList: any[],
+    classes: any,
+    getImageListCalled: boolean
 }
 
-export default withStyles(styles)(SingleLineGridList);
+export const Gallery = withStyles(styles)(
+    class extends React.Component<{}, IGallery> {
+
+        constructor(props: any) {
+            super(props);
+            this.state = {
+                imageList: [],
+                classes: props,
+                getImageListCalled: false
+            }
+        }
+        // Next step: use context to pass country name to ge the correct pictures. Also need to address the resource that the pics come from (PIXABAY)
+        public render() {
+            const { classes } = this.state.classes;
+            return (
+                <div className={classes.root}>
+                    <GridList className={classes.gridList} cols={3}>
+                        {this.state.imageList.map(tile => {
+                            return (
+                                <GridListTile key={tile.id}>
+                                    <img src={tile.webformatURL} />
+                                    <GridListTileBar
+                                        classes={{
+                                            root: classes.titleBar,
+                                            title: classes.title,
+                                        }}
+                                        actionIcon={
+                                            <IconButton>
+                                                <StarBorderIcon className={classes.title} />
+                                            </IconButton>
+                                        }
+                                    />
+                                </GridListTile>
+                            );
+                        })}
+                    </GridList>
+                </div>
+            );
+        }
+
+        public componentWillMount() {
+            this.getImageList(encodeURI('Hong Kong'));
+        }
+
+        public getImageList(countryName: string) {
+            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + countryName + "&image_type=photo";
+            fetch(url)
+                .then(response => response.json())
+                .then((out) => {
+                    if (out.hits !== undefined) {
+                        if (out.hits.length > 0) {
+                            this.setState({ imageList: out.hits });
+                        }
+                    }
+                    
+                })
+                .catch(err => alert('getImageList(): ' + err)
+                );
+        }
+
+    }
+)

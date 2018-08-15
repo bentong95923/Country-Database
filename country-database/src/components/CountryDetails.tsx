@@ -21,13 +21,12 @@ import {
     Language, LocationCity,
     MonetizationOn, People,
     Phone, PinDrop, Place,
-    Public, ThumbDown,
+    Public, SettingsEthernet,
     Timeline, Translate,
-    VerticalAlignCenter,
-    ZoomOutMap
+    VerticalAlignCenter, ZoomOutMap
 } from '@material-ui/icons';
 
-import Gallery from "./Gallery";
+import { Gallery } from "./Gallery";
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 
@@ -100,15 +99,18 @@ export const CountryDetails = withStyles(styles)(
                             <Tab label="Location, Area &amp; Borders" icon={<Place />} />
                             <Tab label="Economy" icon={<EuroSymbol />} />
                             <Tab label="Languages / Names" icon={<Translate />} />
-                            <Tab label="Code / Domain" icon={<ThumbDown />} />
+                            <Tab label="Code / Domain" icon={<SettingsEthernet />} />
                         </Tabs>
                     </AppBar>
                     {this.state.countryDetailsList.map((country) => {
                         return (
                             <div key={country.alpha3Code}>
-                                <Paper className={classes.root} elevation={1}>
+                                <Paper className={classes.root} elevation={4}>
                                     <Typography variant="headline" className="countryDetailsTitle" component="h2">
-                                        {country.name} <img className="countryFlag" src={country.flag} title={"Flag of " + country.name} alt={"Flag of " + country.name} />
+                                        {country.name}
+                                        <a href={country.flag} target="_blank">
+                                            <img className="countryFlag" src={country.flag} title={"Flag of " + country.name} alt={"Flag of " + country.name} />
+                                        </a>
                                     </Typography>
 
                                     <Typography className="countryDescription" component="p">
