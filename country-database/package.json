@@ -3,20 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^1.4.0",
+    "@material-ui/core": "^1.5.0",
     "@material-ui/icons": "^1.1.0",
     "@types/chroma-js": "^1.3.5",
-    "@types/prop-types": "^15.5.4",
+    "@types/prop-types": "^15.5.5",
     "@types/react-bootstrap": "^0.32.11",
-    "@types/react-dropzone": "^4.2.0",
+    "@types/react-dropzone": "^4.2.2",
     "@types/react-router-bootstrap": "^0.24.5",
-    "@types/react-router-dom": "^4.2.7",
+    "@types/react-router-dom": "^4.3.0",
     "@types/react-select": "^2.0.2",
     "prop-types": "^15.6.2",
-    "react": "^16.4.1",
+    "react": "^16.4.2",
     "react-bootstrap": "^0.32.1",
-    "react-dom": "^16.4.1",
-    "react-dropzone": "^4.2.13",
+    "react-dom": "^16.4.2",
+    "react-dropzone": "^4.3.0",
     "react-loader-spinner": "^2.1.0",
     "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.3.1",
@@ -30,10 +30,10 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
-    "@types/jest": "^23.1.6",
-    "@types/node": "^10.5.2",
-    "@types/react": "^16.4.6",
-    "@types/react-dom": "^16.0.6",
+    "@types/jest": "^23.3.1",
+    "@types/node": "^10.7.0",
+    "@types/react": "^16.4.10",
+    "@types/react-dom": "^16.0.7",
     "typescript": "^2.9.2"
   }
 }

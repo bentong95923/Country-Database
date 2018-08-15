@@ -24,6 +24,17 @@ iframe.iframeTriggerOnly {
     text-align: justify;
 }
 
+.countryDetailsTitle {
+    display: inline-block;
+}
+
+img.countryFlag {
+    vertical-align: text-bottom;
+    margin-left: 5px;
+    width: 50px;
+    display: inline-block;
+}
+
 #wrapper {
     max-width: 70%;
     margin: 0 auto;
