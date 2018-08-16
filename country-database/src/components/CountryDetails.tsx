@@ -86,7 +86,12 @@ export const CountryDetails = withStyles(styles)(
                 <div>
                     {/* An iframe is created for only allowing to auto-trigger the api in the searchCountryDetails() to get the country details. It is not rendered out. */}
                     <CContext.Consumer>
-                        {state => <iframe className="iframeTriggerOnly" id={state.selectedCountry3Code} onLoad={this.searchCountryDetails} />}
+                        {state => {
+                            if (!this.state.loaded[0]) {
+                                this.searchCountryDetails(state.selectedCountry3Code);
+                            }
+                            return '';
+                        }}
                     </CContext.Consumer>
                     {/* React components must have a wrapper node/element */}
 
@@ -177,7 +182,7 @@ export const CountryDetails = withStyles(styles)(
                                 <TableCell component="th" scope="row">
                                     <LocationCity /> Capital:
                                 </TableCell>
-                                <TableCell> {capital.length > 0? capital: 'n/a'}</TableCell>
+                                <TableCell> {capital.length > 0 ? capital : 'n/a'}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
@@ -190,7 +195,7 @@ export const CountryDetails = withStyles(styles)(
                                     <AccessTime /> Time Zone(s):
                                 </TableCell>
                                 <TableCell> {timezones.toString().split(',\s')}</TableCell>
-                            </TableRow>                            
+                            </TableRow>
                         </TableBody>
                     </Table>
                 </Paper>
@@ -407,11 +412,11 @@ export const CountryDetails = withStyles(styles)(
         }
 
         // Add commas for each thoudsand
-        public numberWithCommas(n: number) {
+        public numberWithCommas = (n: number) => {
             return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        public async getCountryFullNameArray(countryArray: string[]) {
+        public getCountryFullNameArray = async (countryArray: string[]) => {
             const tempArray = new Array();
             /* Calling api from REST Countries website */
             for (const i in countryArray) {
@@ -436,9 +441,9 @@ export const CountryDetails = withStyles(styles)(
             this.setState({ borderFullName: tempArray });
         }
 
-        public searchCountryDetails = (event: any) => {
+        public searchCountryDetails = (alpha3Code: string) => {
             /* Calling api from REST Countries website */
-            const url = 'https://restcountries.eu/rest/v2/alpha/' + event.target.id;
+            const url = 'https://restcountries.eu/rest/v2/alpha/' + alpha3Code;
             fetch(url)
                 .then(response => response.json())
                 .then((out) => {
@@ -448,7 +453,11 @@ export const CountryDetails = withStyles(styles)(
                         output.push(out);
                         // alert(JSON.stringify(out));
                         const tempStr = JSON.stringify({ name: out.name, altSpellings: out.altSpellings })
-                        this.setState({ countryDetailsList: output, allCountryName: tempStr });
+                        this.setState({
+                            countryDetailsList: output,
+                            allCountryName: tempStr,
+                            loaded: [!this.state.loaded[0], this.state.loaded[1], this.state.loaded[2]]
+                        });
                     } else {
                         // 404 Not result found error, but should not reach here
                         this.setState({ countryDetailsList: out.message });
@@ -459,7 +468,7 @@ export const CountryDetails = withStyles(styles)(
 
         }
 
-        public getExtract(countryName: string) {
+        public getExtract = (countryName: string) => {
 
             // Redirect: true - turn on to redirect automatically to content of synonyms
             const url = 'https://en.wikipedia.org/w/api.php?origin=*&action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&redirects=1&titles=' + countryName.replace(' ', '_');

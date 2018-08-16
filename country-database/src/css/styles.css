@@ -11,10 +11,6 @@
     color: purple;
 }
 
-iframe.iframeTriggerOnly {
-    display: none;
-}
-
 .searchBar {
     margin-top: 5%!important;
     width: 60%;

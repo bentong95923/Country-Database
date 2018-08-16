@@ -79,7 +79,7 @@ export const Gallery = withStyles(styles)(
                 <div className={classes.root}>
                     {/* Can pass a JSON stringified string via context and then JSON parse it to read. */}
                     <CountryNameContext.Consumer>
-                        {state => {                            
+                        {state => {
                             if (!this.state.getImageListCalled) {
                                 this.getImageList(JSON.parse(state.allCountryName).name);
                             }
@@ -110,7 +110,7 @@ export const Gallery = withStyles(styles)(
             );
         }
 
-        public getImageList(countryName: string) {
+        public getImageList = (countryName: string) => {
             const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(countryName) + "&image_type=photo";
             fetch(url)
                 .then(response => response.json())
