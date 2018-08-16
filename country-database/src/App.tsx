@@ -10,8 +10,8 @@ interface IState {
     confirmedQuery: boolean
 };
 
-const minNumInput = 2;
-const placeholderString = 'Enter country name...';
+const minNumInput = 2; // Minimum number of letters to trigger the search
+const placeholderString = 'Search country...';
 
 // Exporting CContext so other Components can import this context for its use.
 // Context with a component tag will render its content to the current component.
@@ -47,8 +47,8 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
                         defaultOptions={true}
                         placeholder={placeholderString}
                         noOptionsMessage={this.getNoOptText}
-                        isClearable={true}
                         onChange={this.getCountryDetails}
+                        escapeClearsValue={true}
                     />
                 </div>
             );
@@ -84,7 +84,7 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
         tempArray.push(data);
         tempArray.map((value: any) => {
             if (value.inputValue.trim().length === 0) {
-                noOptTxt = placeholderString;
+                noOptTxt = 'Enter a country or territory name...';
             } else if (value.inputValue.trim().length < minNumInput) {
                 noOptTxt = 'Keep typing...';
             } else {

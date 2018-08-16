@@ -16,9 +16,9 @@ import {
 import {
     AccessTime, Assignment,
     Comment, Done, EuroSymbol,
-    Face, Flag, Group,
-    GTranslate, Http, Info,
-    Language, LocationCity,
+    Face, Group, GTranslate,
+    Http, Info, Language,
+    LocationCity,
     MonetizationOn, People,
     Phone, PinDrop, Place,
     Public, SettingsEthernet,
@@ -29,6 +29,8 @@ import {
 import { Gallery } from "./Gallery";
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
+
+export const CountryNameContext = React.createContext({ allCountryName: "" });
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
@@ -45,7 +47,8 @@ interface ICountryDetails {
     borderFullName: any[],
     loaded: boolean[],
     value: number,
-    classes: any
+    classes: any,
+    allCountryName: string
 }
 
 function TabContainer(props: any) {
@@ -62,13 +65,14 @@ export const CountryDetails = withStyles(styles)(
         constructor(props: any) {
             super(props);
             this.state = {
-                countryDetailsList: [],
+                countryDetailsList: new Array(),
                 countryExtract: "",
                 borderFullName: [],
                 // details, borderFullName, extract
                 loaded: [false, false, false],
                 value: 0,
-                classes: props
+                classes: props,
+                allCountryName: ""
             }
         }
 
@@ -116,7 +120,9 @@ export const CountryDetails = withStyles(styles)(
                                     <Typography className="countryDescription" component="p">
                                         {this.state.countryExtract}
                                     </Typography>
-                                    <Gallery />
+                                    <CountryNameContext.Provider value={this.state}>
+                                        <Gallery />
+                                    </CountryNameContext.Provider>
                                 </Paper>
                                 {this.state.value === 0 &&
                                     <TabContainer>
@@ -164,33 +170,27 @@ export const CountryDetails = withStyles(styles)(
                             <TableRow>
                                 <TableCell component="th" scope="row">
                                     <People /> Population (estimate):
-                            </TableCell>
+                                </TableCell>
                                 <TableCell> {this.numberWithCommas(population)}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
                                     <LocationCity /> Capital:
-                            </TableCell>
-                                <TableCell> {capital}</TableCell>
+                                </TableCell>
+                                <TableCell> {capital.length > 0? capital: 'n/a'}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
                                     <Face /> Demonym:
-                            </TableCell>
+                                </TableCell>
                                 <TableCell> {demonym.length !== 0 ? demonym : "n/a"}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
                                     <AccessTime /> Time Zone(s):
-                            </TableCell>
+                                </TableCell>
                                 <TableCell> {timezones.toString().split(',\s')}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell component="th" scope="row">
-                                    <Flag /> Flag:
-                            </TableCell>
-                                <TableCell> {flag}</TableCell>
-                            </TableRow>
+                            </TableRow>                            
                         </TableBody>
                     </Table>
                 </Paper>
@@ -397,9 +397,10 @@ export const CountryDetails = withStyles(styles)(
             if (temp.length !== 0 && temp.length !== this.state.borderFullName.length && this.state.loaded) {
                 this.getCountryFullNameArray(temp);
             }
+            // Load extract if country detail list is loaded but have not loaded the extract
             if (this.state.countryDetailsList.length > 0 && !this.state.loaded[1]) {
                 this.state.countryDetailsList.map(value => {
-                    // Loading extract...
+                    // Loading extract
                     this.getExtract(value.name);
                 });
             }
@@ -445,7 +446,9 @@ export const CountryDetails = withStyles(styles)(
                         const output = new Array();
                         // Retrieve the alpha 3 code (Primary key) and the country name from the result
                         output.push(out);
-                        this.setState({ countryDetailsList: output });
+                        // alert(JSON.stringify(out));
+                        const tempStr = JSON.stringify({ name: out.name, altSpellings: out.altSpellings })
+                        this.setState({ countryDetailsList: output, allCountryName: tempStr });
                     } else {
                         // 404 Not result found error, but should not reach here
                         this.setState({ countryDetailsList: out.message });
