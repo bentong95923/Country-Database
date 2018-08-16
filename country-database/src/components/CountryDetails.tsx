@@ -60,8 +60,8 @@ function TabContainer(props: any) {
 }
 
 export const CountryDetails = withStyles(styles)(
-    class extends React.Component<{}, ICountryDetails> {
 
+    class extends React.Component<{}, ICountryDetails> {
         constructor(props: any) {
             super(props);
             this.state = {
@@ -399,17 +399,33 @@ export const CountryDetails = withStyles(styles)(
                 temp = val.borders
             });
             // Stop calling the API if countries name for all alpha3codes are all received
-            if (temp.length !== 0 && temp.length !== this.state.borderFullName.length && this.state.loaded) {
+            if (temp.length !== 0 && temp.length !== this.state.borderFullName.length && !this.state.loaded[1]) {
                 this.getCountryFullNameArray(temp);
             }
             // Load extract if country detail list is loaded but have not loaded the extract
-            if (this.state.countryDetailsList.length > 0 && !this.state.loaded[1]) {
+            if (this.state.countryDetailsList.length > 0 && !this.state.loaded[2]) {
                 this.state.countryDetailsList.map(value => {
                     // Loading extract
                     this.getExtract(value.name);
                 });
             }
         }
+
+        // Clear state variable when refreshing the page (only after user had confirmed(and submitted) the query previosuly)
+/*         public componentWillReceiveProps() {
+            const pageLoadCompleted = this.state.loaded[0] && this.state.loaded[1] && this.state.loaded[2];
+            if (pageLoadCompleted) {
+                this.setState({
+                    countryDetailsList: new Array(),
+                    countryExtract: "",
+                    borderFullName: [],
+                    loaded: [false, false, false],
+                    value: 0,
+                    classes: [],
+                    allCountryName: ""
+                });
+            }
+        } */
 
         // Add commas for each thoudsand
         public numberWithCommas = (n: number) => {
@@ -438,7 +454,7 @@ export const CountryDetails = withStyles(styles)(
 
                 }
             }
-            this.setState({ borderFullName: tempArray });
+            this.setState({ borderFullName: tempArray, loaded: [this.state.loaded[0], !this.state.loaded[1], this.state.loaded[2]] });
         }
 
         public searchCountryDetails = (alpha3Code: string) => {
@@ -487,7 +503,7 @@ export const CountryDetails = withStyles(styles)(
                     }
                     this.setState({
                         countryExtract: extract,
-                        loaded: [this.state.loaded[0], !this.state.loaded[1], this.state.loaded[2]]
+                        loaded: [this.state.loaded[0], this.state.loaded[1], !this.state.loaded[2]]
                     });
                 })
                 .catch(err => alert('getExtract(): ' + err)

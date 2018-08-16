@@ -3,14 +3,6 @@
     margin-top: 50px;
 }
 
-.countryOptions {
-    cursor: pointer;
-}
-
-.countryOptions:hover {
-    color: purple;
-}
-
 .searchBar {
     margin-top: 5%!important;
     width: 60%;

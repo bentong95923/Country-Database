@@ -62,6 +62,7 @@ interface IGallery {
 }
 
 export const Gallery = withStyles(styles)(
+    
     class extends React.Component<{}, IGallery> {
 
         constructor(props: any) {
