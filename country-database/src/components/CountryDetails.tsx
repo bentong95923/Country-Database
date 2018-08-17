@@ -32,7 +32,7 @@ import { Gallery } from "./Gallery";
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 
-export const CountryNameContext = React.createContext({ allCountryName: "" });
+export const CountryNameContext = React.createContext({ dataGallery: "" });
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
@@ -50,7 +50,7 @@ interface ICountryDetails {
     loaded: boolean[],
     value: number,
     classes: any,
-    allCountryName: string
+    dataGallery: string
 }
 
 function TabContainer(props: any) {
@@ -74,7 +74,7 @@ export const CountryDetails = withStyles(styles)(
                 loaded: [false, false, false],
                 value: 0,
                 classes: props,
-                allCountryName: ""
+                dataGallery: ""
             }
         }
 
@@ -231,7 +231,7 @@ export const CountryDetails = withStyles(styles)(
                                 <TableCell component="th" scope="row">
                                     <ZoomOutMap /> Area:
                             </TableCell>
-                                <TableCell> {this.numberWithCommas(area)} km<sup>2</sup></TableCell>
+                                 {area !== null?  <TableCell>{this.numberWithCommas(area)+" km"}<sup>2</sup></TableCell>: <TableCell>No data</TableCell>}
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
@@ -458,10 +458,10 @@ export const CountryDetails = withStyles(styles)(
                             value.name = fixedName;
                         })
                         // alert(JSON.stringify(out));
-                        const tempStr = JSON.stringify({ name: fixedName, altSpellings: out.altSpellings })
+                        const tempStr = JSON.stringify({ name: fixedName, capital: out.capital })
                         this.setState({
                             countryDetailsList: output,
-                            allCountryName: tempStr,
+                            dataGallery: tempStr,
                             loaded: [!this.state.loaded[0], this.state.loaded[1], this.state.loaded[2]]
                         });
                     } else {

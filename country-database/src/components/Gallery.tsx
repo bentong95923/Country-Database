@@ -58,11 +58,11 @@ const styles = (theme: Theme) => createStyles({
 interface IGallery {
     imageList: any[],
     classes: any,
-    getImageListCalled: boolean
+    getImageListStatus: number
 }
 
 export const Gallery = withStyles(styles)(
-    
+
     class extends React.Component<{}, IGallery> {
 
         constructor(props: any) {
@@ -70,7 +70,12 @@ export const Gallery = withStyles(styles)(
             this.state = {
                 imageList: [],
                 classes: props,
-                getImageListCalled: false
+                /*
+                    0: never called
+                    1: called using country name but not enough photos
+                    2: called using capital name or abort search
+                */
+                getImageListStatus: 0,
             }
         }
         // Next step: use context to pass country name to ge the correct pictures. Also need to address the resource that the pics come from (PIXABAY)
@@ -81,8 +86,17 @@ export const Gallery = withStyles(styles)(
                     {/* Can pass a JSON stringified string via context and then JSON parse it to read. */}
                     <CountryNameContext.Consumer>
                         {state => {
-                            if (!this.state.getImageListCalled) {
-                                this.getImageList(JSON.parse(state.allCountryName).name);
+                            switch (this.state.getImageListStatus) {
+                                case 0:
+                                    this.getImageList(JSON.parse(state.dataGallery).name);
+                                    break;
+                                case 1:
+                                    if (JSON.parse(state.dataGallery).capital.length > 0) {
+                                        this.getImageList(JSON.parse(state.dataGallery).capital);
+                                    }
+                                    break;
+                                case 2:
+                                    break;
                             }
                             return '';
                         }}
@@ -111,24 +125,30 @@ export const Gallery = withStyles(styles)(
             );
         }
 
-        public getImageList = (countryName: string) => {
-            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(countryName) + "&image_type=photo";
+        public getImageList = (nameOrCapital: string) => {
+            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(nameOrCapital) + "&image_type=photo";
             fetch(url)
                 .then(response => response.json())
                 .then((out) => {
                     alert(JSON.stringify(out));
                     if (out.hits !== undefined) {
-                        if (out.hits.length > 0) {
+                        if (out.hits.length >= 3 || this.state.getImageListStatus === 2) {
                             this.setState({
                                 imageList: out.hits,
-                                getImageListCalled: true
+                                getImageListStatus: 2
                             });
+                        // Abort search if it has already been searched twice
+                        } else if (this.state.getImageListStatus === 1) {
+                            this.setState({ getImageListStatus: 2 });
+                        // Else Keep searching
+                        } else {
+                            this.setState({ getImageListStatus: 1 });
                         }
                     }
 
                 })
                 .catch(err => alert('getImageList(): ' + err)
-                );
+                );            
         }
 
     }
