@@ -6,6 +6,8 @@ import * as React from "react";
 */
 import { CContext } from "../App";
 
+import { fixCountryName } from "../ImproveImageSearch";
+
 import {
     AppBar, Paper, Tab,
     Table, TableBody,
@@ -411,22 +413,6 @@ export const CountryDetails = withStyles(styles)(
             }
         }
 
-        // Clear state variable when refreshing the page (only after user had confirmed(and submitted) the query previosuly)
-/*         public componentWillReceiveProps() {
-            const pageLoadCompleted = this.state.loaded[0] && this.state.loaded[1] && this.state.loaded[2];
-            if (pageLoadCompleted) {
-                this.setState({
-                    countryDetailsList: new Array(),
-                    countryExtract: "",
-                    borderFullName: [],
-                    loaded: [false, false, false],
-                    value: 0,
-                    classes: [],
-                    allCountryName: ""
-                });
-            }
-        } */
-
         // Add commas for each thoudsand
         public numberWithCommas = (n: number) => {
             return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -467,8 +453,12 @@ export const CountryDetails = withStyles(styles)(
                         const output = new Array();
                         // Retrieve the alpha 3 code (Primary key) and the country name from the result
                         output.push(out);
+                        const fixedName = fixCountryName(out.name);
+                        output.map(value => {
+                            value.name = fixedName;
+                        })
                         // alert(JSON.stringify(out));
-                        const tempStr = JSON.stringify({ name: out.name, altSpellings: out.altSpellings })
+                        const tempStr = JSON.stringify({ name: fixedName, altSpellings: out.altSpellings })
                         this.setState({
                             countryDetailsList: output,
                             allCountryName: tempStr,
