@@ -140,11 +140,3 @@ const getSpecialName = (countryName: string, keyWordType: string) => {
     }
     return outputName;
 }
-
-/* 
-    Put the country name string inside the Parentheses out to the beginning of the original string
-    if there are parentheses.
-    E.g. Korea (Republic of) becomes Republic of Korea
-    Parentheses between the string will not be modified. E.g. Cocos (Keeling) Islands
-    3 types: use for listing, getting extract or getting image
-*/

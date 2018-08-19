@@ -1,11 +1,11 @@
 import * as React from 'react';
+import { Redirect } from 'react-router';
 
 import AsyncSelect from 'react-select/lib/Async';
-import {CountryDetails} from './components/CountryDetails';
 
 interface IState {
     countryOptions: any[],
-    selectedCountry3Code: string,
+    alpha3Code: string,
     responseReceived: boolean, // Flag indicates if results are found.
     confirmedQuery: boolean
 };
@@ -13,16 +13,12 @@ interface IState {
 const minNumInput = 2; // Minimum number of letters to trigger the search
 const placeholderString = 'Search country...';
 
-// Exporting CContext so other Components can import this context for its use.
-// Context with a component tag will render its content to the current component.
-export const CContext = React.createContext({ selectedCountry3Code: "None" });
-
-export default class CountrySearchBar extends React.Component<{}, IState> {
+export default class CountryDatabase extends React.Component<{}, IState> {
     constructor(props: any) {
         super(props);
         this.state = {
             countryOptions: [],
-            selectedCountry3Code: "None",
+            alpha3Code: "None",
             responseReceived: false,
             confirmedQuery: false
         }
@@ -30,14 +26,7 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
 
     public render() {
         if (this.state.confirmedQuery) {
-            return (
-                <div id='wrapper'>
-                    {/* Passing state to CountryDetails component*/}
-                    <CContext.Provider value={this.state}>
-                        <CountryDetails />
-                    </CContext.Provider>
-                </div>
-            );
+            return <Redirect to={'/'+this.state.alpha3Code} />;
         } else {
             return (
                 <div id="wrapper" className="searchBar">
@@ -60,7 +49,7 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
         if (this.state.confirmedQuery) {
             this.setState({
                 countryOptions: [],
-                selectedCountry3Code: "None",
+                alpha3Code: "None",
                 responseReceived: false,
                 confirmedQuery: false
             });
@@ -71,7 +60,7 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
         if (selectedOptValue.alpha3Code !== undefined) {
             if (selectedOptValue.alpha3Code.length === 3) {
                 this.setState({
-                    selectedCountry3Code: selectedOptValue.alpha3Code,
+                    alpha3Code: selectedOptValue.alpha3Code,
                     confirmedQuery: true
                 });
             }
@@ -132,7 +121,7 @@ export default class CountrySearchBar extends React.Component<{}, IState> {
                 }
                 this.setState({ countryOptions: output, responseReceived: true });
             })
-            .catch(err => alert('getCountryList(): '+ err)
+            .catch(err => alert('getCountryList(): ' + err)
             );
     }
 }

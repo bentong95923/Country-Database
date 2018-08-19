@@ -1,10 +1,10 @@
 import * as React from "react";
+import { Redirect } from 'react-router';
 /* 
     Curely brace import only work if, in this case, CContext
     contains a named export called CContext. If with 'dafault'
     keyword on export, no curely brace is needed.
 */
-import { CContext } from "../App";
 
 import { optimizeCountryName } from "../CountryNameOptimization";
 
@@ -51,6 +51,8 @@ interface ICountryDetails {
     value: number,
     classes: any,
     dataGallery: string,
+    alpha3Code: string,
+    test: any[],
     apiError: boolean[]
 }
 
@@ -78,11 +80,17 @@ export const CountryDetails = withStyles(styles)(
                 dataGallery: "",
                 /*
                     API Fetch error flag:
-                    getCountryFullNameArray(): index 0
-                    searchCountryDetails(): index 1
+                    searchCountryDetails(): index 0
+                    getCountryFullNameArray(): index 1
                     getExtract(): index 2
                 */
+                alpha3Code: props.match.params.alpha3Code,
+                test: props,
                 apiError: [false, false, false]
+            }
+            // Rewrite URL parameter to upper case
+            if (props.match.params.alpha3Code.length === 3) {
+                props.history.push('/' + props.match.params.alpha3Code.toUpperCase());
             }
         }
 
@@ -92,83 +100,79 @@ export const CountryDetails = withStyles(styles)(
 
         public render() {
             const { classes } = this.state.classes;
-            return (
-                <div>
-                    {/* An iframe is created for only allowing to auto-trigger the api in the searchCountryDetails() to get the country details. It is not rendered out. */}
-                    <CContext.Consumer>
-                        {state => {
-                            if (!this.state.loaded[0]) {
-                                this.searchCountryDetails(state.selectedCountry3Code);
-                            }
-                            return '';
-                        }}
-                    </CContext.Consumer>
-                    {/* React components must have a wrapper node/element */}
+            if (this.state.apiError[0] || this.state.alpha3Code.length !== 3) {
+                // Bad request, redirect to homepage
+                return <Redirect to={'/'} />;
+            } else {
+                return (
+                    <div>
+                        {/* React components must have a wrapper node/element */}
 
-                    <AppBar position="static" color="default">
-                        <Tabs
-                            value={this.state.value}
-                            onChange={this.handleChange}
-                            scrollable={true}
-                            scrollButtons="on"
-                            indicatorColor="primary"
-                            textColor="primary"
-                        >
-                            <Tab label="General Info" icon={<Info />} />
-                            <Tab label="Location, Area &amp; Borders" icon={<Place />} />
-                            <Tab label="Economy" icon={<EuroSymbol />} />
-                            <Tab label="Languages / Names" icon={<Translate />} />
-                            <Tab label="Code / Domain" icon={<SettingsEthernet />} />
-                        </Tabs>
-                    </AppBar>
-                    {this.state.countryDetailsList.map((country) => {
-                        return (
-                            <div key={country.alpha3Code}>
-                                <Paper className={classes.root} elevation={4}>
-                                    <Typography variant="headline" className="countryDetailsTitle" component="h2">
-                                        {country.name}
-                                        <a href={country.flag} target="_blank">
-                                            <img className="countryFlag" src={country.flag} title={"Flag of " + country.name} alt={"Flag of " + country.name} />
-                                        </a>
-                                    </Typography>
+                        <AppBar position="static" color="default">
+                            <Tabs
+                                value={this.state.value}
+                                onChange={this.handleChange}
+                                scrollable={true}
+                                scrollButtons="on"
+                                indicatorColor="primary"
+                                textColor="primary"
+                            >
+                                <Tab label="General Info" icon={<Info />} />
+                                <Tab label="Location, Area &amp; Borders" icon={<Place />} />
+                                <Tab label="Economy" icon={<EuroSymbol />} />
+                                <Tab label="Languages / Names" icon={<Translate />} />
+                                <Tab label="Code / Domain" icon={<SettingsEthernet />} />
+                            </Tabs>
+                        </AppBar>
+                        {this.state.countryDetailsList.map((country) => {
+                            return (
+                                <div key={country.alpha3Code}>
+                                    <Paper className={classes.root} elevation={4}>
+                                        <Typography variant="headline" className="countryDetailsTitle" component="h2">
+                                            {country.name}
+                                            <a href={country.flag} target="_blank">
+                                                <img className="countryFlag" src={country.flag} title={"Flag of " + country.name} alt={"Flag of " + country.name} />
+                                            </a>
+                                        </Typography>
 
-                                    <Typography className="countryDescription" component="p">
-                                        {this.state.countryExtract}
-                                    </Typography>
-                                    <CountryNameContext.Provider value={this.state}>
-                                        <Gallery />
-                                    </CountryNameContext.Provider>
-                                </Paper>
-                                {this.state.value === 0 &&
-                                    <TabContainer>
-                                        {this.renderGeneralInfoContent(country.population, country.capital, country.demonym, country.timezones, country.flag)}
-                                    </TabContainer>
-                                }
-                                {this.state.value === 1 &&
-                                    <TabContainer>
-                                        {this.renderLocationContent(country.region, country.subregion, country.latlng, country.area, country.borders)}
-                                    </TabContainer>
-                                }
-                                {this.state.value === 2 &&
-                                    <TabContainer>
-                                        {this.renderEconmonyContent(country.gini, country.currencies, country.regionalBlocs)}
-                                    </TabContainer>
-                                }
-                                {this.state.value === 3 &&
-                                    <TabContainer>
-                                        {this.renderLanguagesNamesContent(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
-                                    </TabContainer>
-                                }
-                                {this.state.value === 4 &&
-                                    <TabContainer>
-                                        {this.renderCodeDomainContent(country.topLevelDomain, country.alpha2Code, country.alpha3Code, country.callingCodes, country.numericCode)}
-                                    </TabContainer>
-                                }
-                            </div>
-                        );
-                    })}
-                </div>
-            );
+                                        <Typography className="countryDescription" component="p">
+                                            {this.state.countryExtract}
+                                        </Typography>
+                                        <CountryNameContext.Provider value={this.state}>
+                                            <Gallery />
+                                        </CountryNameContext.Provider>
+                                    </Paper>
+                                    {this.state.value === 0 &&
+                                        <TabContainer>
+                                            {this.renderGeneralInfoContent(country.population, country.capital, country.demonym, country.timezones, country.flag)}
+                                        </TabContainer>
+                                    }
+                                    {this.state.value === 1 &&
+                                        <TabContainer>
+                                            {this.renderLocationContent(country.region, country.subregion, country.latlng, country.area, country.borders)}
+                                        </TabContainer>
+                                    }
+                                    {this.state.value === 2 &&
+                                        <TabContainer>
+                                            {this.renderEconmonyContent(country.gini, country.currencies, country.regionalBlocs)}
+                                        </TabContainer>
+                                    }
+                                    {this.state.value === 3 &&
+                                        <TabContainer>
+                                            {this.renderLanguagesNamesContent(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
+                                        </TabContainer>
+                                    }
+                                    {this.state.value === 4 &&
+                                        <TabContainer>
+                                            {this.renderCodeDomainContent(country.topLevelDomain, country.alpha2Code, country.alpha3Code, country.callingCodes, country.numericCode)}
+                                        </TabContainer>
+                                    }
+                                </div>
+                            );
+                        })}
+                    </div>
+                );
+            }
         }
 
         public renderGeneralInfoContent(population: number, capital: string, demonym: string, timezones: string[], flag: string) {
@@ -402,6 +406,12 @@ export const CountryDetails = withStyles(styles)(
             );
         }
 
+        public componentWillMount() {
+            if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
+                this.searchCountryDetails(this.state.alpha3Code);
+            }
+        }
+
         // Will be called if there is any component(s) updated for re-rendering
         public componentDidUpdate() {
             let temp = new Array();
@@ -426,6 +436,35 @@ export const CountryDetails = withStyles(styles)(
             return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
+        public searchCountryDetails = (alpha3Code: string) => {
+            /* Calling api from REST Countries website */
+            const url = 'https://restcountries.eu/rest/v2/alpha/' + alpha3Code.toLowerCase();
+            fetch(url)
+                .then(response => response.json())
+                .then((out) => {
+                    const output = [out];
+                    const nameTemp = out.name;
+                    output.map(value => {
+                        value.name = optimizeCountryName(nameTemp, 'e');;
+                    });
+                    const dataGalleryStr = JSON.stringify({ name: optimizeCountryName(nameTemp, 'i'), capital: out.capital })
+                    // alert(tempStr);
+                    this.setState({
+                        countryDetailsList: output,
+                        dataGallery: dataGalleryStr,
+                        loaded: [!this.state.loaded[0], this.state.loaded[1], this.state.loaded[2]]
+                    });
+                })
+                .catch(err => {
+                    if (!this.state.apiError[1]) {
+                        alert('searchCountryDetails(): ' + err);
+                        this.setState({ apiError: [true, this.state.apiError[1], this.state.apiError[2]] });
+                    }
+                    return;
+                });
+
+        }
+
         public getCountryFullNameArray = async (countryArray: string[]) => {
             const tempArray = new Array();
             /* Calling api from REST Countries website */
@@ -445,7 +484,7 @@ export const CountryDetails = withStyles(styles)(
                         .catch(err => {
                             if (!this.state.apiError[0]) {
                                 alert('getCountryFullNameArray(): ' + err);
-                                this.setState({ apiError: [true, this.state.apiError[1], this.state.apiError[2]] })
+                                this.setState({ apiError: [this.state.apiError[0], true, this.state.apiError[2]] });
                             }
                             return;
                         });
@@ -453,40 +492,6 @@ export const CountryDetails = withStyles(styles)(
                 }
             }
             this.setState({ borderFullName: tempArray, loaded: [this.state.loaded[0], !this.state.loaded[1], this.state.loaded[2]] });
-        }
-
-        public searchCountryDetails = (alpha3Code: string) => {
-            /* Calling api from REST Countries website */
-            const url = 'https://restcountries.eu/rest/v2/alpha/' + alpha3Code;
-            fetch(url)
-                .then(response => response.json())
-                .then((out) => {
-                    if (out.status !== 404) {
-                        const output = [out];
-                        const nameTemp = out.name;
-                        output.map(value => {
-                            value.name = optimizeCountryName(nameTemp, 'e');;
-                        });
-                        const dataGalleryStr = JSON.stringify({ name: optimizeCountryName(nameTemp, 'i'), capital: out.capital })
-                        // alert(tempStr);
-                        this.setState({
-                            countryDetailsList: output,
-                            dataGallery: dataGalleryStr,
-                            loaded: [!this.state.loaded[0], this.state.loaded[1], this.state.loaded[2]]
-                        });
-                    } else {
-                        // 404 Not result found error, but should not reach here
-                        this.setState({ countryDetailsList: out.message });
-                    }
-                })
-                .catch(err => {
-                    if (!this.state.apiError[1]) {
-                        alert('searchCountryDetails(): ' + err);
-                        this.setState({ apiError: [this.state.apiError[1], true, this.state.apiError[2]] })
-                    }
-                    return;
-                });
-
         }
 
         public getExtract = (countryName: string) => {
@@ -514,7 +519,7 @@ export const CountryDetails = withStyles(styles)(
                 .catch(err => {
                     if (!this.state.apiError[2]) {
                         alert('getExtract(): ' + err);
-                        this.setState({ apiError: [this.state.apiError[0], this.state.apiError[1], true ]})
+                        this.setState({ apiError: [this.state.apiError[0], this.state.apiError[1], true] })
                     }
                     return;
                 });
