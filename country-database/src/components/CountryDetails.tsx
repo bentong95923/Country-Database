@@ -6,7 +6,7 @@ import * as React from "react";
 */
 import { CContext } from "../App";
 
-import { fixCountryName } from "../ImproveImageSearch";
+import { optimizeCountryName } from "../CountryNameOptimization";
 
 import {
     AppBar, Paper, Tab,
@@ -50,7 +50,8 @@ interface ICountryDetails {
     loaded: boolean[],
     value: number,
     classes: any,
-    dataGallery: string
+    dataGallery: string,
+    apiError: boolean[]
 }
 
 function TabContainer(props: any) {
@@ -74,7 +75,14 @@ export const CountryDetails = withStyles(styles)(
                 loaded: [false, false, false],
                 value: 0,
                 classes: props,
-                dataGallery: ""
+                dataGallery: "",
+                /*
+                    API Fetch error flag:
+                    getCountryFullNameArray(): index 0
+                    searchCountryDetails(): index 1
+                    getExtract(): index 2
+                */
+                apiError: [false, false, false]
             }
         }
 
@@ -231,7 +239,7 @@ export const CountryDetails = withStyles(styles)(
                                 <TableCell component="th" scope="row">
                                     <ZoomOutMap /> Area:
                             </TableCell>
-                                 {area !== null?  <TableCell>{this.numberWithCommas(area)+" km"}<sup>2</sup></TableCell>: <TableCell>No data</TableCell>}
+                                {area !== null ? <TableCell>{this.numberWithCommas(area) + " km"}<sup>2</sup></TableCell> : <TableCell>No data</TableCell>}
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
@@ -428,15 +436,19 @@ export const CountryDetails = withStyles(styles)(
                         .then(response => response.json())
                         .then((out) => {
                             if (out.status !== 404) {
-                                // Retrieve the alpha 3 code (Primary key) and the country name from the result
-                                tempArray.push(out.name);
+                                tempArray.push(optimizeCountryName(out.name, 'e'));
                             } else {
                                 // 404 Not result found error, but should not reach here
                                 tempArray.push(out.message);
                             }
                         })
-                        .catch(err => alert('getCountryFullNameArray(): ' + err)
-                        );
+                        .catch(err => {
+                            if (!this.state.apiError[0]) {
+                                alert('getCountryFullNameArray(): ' + err);
+                                this.setState({ apiError: [true, this.state.apiError[1], this.state.apiError[2]] })
+                            }
+                            return;
+                        });
 
                 }
             }
@@ -450,18 +462,16 @@ export const CountryDetails = withStyles(styles)(
                 .then(response => response.json())
                 .then((out) => {
                     if (out.status !== 404) {
-                        const output = new Array();
-                        // Retrieve the alpha 3 code (Primary key) and the country name from the result
-                        output.push(out);
-                        const fixedName = fixCountryName(out.name);
+                        const output = [out];
+                        const nameTemp = out.name;
                         output.map(value => {
-                            value.name = fixedName;
-                        })
-                        // alert(JSON.stringify(out));
-                        const tempStr = JSON.stringify({ name: fixedName, capital: out.capital })
+                            value.name = optimizeCountryName(nameTemp, 'e');;
+                        });
+                        const dataGalleryStr = JSON.stringify({ name: optimizeCountryName(nameTemp, 'i'), capital: out.capital })
+                        // alert(tempStr);
                         this.setState({
                             countryDetailsList: output,
-                            dataGallery: tempStr,
+                            dataGallery: dataGalleryStr,
                             loaded: [!this.state.loaded[0], this.state.loaded[1], this.state.loaded[2]]
                         });
                     } else {
@@ -469,8 +479,13 @@ export const CountryDetails = withStyles(styles)(
                         this.setState({ countryDetailsList: out.message });
                     }
                 })
-                .catch(err => alert('searchCountryDetails(): ' + err)
-                );
+                .catch(err => {
+                    if (!this.state.apiError[1]) {
+                        alert('searchCountryDetails(): ' + err);
+                        this.setState({ apiError: [this.state.apiError[1], true, this.state.apiError[2]] })
+                    }
+                    return;
+                });
 
         }
 
@@ -496,8 +511,13 @@ export const CountryDetails = withStyles(styles)(
                         loaded: [this.state.loaded[0], this.state.loaded[1], !this.state.loaded[2]]
                     });
                 })
-                .catch(err => alert('getExtract(): ' + err)
-                );
+                .catch(err => {
+                    if (!this.state.apiError[2]) {
+                        alert('getExtract(): ' + err);
+                        this.setState({ apiError: [this.state.apiError[0], this.state.apiError[1], true ]})
+                    }
+                    return;
+                });
         }
 
     }

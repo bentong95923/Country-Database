@@ -57,8 +57,10 @@ const styles = (theme: Theme) => createStyles({
 
 interface IGallery {
     imageList: any[],
+    numImage: number,
     classes: any,
-    getImageListStatus: number
+    getImageListStatus: number,
+    apiError: boolean
 }
 
 export const Gallery = withStyles(styles)(
@@ -70,12 +72,14 @@ export const Gallery = withStyles(styles)(
             this.state = {
                 imageList: [],
                 classes: props,
+                numImage: 0,
                 /*
                     0: never called
                     1: called using country name but not enough photos
                     2: called using capital name or abort search
                 */
                 getImageListStatus: 0,
+                apiError: false
             }
         }
         // Next step: use context to pass country name to ge the correct pictures. Also need to address the resource that the pics come from (PIXABAY)
@@ -101,7 +105,7 @@ export const Gallery = withStyles(styles)(
                             return '';
                         }}
                     </CountryNameContext.Consumer>
-                    <GridList className={classes.gridList} cols={3}>
+                    <GridList className={classes.gridList} cols={this.state.numImage < 3 ? this.state.numImage : 3}>
                         {this.state.imageList.map(tile => {
                             return (
                                 <GridListTile key={tile.id}>
@@ -126,29 +130,34 @@ export const Gallery = withStyles(styles)(
         }
 
         public getImageList = (nameOrCapital: string) => {
-            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(nameOrCapital) + "&image_type=photo";
+            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(nameOrCapital) + "&image_type=photo&safesearch=true";
             fetch(url)
                 .then(response => response.json())
                 .then((out) => {
-                    alert(JSON.stringify(out));
+                    // alert(JSON.stringify(out));
                     if (out.hits !== undefined) {
                         if (out.hits.length >= 3 || this.state.getImageListStatus === 2) {
                             this.setState({
                                 imageList: out.hits,
                                 getImageListStatus: 2
                             });
-                        // Abort search if it has already been searched twice
+                            // Abort search if it has already been searched twice
                         } else if (this.state.getImageListStatus === 1) {
                             this.setState({ getImageListStatus: 2 });
-                        // Else Keep searching
+                            // Else Keep searching
                         } else {
                             this.setState({ getImageListStatus: 1 });
                         }
+                        this.setState({ numImage: out.hits.length });
                     }
-
                 })
-                .catch(err => alert('getImageList(): ' + err)
-                );            
+                .catch(err => {
+                    if (!this.state.apiError) {
+                        alert('getImageList(): ' + err);
+                        this.setState({ apiError: true })
+                    }
+                    return;
+                });
         }
 
     }
