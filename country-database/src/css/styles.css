@@ -24,6 +24,7 @@ img.countryFlag {
 }
 
 #wrapper {
-    max-width: 70%;
+    max-width: 60%;
+    min-width: 20%;
     margin: 0 auto;
 }

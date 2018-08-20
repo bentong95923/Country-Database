@@ -31,8 +31,9 @@ import {
 import { Gallery } from "./Gallery";
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
+import { ExtractCard } from "./ExtractCard";
 
-export const CountryNameContext = React.createContext({ dataGallery: "" });
+export const CContext = React.createContext({ dataGallery: "", extractContent: "" });
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
@@ -45,14 +46,13 @@ const styles = (theme: Theme) => createStyles({
 
 interface ICountryDetails {
     countryDetailsList: any[],
-    countryExtract: string,
+    extractContent: string,
     borderFullName: any[],
     loaded: boolean[],
-    value: number,
+    tabValue: number,
     classes: any,
     dataGallery: string,
     alpha3Code: string,
-    test: any[],
     apiError: boolean[]
 }
 
@@ -71,11 +71,11 @@ export const CountryDetails = withStyles(styles)(
             super(props);
             this.state = {
                 countryDetailsList: new Array(),
-                countryExtract: "",
+                extractContent: "",
                 borderFullName: [],
                 // details, borderFullName, extract
                 loaded: [false, false, false],
-                value: 0,
+                tabValue: 0,
                 classes: props,
                 dataGallery: "",
                 /*
@@ -85,17 +85,16 @@ export const CountryDetails = withStyles(styles)(
                     getExtract(): index 2
                 */
                 alpha3Code: props.match.params.alpha3Code,
-                test: props,
                 apiError: [false, false, false]
             }
             // Rewrite URL parameter to upper case
             if (props.match.params.alpha3Code.length === 3) {
-                props.history.push('/' + props.match.params.alpha3Code.toUpperCase());
+                props.history.push('/details/' + props.match.params.alpha3Code.toUpperCase());
             }
         }
 
         public handleChange = (event: any, val: number) => {
-            this.setState({ value: val });
+            this.setState({ tabValue: val });
         };
 
         public render() {
@@ -107,10 +106,9 @@ export const CountryDetails = withStyles(styles)(
                 return (
                     <div>
                         {/* React components must have a wrapper node/element */}
-
                         <AppBar position="static" color="default">
                             <Tabs
-                                value={this.state.value}
+                                value={this.state.tabValue}
                                 onChange={this.handleChange}
                                 scrollable={true}
                                 scrollButtons="on"
@@ -127,6 +125,9 @@ export const CountryDetails = withStyles(styles)(
                         {this.state.countryDetailsList.map((country) => {
                             return (
                                 <div key={country.alpha3Code}>
+                                    <CContext.Provider value={this.state}>
+                                        <ExtractCard />
+                                    </CContext.Provider>
                                     <Paper className={classes.root} elevation={4}>
                                         <Typography variant="headline" className="countryDetailsTitle" component="h2">
                                             {country.name}
@@ -135,34 +136,32 @@ export const CountryDetails = withStyles(styles)(
                                             </a>
                                         </Typography>
 
-                                        <Typography className="countryDescription" component="p">
-                                            {this.state.countryExtract}
-                                        </Typography>
-                                        <CountryNameContext.Provider value={this.state}>
+                                        <CContext.Provider value={this.state}>
+                                            <Typography className="countryDescription" component="p" />
                                             <Gallery />
-                                        </CountryNameContext.Provider>
+                                        </CContext.Provider>
                                     </Paper>
-                                    {this.state.value === 0 &&
+                                    {this.state.tabValue === 0 &&
                                         <TabContainer>
                                             {this.renderGeneralInfoContent(country.population, country.capital, country.demonym, country.timezones, country.flag)}
                                         </TabContainer>
                                     }
-                                    {this.state.value === 1 &&
+                                    {this.state.tabValue === 1 &&
                                         <TabContainer>
                                             {this.renderLocationContent(country.region, country.subregion, country.latlng, country.area, country.borders)}
                                         </TabContainer>
                                     }
-                                    {this.state.value === 2 &&
+                                    {this.state.tabValue === 2 &&
                                         <TabContainer>
                                             {this.renderEconmonyContent(country.gini, country.currencies, country.regionalBlocs)}
                                         </TabContainer>
                                     }
-                                    {this.state.value === 3 &&
+                                    {this.state.tabValue === 3 &&
                                         <TabContainer>
                                             {this.renderLanguagesNamesContent(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
                                         </TabContainer>
                                     }
-                                    {this.state.value === 4 &&
+                                    {this.state.tabValue === 4 &&
                                         <TabContainer>
                                             {this.renderCodeDomainContent(country.topLevelDomain, country.alpha2Code, country.alpha3Code, country.callingCodes, country.numericCode)}
                                         </TabContainer>
@@ -495,7 +494,6 @@ export const CountryDetails = withStyles(styles)(
         }
 
         public getExtract = (countryName: string) => {
-
             // Redirect: true - turn on to redirect automatically to content of synonyms
             const url = 'https://en.wikipedia.org/w/api.php?origin=*&action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&redirects=1&titles=' + countryName.replace(' ', '_');
             fetch(url)
@@ -503,7 +501,6 @@ export const CountryDetails = withStyles(styles)(
                 .then((out) => {
                     let extract = "";
                     // out.query.pages.extract cannot read length property
-                    // alert(JSON.stringify(out));
                     if (out.query.pages !== undefined) {
                         out.query.pages.map((data: any) => {
                             if (data.extract.length > 0) {
@@ -512,7 +509,7 @@ export const CountryDetails = withStyles(styles)(
                         });
                     }
                     this.setState({
-                        countryExtract: extract,
+                        extractContent: extract,
                         loaded: [this.state.loaded[0], this.state.loaded[1], !this.state.loaded[2]]
                     });
                 })

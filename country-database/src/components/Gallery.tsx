@@ -10,7 +10,7 @@ import {
     IconButton
 } from '@material-ui/core';
 
-import { CountryNameContext } from './CountryDetails';
+import { CContext } from './CountryDetails';
 
 const API_KEY_PIXABAY = "***REMOVED***";
 
@@ -36,24 +36,6 @@ const styles = (theme: Theme) => createStyles({
             'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
     },
 });
-
-/**
- * The example data is structured as follows:
- *
- * import image from 'path/to/image.jpg';
- * [etc...]
- *
- * const tileData = [
- *   {
- *     img: image,
- *     title: 'Image',
- *     author: 'author',
- *   },
- *   {
- *     [etc...]
- *   },
- * ];
- */
 
 interface IGallery {
     imageList: any[],
@@ -88,7 +70,7 @@ export const Gallery = withStyles(styles)(
             return (
                 <div className={classes.root}>
                     {/* Can pass a JSON stringified string via context and then JSON parse it to read. */}
-                    <CountryNameContext.Consumer>
+                    <CContext.Consumer>
                         {state => {
                             switch (this.state.getImageListStatus) {
                                 case 0:
@@ -104,7 +86,7 @@ export const Gallery = withStyles(styles)(
                             }
                             return '';
                         }}
-                    </CountryNameContext.Consumer>
+                    </CContext.Consumer>
                     <GridList className={classes.gridList} cols={this.state.numImage < 3 ? this.state.numImage : 3}>
                         {this.state.imageList.map(tile => {
                             return (

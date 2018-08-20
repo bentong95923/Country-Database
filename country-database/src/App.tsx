@@ -26,7 +26,7 @@ export default class CountryDatabase extends React.Component<{}, IState> {
 
     public render() {
         if (this.state.confirmedQuery) {
-            return <Redirect to={'/'+this.state.alpha3Code} />;
+            return <Redirect to={'/details/'+this.state.alpha3Code} />;
         } else {
             return (
                 <div id="wrapper" className="searchBar">

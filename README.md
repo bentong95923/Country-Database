@@ -22,3 +22,6 @@ intro
 
 6. Chroma.js
 ### npm install --save @types/chroma-js
+
+7. Classnames
+### npm install --save @types/classnames
