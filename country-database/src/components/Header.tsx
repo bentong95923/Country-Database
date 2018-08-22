@@ -14,7 +14,7 @@ export const Header: React.StatelessComponent<{}> = () => {
                 </IconButton>
                 <Typography variant="title" color="inherit">
                     <Link style={{ color: "white" }} to="/" className="App-Title">Country Database</Link>
-                    <Link style={{ color: "white" }} to="/test" className="App-Title">Test</Link>
+                    <Link style={{ color: "white" }} to="/" className="App-Title">Weather</Link>
                 </Typography>
             </Toolbar>
         </AppBar>
