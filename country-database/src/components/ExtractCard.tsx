@@ -72,9 +72,11 @@ class InfoCard extends React.Component<{}, ICard> {
             <div>
                 <CContext.Consumer>
                     {ctextData => {
-                        if (ctextData.extractContent.length > 0) {
+                        const dataExtractCard = JSON.parse(ctextData.dataExtractCard);
+                        const extractContent = ctextData.extractContent;
+                        if (extractContent.length > 0) {
 
-                            const extractBuf = ctextData.extractContent.split('\n');
+                            const extractBuf = extractContent.split('\n');
                             const extract = new Array();
                             let count = 0;
                             extractBuf.forEach((s, i) => {
@@ -84,24 +86,25 @@ class InfoCard extends React.Component<{}, ICard> {
                                 }
                             });
                             return (
-
                                 <Card className={classes.card}>
                                     <CardHeader
                                         avatar={
-                                            <img className="countryFlag" src="https://restcountries.eu/data/prk.svg" />
+                                            <a href={dataExtractCard.flag} target="_blank">
+                                                <img className="countryFlag" src={dataExtractCard.flag} />
+                                            </a>
                                         }
                                         action={
                                             <IconButton>
                                                 <MoreVertIcon />
                                             </IconButton>
                                         }
-                                        title="Republic of Congo"
-                                        subheader="Country in Eastern Asia"
+                                        title={dataExtractCard.name}
+                                        subheader={"Country in " + dataExtractCard.region}
                                     />
 
                                     <CardContent>
                                         <Typography component="p">
-                                            {count + ' ' + extract[count++].str}
+                                            {extract[count++].str}
                                         </Typography>
                                     </CardContent>
                                     {extract.length > 1 ?
@@ -121,24 +124,24 @@ class InfoCard extends React.Component<{}, ICard> {
                                             </IconButton>
                                             More
                                         </CardActions>
-                                    : ''}
+                                        : ''}
                                     {extract.length > 1 ?
                                         <Collapse in={this.state.expanded} timeout="auto" unmountOnExit={true}>
                                             <CardContent>
                                                 <Typography paragraph={extract.length - 1 !== count}>
-                                                    {count + ' ' + extract[count++].str}
+                                                    {extract[count++].str}
                                                 </Typography>
                                                 {extract.map((v: any, i: number) => {
                                                     // Not display the repeated contents
                                                     if (i >= count) {
                                                         return (
-                                                            <Typography key={v.id} paragraph={extract.length - 1 !== i}>{v.id + ' ' + v.str}</Typography>
+                                                            <Typography key={v.id} paragraph={extract.length - 1 !== i}>{v.str}</Typography>
                                                         );
                                                     } return
                                                 })}
                                             </CardContent>
                                         </Collapse>
-                                    : ''}
+                                        : ''}
                                 </Card>
                             );
                         } else {

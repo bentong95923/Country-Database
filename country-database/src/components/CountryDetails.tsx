@@ -33,7 +33,7 @@ import { Gallery } from "./Gallery";
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 import { ExtractCard } from "./ExtractCard";
 
-export const CContext = React.createContext({ dataGallery: "", extractContent: "" });
+export const CContext = React.createContext({ dataGallery: "", extractContent: "", dataExtractCard: "" });
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
@@ -47,6 +47,7 @@ const styles = (theme: Theme) => createStyles({
 interface ICountryDetails {
     countryDetailsList: any[],
     extractContent: string,
+    dataExtractCard: string,
     borderFullName: any[],
     loaded: boolean[],
     tabValue: number,
@@ -70,8 +71,9 @@ export const CountryDetails = withStyles(styles)(
         constructor(props: any) {
             super(props);
             this.state = {
-                countryDetailsList: new Array(),
+                countryDetailsList: [],
                 extractContent: "",
+                dataExtractCard: "",
                 borderFullName: [],
                 // details, borderFullName, extract
                 loaded: [false, false, false],
@@ -443,14 +445,24 @@ export const CountryDetails = withStyles(styles)(
                 .then((out) => {
                     const output = [out];
                     const nameTemp = out.name;
+                    let flagURL = "";
                     output.map(value => {
-                        value.name = optimizeCountryName(nameTemp, 'e');;
+                        value.name = optimizeCountryName(nameTemp, 'e');
+                        flagURL = value.flag;
                     });
-                    const dataGalleryStr = JSON.stringify({ name: optimizeCountryName(nameTemp, 'i'), capital: out.capital })
-                    // alert(tempStr);
+                    const dataGalleryStr = JSON.stringify({
+                        name: optimizeCountryName(nameTemp, 'i'),
+                        capital: out.capital
+                    });
+                    const dataExtractCardStr = JSON.stringify({
+                        name: optimizeCountryName(nameTemp, 'e'),
+                        region: out.subregion,
+                        flag: flagURL
+                    });
                     this.setState({
                         countryDetailsList: output,
                         dataGallery: dataGalleryStr,
+                        dataExtractCard: dataExtractCardStr,
                         loaded: [!this.state.loaded[0], this.state.loaded[1], this.state.loaded[2]]
                     });
                 })
