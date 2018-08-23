@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 
-import StarBorderIcon from '@material-ui/icons/StarBorder';
+import Launch from '@material-ui/icons/Launch';
 
 import {
     GridList, GridListTile,
@@ -22,6 +22,7 @@ const styles = (theme: Theme) => createStyles({
         justifyContent: 'space-around',
         overflow: 'hidden',
         backgroundColor: theme.palette.background.paper,
+        marginBottom: '20px',
     },
     gridList: {
         flexWrap: 'nowrap',
@@ -87,7 +88,7 @@ export const Gallery = withStyles(styles)(
                             return '';
                         }}
                     </CContext.Consumer>
-                    <GridList className={classes.gridList} cols={this.state.numImage < 3 ? this.state.numImage : 3}>
+                    <GridList className={classes.gridList} cellHeight={220} cols={this.state.numImage < 3 ? this.state.numImage : 3}>
                         {this.state.imageList.map(tile => {
                             return (
                                 <GridListTile key={tile.id}>
@@ -98,8 +99,8 @@ export const Gallery = withStyles(styles)(
                                             title: classes.title,
                                         }}
                                         actionIcon={
-                                            <IconButton>
-                                                <StarBorderIcon className={classes.title} />
+                                            <IconButton onClick={this.openPicture(tile.largeImageURL)}>
+                                                <Launch className={classes.title} />
                                             </IconButton>
                                         }
                                     />
@@ -109,6 +110,10 @@ export const Gallery = withStyles(styles)(
                     </GridList>
                 </div>
             );
+        }
+
+        public openPicture = (url: string) => (event: any) => {
+            window.open(url, "_blank");
         }
 
         public getImageList = (nameOrCapital: string) => {

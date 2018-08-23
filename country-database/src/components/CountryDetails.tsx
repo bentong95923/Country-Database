@@ -16,11 +16,10 @@ import {
 } from '@material-ui/core';
 
 import {
-    AccessTime, Assignment,
-    Comment, Done, EuroSymbol,
-    Face, Group, GTranslate,
-    Http, Info, Language,
-    LocationCity,
+    AccessTime, Assignment, Comment,
+    Done, EuroSymbol, Face,
+    Group, GTranslate, Http,
+    Info, Language, LocationCity,
     MonetizationOn, People,
     Phone, PinDrop, Place,
     Public, SettingsEthernet,
@@ -28,12 +27,10 @@ import {
     VerticalAlignCenter, ZoomOutMap
 } from '@material-ui/icons';
 
-import { Gallery } from "./Gallery";
-
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 import { ExtractCard } from "./ExtractCard";
 
-export const CContext = React.createContext({ dataGallery: "", extractContent: "", dataExtractCard: "" });
+export const CContext = React.createContext({ dataExtractCard: "", dataGallery: "", extractContent: "" });
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
@@ -41,6 +38,9 @@ const styles = (theme: Theme) => createStyles({
         ...theme.mixins.gutters(),
         paddingTop: theme.spacing.unit * 2,
         paddingBottom: theme.spacing.unit * 2,
+    },
+    galleryTitle: {
+        marginBottom: '0.5em',
     },
 });
 
@@ -100,7 +100,7 @@ export const CountryDetails = withStyles(styles)(
         };
 
         public render() {
-            const { classes } = this.state.classes;
+            // const { classes } = this.state.classes;
             if (this.state.apiError[0] || this.state.alpha3Code.length !== 3) {
                 // Bad request, redirect to homepage
                 return <Redirect to={'/'} />;
@@ -127,22 +127,9 @@ export const CountryDetails = withStyles(styles)(
                         {this.state.countryDetailsList.map((country) => {
                             return (
                                 <div key={country.alpha3Code}>
-                                    <CContext.Provider value={this.state}>
+                                    <CContext.Provider value={{dataExtractCard: this.state.dataExtractCard, extractContent: this.state.extractContent, dataGallery: this.state.dataGallery}}>
                                         <ExtractCard />
                                     </CContext.Provider>
-                                    <Paper className={classes.root} elevation={4}>
-                                        <Typography variant="headline" className="countryDetailsTitle" component="h2">
-                                            {country.name}
-                                            <a href={country.flag} target="_blank">
-                                                <img className="countryFlag" src={country.flag} title={"Flag of " + country.name} alt={"Flag of " + country.name} />
-                                            </a>
-                                        </Typography>
-
-                                        <CContext.Provider value={this.state}>
-                                            <Typography className="countryDescription" component="p" />
-                                            <Gallery />
-                                        </CContext.Provider>
-                                    </Paper>
                                     {this.state.tabValue === 0 &&
                                         <TabContainer>
                                             {this.renderGeneralInfoContent(country.population, country.capital, country.demonym, country.timezones, country.flag)}

@@ -2,28 +2,24 @@ import * as React from 'react';
 
 import classnames from 'classnames';
 
-// import Avatar from '@material-ui/core/Avatar';
 import Card from '@material-ui/core/Card';
 
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
-// import CardMedia from '@material-ui/core/CardMedia';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
-import { Theme, withStyles } from '@material-ui/core/styles';
+import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-// import FavoriteIcon from '@material-ui/icons/Favorite';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ShareIcon from '@material-ui/icons/Share';
 import { CContext } from './CountryDetails';
+import { Gallery } from './Gallery';
 
-// import { CContext } from './CountryDetails';
-
-const styles = (theme: Theme) => ({
+const styles = (theme: Theme) => createStyles({
     card: {
-        maxWidth: 600,
+        maxWidth: 1024,
+        margin: 'auto',
     },
     media: {
         height: 0,
@@ -44,7 +40,20 @@ const styles = (theme: Theme) => ({
     },
     expandOpen: {
         transform: 'rotate(180deg)',
-    }
+    },
+    countryFlag: {
+        verticalAlign: 'text-bottom',
+        marginLeft: '10px',
+        width: '50px',
+        display: 'inline-block',
+    },
+    wikiText: {
+        margin: '30px 20px auto auto',
+        color: 'rgba(0, 0, 0, 0.54)',
+    },
+    extractContent: {
+        textAlign: 'justify',
+    },
 });
 
 interface ICard {
@@ -90,20 +99,23 @@ class InfoCard extends React.Component<{}, ICard> {
                                     <CardHeader
                                         avatar={
                                             <a href={dataExtractCard.flag} target="_blank">
-                                                <img className="countryFlag" src={dataExtractCard.flag} />
+                                                <img title={"Click to see the large version of this flag"} className={classes.countryFlag} src={dataExtractCard.flag} />
                                             </a>
                                         }
                                         action={
-                                            <IconButton>
-                                                <MoreVertIcon />
-                                            </IconButton>
+                                            <Typography className={classes.wikiText}>
+                                                From Wikipedia
+                                            </Typography>
                                         }
                                         title={dataExtractCard.name}
                                         subheader={"Country in " + dataExtractCard.region}
                                     />
 
                                     <CardContent>
-                                        <Typography component="p">
+                                        <CContext.Provider value={{dataExtractCard: "", extractContent: "", dataGallery: ctextData.dataGallery}}>
+                                            <Gallery />
+                                        </CContext.Provider>
+                                        <Typography className={classes.extractContent} component="p">
                                             {extract[count++].str}
                                         </Typography>
                                     </CardContent>
@@ -122,20 +134,19 @@ class InfoCard extends React.Component<{}, ICard> {
                                             >
                                                 <ExpandMoreIcon />
                                             </IconButton>
-                                            More
                                         </CardActions>
                                         : ''}
                                     {extract.length > 1 ?
                                         <Collapse in={this.state.expanded} timeout="auto" unmountOnExit={true}>
                                             <CardContent>
-                                                <Typography paragraph={extract.length - 1 !== count}>
+                                                <Typography className={classes.extractContent} paragraph={extract.length - 1 !== count}>
                                                     {extract[count++].str}
                                                 </Typography>
                                                 {extract.map((v: any, i: number) => {
                                                     // Not display the repeated contents
                                                     if (i >= count) {
                                                         return (
-                                                            <Typography key={v.id} paragraph={extract.length - 1 !== i}>{v.str}</Typography>
+                                                            <Typography key={v.id} className={classes.extractContent} paragraph={extract.length - 1 !== i}>{v.str}</Typography>
                                                         );
                                                     } return
                                                 })}
