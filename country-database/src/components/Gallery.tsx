@@ -5,6 +5,7 @@ import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 import Launch from '@material-ui/icons/Launch';
 
 import {
+    CircularProgress,
     GridList, GridListTile,
     GridListTileBar,
     IconButton
@@ -38,6 +39,13 @@ const styles = (theme: Theme) => createStyles({
     },
 });
 
+const imgSrcIcon = {
+    width: '100px',
+    display: 'block',
+    float: 'right' as 'right',
+    marginTop: '10px',
+}
+
 interface IGallery {
     imageList: any[],
     winWidth: number,
@@ -45,6 +53,7 @@ interface IGallery {
     numImage: number,
     classes: any,
     getImageListStatus: number,
+    finishLoading: boolean,
     apiError: boolean
 }
 
@@ -66,6 +75,7 @@ export const Gallery = withStyles(styles)(
                     2: called using capital name or abort search
                 */
                 getImageListStatus: 0,
+                finishLoading: false,
                 apiError: false
             }
         }
@@ -74,7 +84,6 @@ export const Gallery = withStyles(styles)(
             const { classes } = this.state.classes;
             return (
                 <div className={classes.root}>
-                    {/* Can pass a JSON stringified string via context and then JSON parse it to read. */}
                     <GContext.Consumer>
                         {dataGallery => {
                             switch (this.state.getImageListStatus) {
@@ -92,7 +101,8 @@ export const Gallery = withStyles(styles)(
                             return '';
                         }}
                     </GContext.Consumer>
-                    <GridList className={classes.gridList} cellHeight={220} cols={this.responsiveDisplay()}>
+
+                    {!this.state.finishLoading ? <CircularProgress /> : <GridList className={classes.gridList} cellHeight={220} cols={this.responsiveDisplay()}>
                         {this.state.imageList.map(tile => {
                             return (
                                 <GridListTile key={tile.id}>
@@ -111,13 +121,18 @@ export const Gallery = withStyles(styles)(
                                 </GridListTile>
                             );
                         })}
-                    </GridList>
+                    </GridList>}
+                    {this.state.numImage > 0 ?
+                        <a href="https://pixabay.com/" target="_blank">
+                            <img src="https://pixabay.com/static/img/logo.png" style={imgSrcIcon} />
+                        </a>
+                    : ''}
                 </div>
             );
         }
 
         public updateResolution = () => {
-            this.setState({winWidth: window.innerWidth, winHeight: window.innerHeight});
+            this.setState({ winWidth: window.innerWidth, winHeight: window.innerHeight });
         }
 
         public componentDidMount() {
@@ -155,6 +170,7 @@ export const Gallery = withStyles(styles)(
                                 getImageListStatus: 2
                             });
                             // Abort search if it has already been searched twice
+                            this.setState({ finishLoading: true });
                         } else if (this.state.getImageListStatus === 1) {
                             this.setState({ getImageListStatus: 2 });
                             // Else Keep searching

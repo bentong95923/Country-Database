@@ -45,7 +45,7 @@ const TabContainer = (props: any) => {
     );
 }
 
-export const CountryDetails = withStyles(styles)(
+export const DetailsTables = withStyles(styles)(
 
     class extends React.Component<{}, ICountryDetails> {
         constructor(props: any) {
@@ -64,21 +64,20 @@ export const CountryDetails = withStyles(styles)(
         public render() {
             return (
                 <div>
-                    {/* React components must have a wrapper node/element */}
                     <AppBar position="static" color="default">
                         <Tabs
                             value={this.state.tabValue}
                             onChange={this.handleChange}
-                            scrollable={true}
                             scrollButtons="on"
                             indicatorColor="primary"
                             textColor="primary"
+                            centered={true}
                         >
-                            <Tab icon={<Info />} />
-                            <Tab icon={<Place />} />
-                            <Tab icon={<EuroSymbol />} />
-                            <Tab icon={<Translate />} />
-                            <Tab icon={<SettingsEthernet />} />
+                            <Tab icon={<Info />} title="General Info" />
+                            <Tab icon={<Place />} title="Location, Area &amp; Borders" />
+                            <Tab icon={<EuroSymbol />} title="Economy" />
+                            <Tab icon={<Translate />} title="Languages / Names" />
+                            <Tab icon={<SettingsEthernet />} title="Code / Domain" />
                         </Tabs>
                     </AppBar>
                     <CContext.Consumer>
@@ -160,7 +159,7 @@ export const CountryDetails = withStyles(styles)(
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
-                                    <AccessTime /> Time Zone(s):
+                                    <AccessTime /> Time zone(s):
                                 </TableCell>
                                 <TableCell> {timezones.toString().toString().replace(/,/g, ', ')}</TableCell>
                             </TableRow>

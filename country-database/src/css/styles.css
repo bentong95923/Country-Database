@@ -8,17 +8,8 @@
     width: 60%;
 }
 
-.countryDescription {
-    text-align: justify;
-}
-
 #wrapper {
     max-width: 60%;
     min-width: 20%;
     margin: 0 auto;
-}
-
-.selectCountryIcon {
-    width: 30px;
-    margin-right: 10px;
 }

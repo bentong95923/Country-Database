@@ -17,10 +17,15 @@ const minNumInput = 2; // Minimum number of letters to trigger the search
 const placeholderString = 'Search country...';
 const { Option } = components;
 
+const countryIconStyles = {    
+    width: '30px',
+    marginRight: '10px',
+}
+
 const IconOptions = (props: any) => {
     return (
         <Option {...props}>
-            <img className="selectCountryIcon" src={props.data.flag} /> {props.data.label}
+            <img style={countryIconStyles} src={props.data.flag} /> {props.data.label}
         </Option>
     );
 
