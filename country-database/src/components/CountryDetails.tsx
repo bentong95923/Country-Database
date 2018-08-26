@@ -1,12 +1,4 @@
 import * as React from "react";
-import { Redirect } from 'react-router';
-/* 
-    Curely brace import only work if, in this case, CContext
-    contains a named export called CContext. If with 'dafault'
-    keyword on export, no curely brace is needed.
-*/
-
-import { optimizeCountryName } from "../CountryNameOptimization";
 
 import {
     AppBar, Paper, Tab,
@@ -28,9 +20,7 @@ import {
 } from '@material-ui/icons';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
-import { ExtractCard } from "./ExtractCard";
-
-export const CContext = React.createContext({ dataExtractCard: "", dataGallery: "", extractContent: "" });
+import { CContext } from "./ExtractCard";
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
@@ -39,25 +29,15 @@ const styles = (theme: Theme) => createStyles({
         paddingTop: theme.spacing.unit * 2,
         paddingBottom: theme.spacing.unit * 2,
     },
-    galleryTitle: {
-        marginBottom: '0.5em',
-    },
 });
 
 interface ICountryDetails {
-    countryDetailsList: any[],
-    extractContent: string,
-    dataExtractCard: string,
-    borderFullName: any[],
-    loaded: boolean[],
     tabValue: number,
     classes: any,
-    dataGallery: string,
-    alpha3Code: string,
-    apiError: boolean[]
+    apiError: boolean
 }
 
-function TabContainer(props: any) {
+const TabContainer = (props: any) => {
     return (
         <Typography component="div" style={{ padding: 8 * 3 }}>
             {props.children}
@@ -71,27 +51,9 @@ export const CountryDetails = withStyles(styles)(
         constructor(props: any) {
             super(props);
             this.state = {
-                countryDetailsList: [],
-                extractContent: "",
-                dataExtractCard: "",
-                borderFullName: [],
-                // details, borderFullName, extract
-                loaded: [false, false, false],
                 tabValue: 0,
                 classes: props,
-                dataGallery: "",
-                /*
-                    API Fetch error flag:
-                    searchCountryDetails(): index 0
-                    getCountryFullNameArray(): index 1
-                    getExtract(): index 2
-                */
-                alpha3Code: props.match.params.alpha3Code,
-                apiError: [false, false, false]
-            }
-            // Rewrite URL parameter to upper case
-            if (props.match.params.alpha3Code.length === 3) {
-                props.history.push('/details/' + props.match.params.alpha3Code.toUpperCase());
+                apiError: false
             }
         }
 
@@ -100,67 +62,71 @@ export const CountryDetails = withStyles(styles)(
         };
 
         public render() {
-            // const { classes } = this.state.classes;
-            if (this.state.apiError[0] || this.state.alpha3Code.length !== 3) {
-                // Bad request, redirect to homepage
-                return <Redirect to={'/'} />;
-            } else {
-                return (
-                    <div>
-                        {/* React components must have a wrapper node/element */}
-                        <AppBar position="static" color="default">
-                            <Tabs
-                                value={this.state.tabValue}
-                                onChange={this.handleChange}
-                                scrollable={true}
-                                scrollButtons="on"
-                                indicatorColor="primary"
-                                textColor="primary"
-                            >
-                                <Tab label="General Info" icon={<Info />} />
-                                <Tab label="Location, Area &amp; Borders" icon={<Place />} />
-                                <Tab label="Economy" icon={<EuroSymbol />} />
-                                <Tab label="Languages / Names" icon={<Translate />} />
-                                <Tab label="Code / Domain" icon={<SettingsEthernet />} />
-                            </Tabs>
-                        </AppBar>
-                        {this.state.countryDetailsList.map((country) => {
-                            return (
-                                <div key={country.alpha3Code}>
-                                    <CContext.Provider value={{dataExtractCard: this.state.dataExtractCard, extractContent: this.state.extractContent, dataGallery: this.state.dataGallery}}>
-                                        <ExtractCard />
-                                    </CContext.Provider>
-                                    {this.state.tabValue === 0 &&
-                                        <TabContainer>
-                                            {this.renderGeneralInfoContent(country.population, country.capital, country.demonym, country.timezones, country.flag)}
-                                        </TabContainer>
-                                    }
-                                    {this.state.tabValue === 1 &&
-                                        <TabContainer>
-                                            {this.renderLocationContent(country.region, country.subregion, country.latlng, country.area, country.borders)}
-                                        </TabContainer>
-                                    }
-                                    {this.state.tabValue === 2 &&
-                                        <TabContainer>
-                                            {this.renderEconmonyContent(country.gini, country.currencies, country.regionalBlocs)}
-                                        </TabContainer>
-                                    }
-                                    {this.state.tabValue === 3 &&
-                                        <TabContainer>
-                                            {this.renderLanguagesNamesContent(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
-                                        </TabContainer>
-                                    }
-                                    {this.state.tabValue === 4 &&
-                                        <TabContainer>
-                                            {this.renderCodeDomainContent(country.topLevelDomain, country.alpha2Code, country.alpha3Code, country.callingCodes, country.numericCode)}
-                                        </TabContainer>
-                                    }
-                                </div>
-                            );
-                        })}
-                    </div>
-                );
-            }
+            return (
+                <div>
+                    {/* React components must have a wrapper node/element */}
+                    <AppBar position="static" color="default">
+                        <Tabs
+                            value={this.state.tabValue}
+                            onChange={this.handleChange}
+                            scrollable={true}
+                            scrollButtons="on"
+                            indicatorColor="primary"
+                            textColor="primary"
+                        >
+                            <Tab icon={<Info />} />
+                            <Tab icon={<Place />} />
+                            <Tab icon={<EuroSymbol />} />
+                            <Tab icon={<Translate />} />
+                            <Tab icon={<SettingsEthernet />} />
+                        </Tabs>
+                    </AppBar>
+                    <CContext.Consumer>
+                        {dataCountryDetails => {
+                            const countryDetailsList = JSON.parse(dataCountryDetails);
+                            if (countryDetailsList.length > 0) {
+                                return (
+                                    <div>
+                                        {countryDetailsList.map((country: any) => {
+                                            return (
+                                                <div key={country.alpha3Code}>
+                                                    {this.state.tabValue === 0 &&
+                                                        <TabContainer>
+                                                            {this.renderGeneralInfoContent(country.population, country.capital, country.demonym, country.timezones, country.flag)}
+                                                        </TabContainer>
+                                                    }
+                                                    {this.state.tabValue === 1 &&
+                                                        <TabContainer>
+                                                            {this.renderLocationContent(country.region, country.subregion, country.latlng, country.area, country.borders)}
+                                                        </TabContainer>
+                                                    }
+                                                    {this.state.tabValue === 2 &&
+                                                        <TabContainer>
+                                                            {this.renderEconmonyContent(country.gini, country.currencies, country.regionalBlocs)}
+                                                        </TabContainer>
+                                                    }
+                                                    {this.state.tabValue === 3 &&
+                                                        <TabContainer>
+                                                            {this.renderLanguagesNamesContent(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
+                                                        </TabContainer>
+                                                    }
+                                                    {this.state.tabValue === 4 &&
+                                                        <TabContainer>
+                                                            {this.renderCodeDomainContent(country.topLevelDomain, country.alpha2Code, country.alpha3Code, country.callingCodes, country.numericCode)}
+                                                        </TabContainer>
+                                                    }
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                );
+                            } else {
+                                return "dataCountryDetails is empty.";
+                            }
+                        }}
+                    </CContext.Consumer>
+                </div>
+            );
         }
 
         public renderGeneralInfoContent(population: number, capital: string, demonym: string, timezones: string[], flag: string) {
@@ -196,7 +162,7 @@ export const CountryDetails = withStyles(styles)(
                                 <TableCell component="th" scope="row">
                                     <AccessTime /> Time Zone(s):
                                 </TableCell>
-                                <TableCell> {timezones.toString().split(',\s')}</TableCell>
+                                <TableCell> {timezones.toString().toString().replace(/,/g, ', ')}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
@@ -237,7 +203,7 @@ export const CountryDetails = withStyles(styles)(
                                 <TableCell component="th" scope="row">
                                     <VerticalAlignCenter /> Country border(s):
                             </TableCell>
-                                <TableCell> {borders.length > 0 ? this.state.borderFullName.toString().split(',\s') : "No Country Surrounded"}</TableCell>
+                                <TableCell> {borders.length > 0 ? borders.toString().replace(/,/g, ', ') : "No Country Surrounded"}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
@@ -319,13 +285,13 @@ export const CountryDetails = withStyles(styles)(
                                 <TableCell component="th" scope="row">
                                     <GTranslate /> Also know as:
                             </TableCell>
-                                <TableCell> {altSpellings.toString().split(',\s')}</TableCell>
+                                <TableCell> {altSpellings.toString().replace(/,/g, ', ')}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
                                     <Comment /> Native people call their country:
                             </TableCell>
-                                <TableCell> {nativeName.toString().split(',\s')}</TableCell>
+                                <TableCell> {nativeName.toString().replace(/,/g, ', ')}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
@@ -369,8 +335,8 @@ export const CountryDetails = withStyles(styles)(
                                     <Public /> ISO Code:
                             </TableCell>
                                 <TableCell>
-                                    <div> {" Alpha-2"} &mdash; {alpha2Code} </div>
-                                    <div> {" Alpha-3"} &mdash; {alpha3Code} </div>
+                                    <div> {"Alpha-2"} &mdash; {alpha2Code} </div>
+                                    <div> {"Alpha-3"} &mdash; {alpha3Code} </div>
                                     <div> {"Numeric"} &mdash; {numericCode} </div>
                                 </TableCell>
                             </TableRow>
@@ -394,131 +360,9 @@ export const CountryDetails = withStyles(styles)(
             );
         }
 
-        public componentWillMount() {
-            if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
-                this.searchCountryDetails(this.state.alpha3Code);
-            }
-        }
-
-        // Will be called if there is any component(s) updated for re-rendering
-        public componentDidUpdate() {
-            let temp = new Array();
-            this.state.countryDetailsList.map(val => {
-                temp = val.borders
-            });
-            // Stop calling the API if countries name for all alpha3codes are all received
-            if (temp.length !== 0 && temp.length !== this.state.borderFullName.length && !this.state.loaded[1]) {
-                this.getCountryFullNameArray(temp);
-            }
-            // Load extract if country detail list is loaded but have not loaded the extract
-            if (this.state.countryDetailsList.length > 0 && !this.state.loaded[2]) {
-                this.state.countryDetailsList.map(value => {
-                    // Loading extract
-                    this.getExtract(value.name);
-                });
-            }
-        }
-
         // Add commas for each thoudsand
         public numberWithCommas = (n: number) => {
             return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-
-        public searchCountryDetails = (alpha3Code: string) => {
-            /* Calling api from REST Countries website */
-            const url = 'https://restcountries.eu/rest/v2/alpha/' + alpha3Code.toLowerCase();
-            fetch(url)
-                .then(response => response.json())
-                .then((out) => {
-                    const output = [out];
-                    const nameTemp = out.name;
-                    let flagURL = "";
-                    output.map(value => {
-                        value.name = optimizeCountryName(nameTemp, 'e');
-                        flagURL = value.flag;
-                    });
-                    const dataGalleryStr = JSON.stringify({
-                        name: optimizeCountryName(nameTemp, 'i'),
-                        capital: out.capital
-                    });
-                    const dataExtractCardStr = JSON.stringify({
-                        name: optimizeCountryName(nameTemp, 'e'),
-                        region: out.subregion,
-                        flag: flagURL
-                    });
-                    this.setState({
-                        countryDetailsList: output,
-                        dataGallery: dataGalleryStr,
-                        dataExtractCard: dataExtractCardStr,
-                        loaded: [!this.state.loaded[0], this.state.loaded[1], this.state.loaded[2]]
-                    });
-                })
-                .catch(err => {
-                    if (!this.state.apiError[1]) {
-                        alert('searchCountryDetails(): ' + err);
-                        this.setState({ apiError: [true, this.state.apiError[1], this.state.apiError[2]] });
-                    }
-                    return;
-                });
-
-        }
-
-        public getCountryFullNameArray = async (countryArray: string[]) => {
-            const tempArray = new Array();
-            /* Calling api from REST Countries website */
-            for (const i in countryArray) {
-                if (countryArray.length >= 0) {
-                    const url = 'https://restcountries.eu/rest/v2/alpha/' + countryArray[i] + '?fields=name';
-                    await fetch(url)
-                        .then(response => response.json())
-                        .then((out) => {
-                            if (out.status !== 404) {
-                                tempArray.push(optimizeCountryName(out.name, 'e'));
-                            } else {
-                                // 404 Not result found error, but should not reach here
-                                tempArray.push(out.message);
-                            }
-                        })
-                        .catch(err => {
-                            if (!this.state.apiError[0]) {
-                                alert('getCountryFullNameArray(): ' + err);
-                                this.setState({ apiError: [this.state.apiError[0], true, this.state.apiError[2]] });
-                            }
-                            return;
-                        });
-
-                }
-            }
-            this.setState({ borderFullName: tempArray, loaded: [this.state.loaded[0], !this.state.loaded[1], this.state.loaded[2]] });
-        }
-
-        public getExtract = (countryName: string) => {
-            // Redirect: true - turn on to redirect automatically to content of synonyms
-            const url = 'https://en.wikipedia.org/w/api.php?origin=*&action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&redirects=1&titles=' + countryName.replace(' ', '_');
-            fetch(url)
-                .then(response => response.json())
-                .then((out) => {
-                    let extract = "";
-                    // out.query.pages.extract cannot read length property
-                    if (out.query.pages !== undefined) {
-                        out.query.pages.map((data: any) => {
-                            if (data.extract.length > 0) {
-                                extract = data.extract;
-                            }
-                        });
-                    }
-                    this.setState({
-                        extractContent: extract,
-                        loaded: [this.state.loaded[0], this.state.loaded[1], !this.state.loaded[2]]
-                    });
-                })
-                .catch(err => {
-                    if (!this.state.apiError[2]) {
-                        alert('getExtract(): ' + err);
-                        this.setState({ apiError: [this.state.apiError[0], this.state.apiError[1], true] })
-                    }
-                    return;
-                });
         }
 
     }

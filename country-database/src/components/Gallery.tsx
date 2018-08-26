@@ -10,7 +10,7 @@ import {
     IconButton
 } from '@material-ui/core';
 
-import { CContext } from './CountryDetails';
+import { GContext } from './ExtractCard';
 
 const API_KEY_PIXABAY = "***REMOVED***";
 
@@ -40,6 +40,8 @@ const styles = (theme: Theme) => createStyles({
 
 interface IGallery {
     imageList: any[],
+    winWidth: number,
+    winHeight: number,
     numImage: number,
     classes: any,
     getImageListStatus: number,
@@ -54,6 +56,8 @@ export const Gallery = withStyles(styles)(
             super(props);
             this.state = {
                 imageList: [],
+                winWidth: window.innerWidth,
+                winHeight: window.innerHeight,
                 classes: props,
                 numImage: 0,
                 /*
@@ -71,15 +75,15 @@ export const Gallery = withStyles(styles)(
             return (
                 <div className={classes.root}>
                     {/* Can pass a JSON stringified string via context and then JSON parse it to read. */}
-                    <CContext.Consumer>
-                        {state => {
+                    <GContext.Consumer>
+                        {dataGallery => {
                             switch (this.state.getImageListStatus) {
                                 case 0:
-                                    this.getImageList(JSON.parse(state.dataGallery).name);
+                                    this.getImageList(JSON.parse(dataGallery).name);
                                     break;
                                 case 1:
-                                    if (JSON.parse(state.dataGallery).capital.length > 0) {
-                                        this.getImageList(JSON.parse(state.dataGallery).capital);
+                                    if (JSON.parse(dataGallery).capital.length > 0) {
+                                        this.getImageList(JSON.parse(dataGallery).capital);
                                     }
                                     break;
                                 case 2:
@@ -87,8 +91,8 @@ export const Gallery = withStyles(styles)(
                             }
                             return '';
                         }}
-                    </CContext.Consumer>
-                    <GridList className={classes.gridList} cellHeight={220} cols={this.state.numImage < 3 ? this.state.numImage : 3}>
+                    </GContext.Consumer>
+                    <GridList className={classes.gridList} cellHeight={220} cols={this.responsiveDisplay()}>
                         {this.state.imageList.map(tile => {
                             return (
                                 <GridListTile key={tile.id}>
@@ -99,7 +103,7 @@ export const Gallery = withStyles(styles)(
                                             title: classes.title,
                                         }}
                                         actionIcon={
-                                            <IconButton onClick={this.openPicture(tile.largeImageURL)}>
+                                            <IconButton title="Click for original size of this image" onClick={this.openPicture(tile.largeImageURL)}>
                                                 <Launch className={classes.title} />
                                             </IconButton>
                                         }
@@ -110,6 +114,28 @@ export const Gallery = withStyles(styles)(
                     </GridList>
                 </div>
             );
+        }
+
+        public updateResolution = () => {
+            this.setState({winWidth: window.innerWidth, winHeight: window.innerHeight});
+        }
+
+        public componentDidMount() {
+            window.addEventListener('resize', this.updateResolution);
+        }
+
+        public componentWillUnmount() {
+            window.removeEventListener('resize', this.updateResolution);
+        }
+
+        public responsiveDisplay = () => {
+            let numCmp = 1;
+            if (this.state.winWidth >= 720) {
+                numCmp = 3;
+            } else if (this.state.winWidth >= 500) {
+                numCmp = 2;
+            }
+            return this.state.numImage < numCmp ? this.state.numImage : numCmp;
         }
 
         public openPicture = (url: string) => (event: any) => {

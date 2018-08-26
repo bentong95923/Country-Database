@@ -1,7 +1,10 @@
 import * as React from 'react';
+import { components } from 'react-select';
+
 import { Redirect } from 'react-router';
 
 import AsyncSelect from 'react-select/lib/Async';
+import { optimizeCountryName } from './CountryNameOptimization';
 
 interface IState {
     countryOptions: any[],
@@ -12,6 +15,16 @@ interface IState {
 
 const minNumInput = 2; // Minimum number of letters to trigger the search
 const placeholderString = 'Search country...';
+const { Option } = components;
+
+const IconOptions = (props: any) => {
+    return (
+        <Option {...props}>
+            <img className="selectCountryIcon" src={props.data.flag} /> {props.data.label}
+        </Option>
+    );
+
+}
 
 export default class CountryDatabase extends React.Component<{}, IState> {
     constructor(props: any) {
@@ -26,7 +39,7 @@ export default class CountryDatabase extends React.Component<{}, IState> {
 
     public render() {
         if (this.state.confirmedQuery) {
-            return <Redirect to={'/details/'+this.state.alpha3Code} />;
+            return <Redirect to={'/details/' + this.state.alpha3Code} />;
         } else {
             return (
                 <div id="wrapper" className="searchBar">
@@ -38,21 +51,10 @@ export default class CountryDatabase extends React.Component<{}, IState> {
                         noOptionsMessage={this.getNoOptText}
                         onChange={this.getCountryDetails}
                         escapeClearsValue={true}
+                        components={{ Option: IconOptions }}
                     />
                 </div>
             );
-        }
-    }
-
-    // Clear state variable when refreshing the page (only after user had confirmed(and submitted) the query previosuly)
-    public componentWillReceiveProps() {
-        if (this.state.confirmedQuery) {
-            this.setState({
-                countryOptions: [],
-                alpha3Code: "None",
-                responseReceived: false,
-                confirmedQuery: false
-            });
         }
     }
 
@@ -95,7 +97,7 @@ export default class CountryDatabase extends React.Component<{}, IState> {
     }
 
     public loadOptions = (inputValue: string) => {
-        // User are required to input at least 3 letters to display any results
+        // User are required to input the required number of charachers specified to display any results
         if (inputValue.length < minNumInput) {
             return new Array();
         } else {
@@ -106,7 +108,7 @@ export default class CountryDatabase extends React.Component<{}, IState> {
 
     public getCountryList = async (country: string) => {
         /* Calling api from REST Countries website */
-        const url = 'https://restcountries.eu/rest/v2/name/' + encodeURI(country) + '?fields=name;alpha3Code';
+        const url = 'https://restcountries.eu/rest/v2/name/' + encodeURI(country) + '?fields=name;alpha3Code;flag';
         const output = new Array();
         await fetch(url)
             .then(response => response.json())
@@ -115,8 +117,9 @@ export default class CountryDatabase extends React.Component<{}, IState> {
                     out.map((value: any) => {
                         output.push({
                             alpha3Code: value.alpha3Code,
-                            label: value.name
-                        })
+                            label: optimizeCountryName(value.name, 'e'),
+                            flag: value.flag
+                        });
                     });
                 }
                 this.setState({ countryOptions: output, responseReceived: true });

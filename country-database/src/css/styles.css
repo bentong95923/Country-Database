@@ -17,3 +17,8 @@
     min-width: 20%;
     margin: 0 auto;
 }
+
+.selectCountryIcon {
+    width: 30px;
+    margin-right: 10px;
+}
