@@ -189,7 +189,10 @@ export const ExtractCard = withStyles(styles)(
                                     </CardContent>
                                     {extract.length > 1 ?
                                         <CardActions className={classes.actions} disableActionSpacing={true}>
-                                            <IconButton aria-label="Share">
+                                            <IconButton
+                                                onClick={this.downloadTxtFile}
+                                                aria-label="Share"
+                                            >
                                                 <ShareIcon />
                                             </IconButton>
                                             <IconButton
@@ -254,6 +257,72 @@ export const ExtractCard = withStyles(styles)(
                     this.getExtract(value.name);
                 });
             }
+        }
+
+        public downloadTxtFile = () => {
+            const element = document.createElement('a');
+
+            const file = new Blob([this.printNormalTxtFile(this.state.countryDetailsList)], { type: 'text/plain' });
+            element.href = URL.createObjectURL(file);
+            element.download = "Details.txt";
+            element.click();
+        }
+
+        public printNormalTxtFile = (countryDetailsList: any) => {
+            let strOutput = "";
+            countryDetailsList.map((country: any) => {
+                strOutput += "\nDetails for " + country.name + ":\n\n";
+                strOutput += "------- General Info -------\n\n";
+                strOutput += "Population: " + country.population.toString() + "\n";
+                strOutput += "Capital: ";
+                country.capital.length > 0 ? strOutput += country.capitial + "\n" : strOutput += "n/a\n";
+                strOutput += "Demonym: ";
+                country.capital.length > 0 ? strOutput += country.demonym + "\n" : strOutput += "n/a\n";
+                strOutput += "Time zone(s):\n\t" + country.timezones + "\n\n";
+                strOutput += "------- Location, Area & Borders -------\n\n";
+                strOutput += "Region: ";
+                strOutput += country.region;
+                country.subregion.length > 0 ? strOutput += " - " + country.subregion + "\n" : strOutput += "\n";
+                strOutput += "Geo coordinates: " + country.latlng.toString() + "\n";
+                strOutput += "Area: " + country.area.toString() + " sq km\n";
+                strOutput += "Country border(s): ";
+                country.borders.length > 0 ? strOutput += country.borders.toString() + "\n\n" : strOutput += "No country surrounded\n\n";
+                strOutput += "------- Economy -------\n\n";
+                strOutput += "Gini Coefficient (%): ";
+                country.gini !== null ? strOutput += (country.gini.length > 0 ? strOutput += country.gini + "No data\n" : strOutput) : strOutput += "n/a\n";
+                strOutput += "Currencies: \n";
+                country.currencies.map((data: any) => {
+                    strOutput += "\t" + data.name + " " + data.code;
+                    data.symbol !== null ? strOutput += " (" + data.symbol + ")\n" : strOutput += "\n";
+                });
+                strOutput += "Regional Trade BLOCs: \n"
+                if (country.regionalBlocs.length > 0) {
+                    country.regionalBlocs.map((data: any) => {
+                        strOutput += "\t" + data.name + " (" + data.acronym + ")\n";
+                    });
+                } else {
+                    strOutput += "\tNone\n";
+                }
+                strOutput += "\n------- Languages / Names -------\n\n";
+                strOutput += "Original / Official Name: " + country.name + "\n";
+                strOutput += "Also known as: ";
+                country.altSpellings.length > 0 ? strOutput += country.altSpellings + "\n" : strOutput += "No other names\n";
+                strOutput += "Native people call this country: " + country.nativeName + "\n";
+                strOutput += "Language they speak: \n";
+                country.languages.map((data: any) => {
+                    strOutput += "\t"+data.name+"\n";
+                })
+                strOutput += "\n\n------- Code / Domain -------\n\n";
+                strOutput += "Top Level Domain: ";
+                country.topLevelDomain.length > 0 ? strOutput += country.topLevelDomain.toString() + "\n" : strOutput += "Not assigned yet\n";
+                strOutput += "ISO code:\n";
+                strOutput += "\tAlpha-2 -- " + country.alpha2Code + "\n";
+                strOutput += "\tAlpha-3 -- " + country.alpha3Code + "\n";
+                strOutput += "\tNumeric -- " + country.numericCode + "\n";
+                strOutput += "Calling code: " + "+ " + country.callingCodes + "\n";
+            });
+            alert(strOutput);
+            return strOutput;
         }
 
         public searchCountryDetails = (alpha3Code: string) => {

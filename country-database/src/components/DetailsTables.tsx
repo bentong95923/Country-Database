@@ -202,7 +202,7 @@ export const DetailsTables = withStyles(styles)(
                                 <TableCell component="th" scope="row">
                                     <VerticalAlignCenter /> Country border(s):
                             </TableCell>
-                                <TableCell> {borders.length > 0 ? borders.toString().replace(/,/g, ', ') : "No Country Surrounded"}</TableCell>
+                                <TableCell> {borders.length > 0 ? borders.toString().replace(/,/g, ', ') : "No country surrounded"}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
