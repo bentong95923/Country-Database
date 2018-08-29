@@ -3,6 +3,8 @@ import { Redirect } from 'react-router';
 
 import classnames from 'classnames';
 
+import { API_KEY_PIXABAY } from '../ApiKey';
+
 import { optimizeCountryName } from "../CountryNameOptimization";
 
 import Card from '@material-ui/core/Card';
@@ -26,9 +28,12 @@ export const CContext = React.createContext("");
 export const GContext = React.createContext("");
 
 const styles = (theme: Theme) => createStyles({
+    cardContainer: {
+        padding: '30px 0 50px 0',
+    },
     card: {
         maxWidth: 1024,
-        margin: '30px auto 50px auto',
+        margin: '0 auto',
     },
     media: {
         height: 0,
@@ -72,6 +77,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface ICard {
+    backgroundImgUrl: string,
     countryDetailsList: any[],
     dataGallery: string,
     extractContent: string,
@@ -82,11 +88,12 @@ interface ICard {
     apiError: boolean[],
 }
 
-export const ExtractCard = withStyles(styles)(
+export const CountryDetails = withStyles(styles)(
     class extends React.Component<{}, ICard> {
         constructor(props: any) {
             super(props);
             this.state = {
+                backgroundImgUrl: "",
                 countryDetailsList: [],
                 dataGallery: "",
                 extractContent: "",
@@ -114,39 +121,37 @@ export const ExtractCard = withStyles(styles)(
         };
 
         public render() {
+            const { classes } = this.state.classes;
             if (this.state.apiError[0] || this.state.alpha3Code.length !== 3) {
                 // Bad request, redirect to homepage
                 return <Redirect to={'/'} />;
             } else {
-                if (this.state.countryDetailsList.length > 0) {
-                    // // Loading extract
-                    return (
-                        <div>
-                            {this.renderLoadingSpinner()}
-                            {this.renderExtractCardContent()}
-                        </div>
-                    );
-                } else {
-                    // Loading contryDetailsList
-                    return (
-                        <div>
-                            {this.renderLoadingSpinner()}
-                        </div>
-                    );
+                return (
+                    // Loading extract content
+                    <div className={classes.cardContainer}>
+                        <div style={{
+                            backgroundImage: `url(${this.state.backgroundImgUrl})`,
+                            backgroundSize: 'cover',
+                            display: 'block' as 'block',
+                            // filter: 'blur(1px)',
+                            // WebkitFilter: 'blur(1px)',
+                            height: window.innerHeight,
+                            left: 0,
+                            position: 'fixed',
+                            right: 0,
+                            zIndex: -1,
+                        }} />
 
-                }
+                        {/* Display loading spinner screen until the page is loaded. */}
+                        {!this.state.loaded[2] && <LoadingScreen />}
+
+                        {this.state.countryDetailsList.length > 0 && this.loadnRenderExtractCardContent()}
+                    </div>
+                );
             }
         }
 
-        public renderLoadingSpinner = () => {
-            return (
-                <div>
-                    {!this.state.loaded[2] && <LoadingScreen />}
-                </div>
-            );
-        }
-
-        public renderExtractCardContent = () => {
+        public loadnRenderExtractCardContent = () => {
             const extractContent = this.state.extractContent;
             const { classes } = this.state.classes;
             return (
@@ -248,6 +253,7 @@ export const ExtractCard = withStyles(styles)(
             if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
                 this.searchCountryDetails(this.state.alpha3Code);
             }
+            this.getBackgroundImage("travel");
         }
 
         // Will be called if there is any component(s) updated for re-rendering
@@ -424,6 +430,28 @@ export const ExtractCard = withStyles(styles)(
                     if (!this.state.apiError[2]) {
                         // alert('getExtract(): ' + err);
                         this.setState({ apiError: [this.state.apiError[0], this.state.apiError[1], true] })
+                    }
+                    return;
+                });
+        }
+
+        public getBackgroundImage = (keyword: string) => {
+            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true";
+            fetch(url)
+                .then(response => response.json())
+                .then((out) => {
+                    // alert(JSON.stringify(out));
+                    if (out.hits !== undefined) {
+                        if (out.hits.length >= 3) {
+                            const randNum = Math.floor(Math.random() * out.hits.length);
+                            this.setState({ backgroundImgUrl: out.hits[randNum].largeImageURL });
+                        }
+                    }
+                })
+                .catch(err => {
+                    if (!this.state.apiError) {
+                        alert('getBackgroundImage(): ' + err);
+                        // this.setState({ apiError: true })
                     }
                     return;
                 });

@@ -20,7 +20,7 @@ import {
 } from '@material-ui/icons';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
-import { CContext } from "./ExtractCard";
+import { CContext } from "./CountryDetails";
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({

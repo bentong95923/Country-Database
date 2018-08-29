@@ -11,9 +11,9 @@ import {
     IconButton
 } from '@material-ui/core';
 
-import { GContext } from './ExtractCard';
+import { API_KEY_PIXABAY } from '../ApiKey';
 
-const API_KEY_PIXABAY = "***REMOVED***";
+import { GContext } from './CountryDetails';
 
 // Material-UI style for Horizontal Grid List
 const styles = (theme: Theme) => createStyles({
