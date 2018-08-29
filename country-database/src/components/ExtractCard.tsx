@@ -14,8 +14,9 @@ import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ShareIcon from '@material-ui/icons/Share';
+import GetApp from '@material-ui/icons/GetApp';
 
 import { DetailsTables } from './DetailsTables';
 import { Gallery } from './Gallery';
@@ -27,7 +28,7 @@ export const GContext = React.createContext("");
 const styles = (theme: Theme) => createStyles({
     card: {
         maxWidth: 1024,
-        margin: 'auto',
+        margin: '30px auto 50px auto',
     },
     media: {
         height: 0,
@@ -55,9 +56,15 @@ const styles = (theme: Theme) => createStyles({
         width: '50px',
         display: 'inline-block',
     },
-    wikiText: {
-        margin: '30px 20px auto auto',
+    refProviderTxt: {
+        fontSize: "14px",
+        marginTop: '5px',
+    },
+    reftxt: {
+        textAlign: 'right',
+        padding: '10px',
         color: 'rgba(0, 0, 0, 0.54)',
+        fontSize: '11px',
     },
     extractContent: {
         textAlign: 'justify',
@@ -169,8 +176,14 @@ export const ExtractCard = withStyles(styles)(
                                             </a>
                                         }
                                         action={
-                                            <Typography className={classes.wikiText}>
-                                                From: <br />Wikipedia<br />REST Countries
+                                            <Typography>
+                                                <IconButton
+                                                    onClick={this.downloadTxtFile}
+                                                    aria-label="Download"
+                                                    title="Download info of this country as .txt file"
+                                                >
+                                                    <GetApp />
+                                                </IconButton>
                                             </Typography>
                                         }
                                         title={countryDetail.name}
@@ -183,6 +196,10 @@ export const ExtractCard = withStyles(styles)(
                                         <GContext.Provider value={this.state.dataGallery}>
                                             <Gallery />
                                         </GContext.Provider>
+                                        <div className={classes.reftxt}>
+                                            Content provided by
+                                            <div className={classes.refProviderTxt}>Wikipedia</div>
+                                        </div>
                                         <Typography className={classes.extractContent} component="p">
                                             {extract[count++].str}
                                         </Typography>
@@ -190,18 +207,13 @@ export const ExtractCard = withStyles(styles)(
                                     {extract.length > 1 ?
                                         <CardActions className={classes.actions} disableActionSpacing={true}>
                                             <IconButton
-                                                onClick={this.downloadTxtFile}
-                                                aria-label="Share"
-                                            >
-                                                <ShareIcon />
-                                            </IconButton>
-                                            <IconButton
                                                 className={classnames(classes.expand, {
                                                     [classes.expandOpen]: this.state.expanded,
                                                 })}
                                                 onClick={this.handleExpandClick}
                                                 aria-expanded={this.state.expanded}
                                                 aria-label="Show more"
+                                                title="Click to expand"
                                             >
                                                 <ExpandMoreIcon />
                                             </IconButton>
@@ -239,17 +251,7 @@ export const ExtractCard = withStyles(styles)(
         }
 
         // Will be called if there is any component(s) updated for re-rendering
-        public componentDidUpdate() {
-            if (!this.state.loaded[1]) {
-                let temp = new Array();
-                this.state.countryDetailsList.map(val => {
-                    temp = val.borders
-                });
-                // Stop calling the API if countries name for all alpha3codes are all received
-                if (temp.length !== 0 && temp[0].length === 3) {
-                    this.getCountryFullNameArray(temp);
-                }
-            }
+        public componentDidMount() {
             // Load extract if country detail list is loaded but have not loaded the extract
             if (this.state.countryDetailsList.length > 0 && !this.state.loaded[2]) {
                 this.state.countryDetailsList.map(value => {
@@ -261,10 +263,13 @@ export const ExtractCard = withStyles(styles)(
 
         public downloadTxtFile = () => {
             const element = document.createElement('a');
-
             const file = new Blob([this.printNormalTxtFile(this.state.countryDetailsList)], { type: 'text/plain' });
             element.href = URL.createObjectURL(file);
-            element.download = "Details.txt";
+            let tempCountry = "";
+            this.state.countryDetailsList.map((country: any) => {
+                tempCountry = country.name;
+            });
+            element.download = tempCountry.replace(" ", "_") + ".txt";
             element.click();
         }
 
@@ -275,25 +280,28 @@ export const ExtractCard = withStyles(styles)(
                 strOutput += "------- General Info -------\n\n";
                 strOutput += "Population: " + country.population.toString() + "\n";
                 strOutput += "Capital: ";
-                country.capital.length > 0 ? strOutput += country.capitial + "\n" : strOutput += "n/a\n";
+                strOutput += (country.capital.length > 0 ? country.capitial + "\n" : "n/a\n");
                 strOutput += "Demonym: ";
-                country.capital.length > 0 ? strOutput += country.demonym + "\n" : strOutput += "n/a\n";
+                strOutput += (country.capital.length > 0 ? country.demonym + "\n" : "n/a\n");
                 strOutput += "Time zone(s):\n\t" + country.timezones + "\n\n";
                 strOutput += "------- Location, Area & Borders -------\n\n";
                 strOutput += "Region: ";
                 strOutput += country.region;
-                country.subregion.length > 0 ? strOutput += " - " + country.subregion + "\n" : strOutput += "\n";
+                strOutput += (country.subregion.length > 0 ? " - " + country.subregion + "\n" : "\n");
                 strOutput += "Geo coordinates: " + country.latlng.toString() + "\n";
                 strOutput += "Area: " + country.area.toString() + " sq km\n";
                 strOutput += "Country border(s): ";
-                country.borders.length > 0 ? strOutput += country.borders.toString() + "\n\n" : strOutput += "No country surrounded\n\n";
+                strOutput += (country.borders.length > 0 ? country.borders.toString() + "\n\n" : "No country surrounded\n\n");
                 strOutput += "------- Economy -------\n\n";
                 strOutput += "Gini Coefficient (%): ";
-                country.gini !== null ? strOutput += (country.gini.length > 0 ? strOutput += country.gini + "No data\n" : strOutput) : strOutput += "n/a\n";
+
+                strOutput += (country.gini !== null ? country.gini + "\n" : "No data\n");
                 strOutput += "Currencies: \n";
                 country.currencies.map((data: any) => {
-                    strOutput += "\t" + data.name + " " + data.code;
-                    data.symbol !== null ? strOutput += " (" + data.symbol + ")\n" : strOutput += "\n";
+                    if (data.name !== null) {
+                        strOutput += "\t" + data.name + " " + (data.code !== null ? data.code + " " : '');
+                        strOutput += (data.symbol !== null ? "(" + data.symbol + ")\n" : "\n");
+                    }
                 });
                 strOutput += "Regional Trade BLOCs: \n"
                 if (country.regionalBlocs.length > 0) {
@@ -306,22 +314,21 @@ export const ExtractCard = withStyles(styles)(
                 strOutput += "\n------- Languages / Names -------\n\n";
                 strOutput += "Original / Official Name: " + country.name + "\n";
                 strOutput += "Also known as: ";
-                country.altSpellings.length > 0 ? strOutput += country.altSpellings + "\n" : strOutput += "No other names\n";
+                strOutput += (country.altSpellings.length > 0 ? country.altSpellings + "\n" : "No other names\n");
                 strOutput += "Native people call this country: " + country.nativeName + "\n";
                 strOutput += "Language they speak: \n";
                 country.languages.map((data: any) => {
-                    strOutput += "\t"+data.name+"\n";
+                    strOutput += "\t" + data.name + "\n";
                 })
-                strOutput += "\n\n------- Code / Domain -------\n\n";
+                strOutput += "\n------- Code / Domain -------\n\n";
                 strOutput += "Top Level Domain: ";
-                country.topLevelDomain.length > 0 ? strOutput += country.topLevelDomain.toString() + "\n" : strOutput += "Not assigned yet\n";
+                strOutput += (country.topLevelDomain.length > 0 ? country.topLevelDomain.toString() + "\n" : "Not assigned yet\n");
+                strOutput += "Calling code: " + "+ " + country.callingCodes + "\n";
                 strOutput += "ISO code:\n";
                 strOutput += "\tAlpha-2 -- " + country.alpha2Code + "\n";
                 strOutput += "\tAlpha-3 -- " + country.alpha3Code + "\n";
                 strOutput += "\tNumeric -- " + country.numericCode + "\n";
-                strOutput += "Calling code: " + "+ " + country.callingCodes + "\n";
             });
-            alert(strOutput);
             return strOutput;
         }
 
@@ -333,8 +340,10 @@ export const ExtractCard = withStyles(styles)(
                 .then((out) => {
                     const output = [out];
                     const nameTemp = out.name;
+                    let borders = new Array();
                     output.map(value => {
                         value.name = optimizeCountryName(nameTemp, 'e');
+                        borders = value.borders;
                     });
                     const dataGalleryStr = JSON.stringify({
                         name: optimizeCountryName(nameTemp, 'i'),
@@ -345,10 +354,12 @@ export const ExtractCard = withStyles(styles)(
                         dataGallery: dataGalleryStr,
                         loaded: [true, this.state.loaded[1], this.state.loaded[2]]
                     });
+                    if (borders.length > 0 && borders[0].length === 3) {
+                        this.getCountryFullNameArray(borders);
+                    }
                 })
                 .catch(err => {
                     if (!this.state.apiError[0]) {
-                        // alert('searchCountryDetails(): ' + err);
                         this.setState({ apiError: [true, this.state.apiError[1], this.state.apiError[2]] });
                     }
                     return;

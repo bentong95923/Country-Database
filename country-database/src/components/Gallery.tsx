@@ -37,14 +37,16 @@ const styles = (theme: Theme) => createStyles({
         background:
             'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
     },
+    refTxt: {
+        color: 'rgba(0, 0, 0, 0.54)',
+        fontSize: '11px',
+    },
+    pixabay: {
+        width: '100px',
+        display: 'block',
+        marginTop: '10px',
+    }
 });
-
-const imgSrcIcon = {
-    width: '100px',
-    display: 'block',
-    float: 'right' as 'right',
-    marginTop: '10px',
-}
 
 interface IGallery {
     imageList: any[],
@@ -83,7 +85,7 @@ export const Gallery = withStyles(styles)(
         public render() {
             const { classes } = this.state.classes;
             return (
-                <div className={classes.root}>
+                <div>
                     <GContext.Consumer>
                         {dataGallery => {
                             switch (this.state.getImageListStatus) {
@@ -101,32 +103,42 @@ export const Gallery = withStyles(styles)(
                             return '';
                         }}
                     </GContext.Consumer>
-
-                    {!this.state.finishLoading ? <CircularProgress /> : <GridList className={classes.gridList} cellHeight={220} cols={this.responsiveDisplay()}>
-                        {this.state.imageList.map(tile => {
-                            return (
-                                <GridListTile key={tile.id}>
-                                    <img src={tile.webformatURL} />
-                                    <GridListTileBar
-                                        classes={{
-                                            root: classes.titleBar,
-                                            title: classes.title,
-                                        }}
-                                        actionIcon={
-                                            <IconButton title="Click for original size of this image" onClick={this.openPicture(tile.largeImageURL)}>
-                                                <Launch className={classes.title} />
-                                            </IconButton>
-                                        }
-                                    />
-                                </GridListTile>
-                            );
-                        })}
-                    </GridList>}
                     {this.state.numImage > 0 ?
-                        <a href="https://pixabay.com/" target="_blank">
-                            <img src="https://pixabay.com/static/img/logo.png" style={imgSrcIcon} />
-                        </a>
-                    : ''}
+                        <div>
+                            <div className={classes.refTxt}>
+                                Photos provided by
+                                <a href="https://pixabay.com/" target="_blank">
+                                    <img src="https://pixabay.com/static/img/logo.png" className={classes.pixabay} />
+                                </a>
+                            </div>
+                        </div>
+                        : ''
+                    }
+                    <br />
+                    <div className={classes.root}>
+                        {!this.state.finishLoading ? <CircularProgress /> :
+                            <GridList className={classes.gridList} cellHeight={220} cols={this.responsiveDisplay()}>
+                                {this.state.imageList.map(tile => {
+                                    return (
+                                        <GridListTile key={tile.id}>
+                                            <img src={tile.webformatURL} />
+                                            <GridListTileBar
+                                                classes={{
+                                                    root: classes.titleBar,
+                                                    title: classes.title,
+                                                }}
+                                                actionIcon={
+                                                    <IconButton title="Click for original size of this image" onClick={this.openPicture(tile.largeImageURL)}>
+                                                        <Launch className={classes.title} />
+                                                    </IconButton>
+                                                }
+                                            />
+                                        </GridListTile>
+                                    );
+                                })}
+                            </GridList>
+                        }
+                    </div>
                 </div>
             );
         }

@@ -24,11 +24,16 @@ import { CContext } from "./ExtractCard";
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
-    root: {
-        ...theme.mixins.gutters(),
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+    reftxt: {
+        textAlign: 'right',
+        padding: '10px 10px 0px 10px',
+        color: 'rgba(0, 0, 0, 0.54)',
+        fontSize: '11px',
     },
+    refProviderTxt: {
+        fontSize: "14px",
+        marginTop: '5px',
+    }
 });
 
 interface ICountryDetails {
@@ -62,6 +67,7 @@ export const DetailsTables = withStyles(styles)(
         };
 
         public render() {
+            const { classes } = this.state.classes;
             return (
                 <div>
                     <AppBar position="static" color="default">
@@ -80,6 +86,10 @@ export const DetailsTables = withStyles(styles)(
                             <Tab icon={<SettingsEthernet />} title="Code / Domain" />
                         </Tabs>
                     </AppBar>
+                    <div className={classes.reftxt}>
+                        Data provided by <br />
+                        <div className={classes.refProviderTxt}>REST Countries</div>
+                    </div>
                     <CContext.Consumer>
                         {dataCountryDetails => {
                             const countryDetailsList = JSON.parse(dataCountryDetails);
@@ -237,7 +247,7 @@ export const DetailsTables = withStyles(styles)(
                                         const sym = (v.symbol !== null ? ' (' + v.symbol + ')' : "");
                                         return (
                                             <div key={v.code}>
-                                                {v.name} &mdash; {v.code + ' ' + sym}
+                                                {v.name} &mdash; {(v.code !== null ? v.code + ' ' : '') + sym}
                                             </div>
                                         );
                                     })}
@@ -331,18 +341,8 @@ export const DetailsTables = withStyles(styles)(
                             </TableRow>
                             <TableRow>
                                 <TableCell component="th" scope="row">
-                                    <Public /> ISO Code:
-                            </TableCell>
-                                <TableCell>
-                                    <div> {"Alpha-2"} &mdash; {alpha2Code} </div>
-                                    <div> {"Alpha-3"} &mdash; {alpha3Code} </div>
-                                    <div> {"Numeric"} &mdash; {numericCode} </div>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell component="th" scope="row">
                                     <Phone /> Calling Code:
-                            </TableCell>
+                                </TableCell>
                                 <TableCell component="th" scope="row">
                                     {callingCodes.map(value => {
                                         return (
@@ -351,6 +351,16 @@ export const DetailsTables = withStyles(styles)(
                                             </div>
                                         );
                                     })}
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell component="th" scope="row">
+                                    <Public /> ISO Code:
+                                </TableCell>
+                                <TableCell>
+                                    <div> {"Alpha-2"} &mdash; {alpha2Code} </div>
+                                    <div> {"Alpha-3"} &mdash; {alpha3Code} </div>
+                                    <div> {"Numeric"} &mdash; {numericCode} </div>
                                 </TableCell>
                             </TableRow>
                         </TableBody>
