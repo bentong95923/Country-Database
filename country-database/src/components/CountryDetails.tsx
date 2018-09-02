@@ -3,29 +3,26 @@ import { Redirect } from 'react-router';
 
 import classnames from 'classnames';
 
-import { API_KEY_PIXABAY } from '../ApiKey';
-
 import { optimizeCountryName } from "../CountryNameOptimization";
 
-import Card from '@material-ui/core/Card';
+import {
+    Card, CardActions, CardContent,
+    CardHeader, ClickAwayListener,
+    Collapse, Fade, IconButton,
+    MenuItem, Paper, Typography
+} from '@material-ui/core'
 
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import Collapse from '@material-ui/core/Collapse';
-import IconButton from '@material-ui/core/IconButton';
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import GetApp from '@material-ui/icons/GetApp';
 
 import { DetailsTables } from './DetailsTables';
 import { Gallery } from './Gallery';
+import Header from './Header';
 import LoadingScreen from './LoadingScreen';
 
-export const CContext = React.createContext("");
-export const GContext = React.createContext("");
+import { CContext, GContext } from '../AppData';
 
 const styles = (theme: Theme) => createStyles({
     cardContainer: {
@@ -33,7 +30,10 @@ const styles = (theme: Theme) => createStyles({
     },
     card: {
         maxWidth: 1024,
-        margin: '0 auto',
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '3px',
+        boxShadow: '0px 2px 4px -1px rgba(0, 0, 0, 0.4), 0px 4px 5px 0px rgba(0, 0, 0, 0.34), 0px 1px 10px 0px rgba(0, 0, 0, 0.32)',
+        fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
     },
     media: {
         height: 0,
@@ -61,6 +61,11 @@ const styles = (theme: Theme) => createStyles({
         width: '50px',
         display: 'inline-block',
     },
+    menu: {
+        backgroundColor: 'rbga(255, 255, 255, 0.4)',
+        top: 50,
+        overflow: 'auto'
+    },
     refProviderTxt: {
         fontSize: "14px",
         marginTop: '5px',
@@ -79,8 +84,11 @@ const styles = (theme: Theme) => createStyles({
 interface ICard {
     backgroundImgUrl: string,
     countryDetailsList: any[],
+    menuOpen: boolean,
+    fadeChecked: boolean,
     dataGallery: string,
     extractContent: string,
+    downloadBoxPosOffset: number,
     loaded: boolean[],
     alpha3Code: string,
     expanded: boolean,
@@ -95,8 +103,11 @@ export const CountryDetails = withStyles(styles)(
             this.state = {
                 backgroundImgUrl: "",
                 countryDetailsList: [],
+                menuOpen: false,
+                fadeChecked: false,
                 dataGallery: "",
                 extractContent: "",
+                downloadBoxPosOffset: 0,
                 // details, borderFullName, extract
                 loaded: [false, false, false],
                 alpha3Code: props.match.params.alpha3Code,
@@ -116,44 +127,52 @@ export const CountryDetails = withStyles(styles)(
             }
         }
 
-        public handleExpandClick = () => {
+        public toggleCardExpand = () => {
             this.setState(preState => ({ expanded: !preState.expanded }));
         };
 
+        public openDownloadMenu = () => {
+            this.setState(preState => ({
+                menuOpen: !preState.menuOpen,
+            }));
+        };
+
+        public closeDownloadMenu = () => {
+            this.setState({
+                menuOpen: false,
+            });
+        };
+
+        public handleConfirmedDownload = () => {
+            this.closeDownloadMenu();
+            this.downloadTxtFile();
+        }
+
         public render() {
             const { classes } = this.state.classes;
-            if (this.state.apiError[0] || this.state.alpha3Code.length !== 3) {
-                // Bad request, redirect to homepage
-                return <Redirect to={'/'} />;
-            } else {
-                return (
-                    // Loading extract content
-                    <div className={classes.cardContainer}>
-                        <div style={{
-                            backgroundImage: `url(${this.state.backgroundImgUrl})`,
-                            backgroundSize: 'cover',
-                            display: 'block' as 'block',
-                            // filter: 'blur(1px)',
-                            // WebkitFilter: 'blur(1px)',
-                            height: window.innerHeight,
-                            left: 0,
-                            position: 'fixed',
-                            right: 0,
-                            zIndex: -1,
-                        }} />
+            return (
+                <div>
+                    <Header />
+                    {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
+                        // Bad request, redirect to homepage
+                        <Redirect to={'/'} />
+                        :
+                        // Loading extract content
+                        <div className={classes.cardContainer}>
+                            {/* Display loading spinner screen until the page is loaded. */}
+                            {!this.state.loaded[2] && <LoadingScreen />}
 
-                        {/* Display loading spinner screen until the page is loaded. */}
-                        {!this.state.loaded[2] && <LoadingScreen />}
-
-                        {this.state.countryDetailsList.length > 0 && this.loadnRenderExtractCardContent()}
-                    </div>
-                );
-            }
+                            {this.state.countryDetailsList.length > 0 && this.loadnRenderExtractCardContent()}
+                        </div>
+                    }
+                </div>
+            );
         }
 
         public loadnRenderExtractCardContent = () => {
             const extractContent = this.state.extractContent;
             const { classes } = this.state.classes;
+            const menuOpen = this.state.menuOpen;
             return (
                 <div>
                     {this.state.countryDetailsList.map(countryDetail => {
@@ -173,7 +192,11 @@ export const CountryDetails = withStyles(styles)(
                                 }
                             });
                             return (
-                                <Card key={countryDetail.alpha3Code} className={classes.card}>
+                                <Card
+                                    id="wrapper"
+                                    key={countryDetail.alpha3Code}
+                                    className={classes.card}
+                                >
                                     <CardHeader
                                         avatar={
                                             <a href={countryDetail.flag} target="_blank">
@@ -181,15 +204,31 @@ export const CountryDetails = withStyles(styles)(
                                             </a>
                                         }
                                         action={
-                                            <Typography>
-                                                <IconButton
-                                                    onClick={this.downloadTxtFile}
-                                                    aria-label="Download"
-                                                    title="Download info of this country as .txt file"
-                                                >
-                                                    <GetApp />
-                                                </IconButton>
-                                            </Typography>
+                                            <ClickAwayListener onClickAway={this.closeDownloadMenu}>
+                                                <div>
+                                                    <IconButton
+                                                        onClick={this.openDownloadMenu}
+                                                        aria-label="Download"
+                                                    >
+                                                        <GetApp />
+                                                    </IconButton>
+                                                    <Fade in={menuOpen}>
+                                                        <Paper
+                                                            style={{
+                                                                position: 'absolute',
+                                                                background: 'rgba(255, 255, 255, 0.7)',
+                                                                right: this.state.downloadBoxPosOffset,
+                                                            }}
+                                                        >
+                                                            <MenuItem
+                                                                onClick={this.handleConfirmedDownload}
+                                                            >
+                                                                Download country info as .txt file
+                                                            </MenuItem>
+                                                        </Paper>
+                                                    </Fade>
+                                                </div>
+                                            </ClickAwayListener>
                                         }
                                         title={countryDetail.name}
                                         subheader={countryDetail.subregion.length > 0 ? "Country in " + countryDetail.subregion : ''}
@@ -209,13 +248,13 @@ export const CountryDetails = withStyles(styles)(
                                             {extract[count++].str}
                                         </Typography>
                                     </CardContent>
-                                    {extract.length > 1 ?
+                                    {extract.length > 1 &&
                                         <CardActions className={classes.actions} disableActionSpacing={true}>
                                             <IconButton
                                                 className={classnames(classes.expand, {
                                                     [classes.expandOpen]: this.state.expanded,
                                                 })}
-                                                onClick={this.handleExpandClick}
+                                                onClick={this.toggleCardExpand}
                                                 aria-expanded={this.state.expanded}
                                                 aria-label="Show more"
                                                 title="Click to expand"
@@ -223,8 +262,8 @@ export const CountryDetails = withStyles(styles)(
                                                 <ExpandMoreIcon />
                                             </IconButton>
                                         </CardActions>
-                                        : ''}
-                                    {extract.length > 1 ?
+                                    }
+                                    {extract.length > 1 &&
                                         <Collapse in={this.state.expanded} timeout="auto" unmountOnExit={true}>
                                             <CardContent>
                                                 <Typography className={classes.extractContent} paragraph={extract.length - 1 !== count}>
@@ -240,7 +279,7 @@ export const CountryDetails = withStyles(styles)(
                                                 })}
                                             </CardContent>
                                         </Collapse>
-                                        : ''}
+                                    }
                                 </Card>
                             );
                         }
@@ -249,21 +288,39 @@ export const CountryDetails = withStyles(styles)(
             );
         }
 
-        public componentWillMount() {
-            if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
-                this.searchCountryDetails(this.state.alpha3Code);
+        public downloadBoxCssPosOffsetCal = () => {
+            const cardEle: HTMLElement | null = document.getElementById('wrapper');
+            if (cardEle !== null) {
+                if ((this.state.downloadBoxPosOffset) !== (window.innerWidth - cardEle.clientWidth) / 2) {
+                    this.setState({
+                        downloadBoxPosOffset: (window.innerWidth - cardEle.clientWidth) / 2,
+                    });
+                }
             }
-            this.getBackgroundImage("travel");
+        }
+
+        public componentWillUnmount() {
+            window.removeEventListener('resize', this.downloadBoxCssPosOffsetCal);
         }
 
         // Will be called if there is any component(s) updated for re-rendering
         public componentDidMount() {
+            if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
+                this.searchCountryDetails(this.state.alpha3Code);
+            }
             // Load extract if country detail list is loaded but have not loaded the extract
             if (this.state.countryDetailsList.length > 0 && !this.state.loaded[2]) {
                 this.state.countryDetailsList.map(value => {
                     // Loading extract
                     this.getExtract(value.name);
                 });
+            }
+            window.addEventListener('resize', this.downloadBoxCssPosOffsetCal);
+        }
+
+        public componentDidUpdate() {            
+            if (this.state.loaded[2]) {
+                this.downloadBoxCssPosOffsetCal();
             }
         }
 
@@ -403,7 +460,7 @@ export const CountryDetails = withStyles(styles)(
             tempCountryDetailsList.map(value => {
                 value.borders = tempArray;
             });
-            this.setState({ countryDetailsList: tempCountryDetailsList, loaded: [this.state.loaded[0], true, this.state.loaded[2]] });
+            this.setState(preState => ({ countryDetailsList: tempCountryDetailsList, loaded: [preState.loaded[0], true, preState.loaded[2]] }));
         }
 
         public getExtract = (countryName: string) => {
@@ -429,29 +486,7 @@ export const CountryDetails = withStyles(styles)(
                 .catch(err => {
                     if (!this.state.apiError[2]) {
                         // alert('getExtract(): ' + err);
-                        this.setState({ apiError: [this.state.apiError[0], this.state.apiError[1], true] })
-                    }
-                    return;
-                });
-        }
-
-        public getBackgroundImage = (keyword: string) => {
-            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true";
-            fetch(url)
-                .then(response => response.json())
-                .then((out) => {
-                    // alert(JSON.stringify(out));
-                    if (out.hits !== undefined) {
-                        if (out.hits.length >= 3) {
-                            const randNum = Math.floor(Math.random() * out.hits.length);
-                            this.setState({ backgroundImgUrl: out.hits[randNum].largeImageURL });
-                        }
-                    }
-                })
-                .catch(err => {
-                    if (!this.state.apiError) {
-                        alert('getBackgroundImage(): ' + err);
-                        // this.setState({ apiError: true })
+                        this.setState(preState => ({ apiError: [preState.apiError[0], preState.apiError[1], true] }))
                     }
                     return;
                 });

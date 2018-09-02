@@ -6,11 +6,10 @@ const loadingScreenStyle = {
     margin: 0,
     position: 'absolute' as 'absolute',
     top: '40%',
-    left: '50%',
+    left: '40%',
 }
 
 export default class LoadingScreen extends React.Component<{}> {
-
     public render() {
         return (
             <div>

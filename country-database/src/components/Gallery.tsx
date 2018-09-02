@@ -11,9 +11,9 @@ import {
     IconButton
 } from '@material-ui/core';
 
-import { API_KEY_PIXABAY } from '../ApiKey';
+import { API_KEY_PIXABAY } from '../AppData';
 
-import { GContext } from './CountryDetails';
+import { GContext } from '../AppData';
 
 // Material-UI style for Horizontal Grid List
 const styles = (theme: Theme) => createStyles({
@@ -22,7 +22,7 @@ const styles = (theme: Theme) => createStyles({
         flexWrap: 'wrap',
         justifyContent: 'space-around',
         overflow: 'hidden',
-        backgroundColor: theme.palette.background.paper,
+        // backgroundColor: theme.palette.background.paper,
         marginBottom: '20px',
     },
     gridList: {
@@ -103,16 +103,13 @@ export const Gallery = withStyles(styles)(
                             return '';
                         }}
                     </GContext.Consumer>
-                    {this.state.numImage > 0 ?
-                        <div>
-                            <div className={classes.refTxt}>
-                                Photos provided by
+                    {this.state.numImage > 0 &&
+                        <div className={classes.refTxt}>
+                            Photos provided by
                                 <a href="https://pixabay.com/" target="_blank">
-                                    <img src="https://pixabay.com/static/img/logo.png" className={classes.pixabay} />
-                                </a>
-                            </div>
+                                <img src="https://pixabay.com/static/img/logo.png" className={classes.pixabay} />
+                            </a>
                         </div>
-                        : ''
                     }
                     <br />
                     <div className={classes.root}>
@@ -169,9 +166,9 @@ export const Gallery = withStyles(styles)(
             window.open(url, "_blank");
         }
 
-        public getImageList = (nameOrCapital: string) => {
+        public getImageList = async (nameOrCapital: string) => {
             const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(nameOrCapital) + "&image_type=photo&safesearch=true";
-            fetch(url)
+            await fetch(url)
                 .then(response => response.json())
                 .then((out) => {
                     // alert(JSON.stringify(out));
@@ -194,7 +191,7 @@ export const Gallery = withStyles(styles)(
                 })
                 .catch(err => {
                     if (!this.state.apiError) {
-                        alert('getImageList(): ' + err);
+                        // alert('getImageList(): ' + err);
                         this.setState({ apiError: true })
                     }
                     return;
