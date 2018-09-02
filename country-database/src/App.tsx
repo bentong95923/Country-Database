@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import SearchBar from './components/SearchBar';
 
-import { SContext } from './AppData';
+import { SContext, WebLogo } from './AppData';
 
 const appStyle = {
     marginTop: '5%',
@@ -10,12 +10,16 @@ const appStyle = {
     textAlign: 'center' as 'center',
 }
 
+const webLogoStyle = {
+    width: '450px',
+}
+
 export default class Home extends React.Component<{}> {
 
     public render() {
         return (
             <div id="wrapper" style={appStyle}>
-                <h2> Country Database<br />more than 200+ country information available</h2>
+                <WebLogo style={webLogoStyle} />
                 <SContext.Provider value={true}>
                     <SearchBar />
                 </SContext.Provider>

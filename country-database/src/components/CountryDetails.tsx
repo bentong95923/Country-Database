@@ -22,7 +22,7 @@ import { Gallery } from './Gallery';
 import Header from './Header';
 import LoadingScreen from './LoadingScreen';
 
-import { CContext, GContext } from '../AppData';
+import { CContext, GContext, LContext } from '../AppData';
 
 const styles = (theme: Theme) => createStyles({
     cardContainer: {
@@ -152,7 +152,9 @@ export const CountryDetails = withStyles(styles)(
             const { classes } = this.state.classes;
             return (
                 <div>
-                    <Header />
+                    <LContext.Provider value={this.state.loaded[2]}>
+                        <Header />
+                    </LContext.Provider>
                     {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
                         // Bad request, redirect to homepage
                         <Redirect to={'/'} />
@@ -220,9 +222,7 @@ export const CountryDetails = withStyles(styles)(
                                                                 right: this.state.downloadBoxPosOffset,
                                                             }}
                                                         >
-                                                            <MenuItem
-                                                                onClick={this.handleConfirmedDownload}
-                                                            >
+                                                            <MenuItem onClick={this.handleConfirmedDownload}>
                                                                 Download country info as .txt file
                                                             </MenuItem>
                                                         </Paper>

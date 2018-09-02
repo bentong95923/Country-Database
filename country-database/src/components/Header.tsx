@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography } from '@material-ui/core';
 import SearchBar from './SearchBar';
 
-import { SContext } from '../AppData';
+import { LContext, SContext, WebLogo } from '../AppData';
 
 const searchBarStyle = {
     width: '60%',
@@ -26,9 +26,13 @@ export default class Header extends React.Component<{}> {
             <AppBar position="static">
                 <Toolbar variant="dense">
                     <Typography variant="title" color="inherit">
-                        <Link style={{ color: "white" }} to="/" className="App-Title">
-                            <img style={webLogoStyle} src={require('../img/webLogo.png')} />
-                        </Link>
+                        <LContext.Consumer>
+                            {pageFinishedLoading => {
+                                return (
+                                    pageFinishedLoading ? <Link to="/"> <WebLogo style={webLogoStyle} /> </Link> : <WebLogo style={webLogoStyle} />
+                                );
+                            }}
+                        </LContext.Consumer>
                     </Typography>
                     <div style={searchBarStyle}>
                         <SContext.Provider value={false}>
