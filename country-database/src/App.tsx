@@ -16,7 +16,7 @@ const appStyle = {
 const webLogoStyle = {
     width: '100%',
     maxWidth: '700px',
-    minWidth: '300px',
+    minWidth: '270px',
     marginBottom: '10%',
 }
 

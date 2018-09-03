@@ -4,6 +4,9 @@ import { components } from 'react-select';
 import { Redirect } from 'react-router';
 
 import AsyncSelect from 'react-select/lib/Async';
+
+import Search from '@material-ui/icons/Search';
+
 import { optimizeCountryName } from '../CountryNameOptimization';
 
 import { SContext } from '../AppData';
@@ -18,7 +21,7 @@ interface IState {
 const minNumInput = 2; // Minimum number of letters to trigger the search
 const placeHolderString = 'Search country...';
 
-const { Option } = components;
+const { Placeholder, ValueContainer, Option } = components;
 
 const countryIconStyle = {
     width: '30px',
@@ -41,6 +44,25 @@ const IconOptions = (props: any) => {
         <Option {...props}>
             <img style={countryIconStyle} src={props.data.flag} /> {props.data.label}
         </Option>
+    );
+}
+
+const ValueContainerBox = (props: any) => {
+    return ValueContainer && (
+        <ValueContainer {...props}>
+            <Search style={{ color: '#333' }} />
+            {props.children}
+        </ValueContainer>
+    );
+}
+
+const PlaceholderContainer = (props: any) => {
+    return Placeholder && (
+        <div style={{ padding: '0 10px' }}>
+            <Placeholder {...props} >
+                {props.children}
+            </Placeholder>
+        </div>
     );
 }
 
@@ -71,7 +93,11 @@ export default class SearchBar extends React.Component<{}, IState> {
                                         noOptionsMessage={this.getNoOptText}
                                         onChange={this.getCountryDetails}
                                         escapeClearsValue={true}
-                                        components={{ Option: IconOptions }}
+                                        components={{
+                                            Option: IconOptions,
+                                            ValueContainer: ValueContainerBox,
+                                            Placeholder: PlaceholderContainer,
+                                        }}
                                     />
                                 </div>
                                 {this.state.confirmedQuery &&

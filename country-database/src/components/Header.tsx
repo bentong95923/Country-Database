@@ -13,12 +13,10 @@ import { LContext, SContext } from '../AppData';
 import { WebLogoDetailed, WebLogoSimple } from '../AppLogo';
 
 const searchBarStyle = {
-    width: '60%',
+    width: '70%',
     padding: 'auto',
-    maxWidth: '100%',
-    minWidth: '20%',
     textAlign: 'initial' as 'initial',
-    color: 'black',
+    color: 'initial',
 }
 
 const webLogoDetailedStyle = {
@@ -55,9 +53,9 @@ export const Header = withStyles(styles)(
         public render() {
             const { classes } = this.state.classes;
             return (
-                <AppBar className={classes.appBar} position="static">
+                <AppBar className={classes.appBar} position="sticky">
                     <Toolbar variant="dense">
-                        <Typography variant="title" color="inherit">
+                        <Typography variant="title">
                             <LContext.Consumer>
                                 {pageFinishedLoading => {
                                     return (
