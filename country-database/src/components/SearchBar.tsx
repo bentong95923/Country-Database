@@ -19,7 +19,7 @@ interface IState {
 };
 
 const minNumInput = 2; // Minimum number of letters to trigger the search
-const placeHolderString = 'Search country...';
+const placeHolderString = 'Country name...';
 
 const { Placeholder, ValueContainer, Option } = components;
 
@@ -50,7 +50,7 @@ const IconOptions = (props: any) => {
 const ValueContainerBox = (props: any) => {
     return ValueContainer && (
         <ValueContainer {...props}>
-            <Search style={{ color: '#333' }} />
+            <Search style={{ color: '#333', marginRight: '5px' }} />
             {props.children}
         </ValueContainer>
     );
@@ -58,7 +58,7 @@ const ValueContainerBox = (props: any) => {
 
 const PlaceholderContainer = (props: any) => {
     return Placeholder && (
-        <div style={{ padding: '0 10px' }}>
+        <div>
             <Placeholder {...props} >
                 {props.children}
             </Placeholder>
