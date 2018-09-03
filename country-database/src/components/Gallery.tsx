@@ -40,6 +40,7 @@ const styles = (theme: Theme) => createStyles({
     refTxt: {
         color: 'rgba(0, 0, 0, 0.54)',
         fontSize: '11px',
+        marginTop: '20px',
     },
     pixabay: {
         width: '100px',

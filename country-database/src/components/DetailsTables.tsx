@@ -40,6 +40,7 @@ const styles = (theme: Theme) => createStyles({
     },
     table: {
         backgroundColor: 'rgba(255, 255, 255, 0.6)',
+        padding: '15px 0',
     }
 });
 
@@ -51,7 +52,7 @@ interface ICountryDetails {
 
 const TabContainer = (props: any) => {
     return (
-        <Typography component="div" style={{ padding: 8 * 3 }}>
+        <Typography component="div" style={{ padding: '10px 0' }}>
             {props.children}
         </Typography>
     );

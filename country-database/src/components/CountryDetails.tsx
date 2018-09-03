@@ -19,14 +19,14 @@ import GetApp from '@material-ui/icons/GetApp';
 
 import { DetailsTables } from './DetailsTables';
 import { Gallery } from './Gallery';
-import Header from './Header';
+import { Header } from './Header';
 import LoadingScreen from './LoadingScreen';
 
 import { CContext, GContext, LContext } from '../AppData';
 
 const styles = (theme: Theme) => createStyles({
     cardContainer: {
-        padding: '30px 0 50px 0',
+        padding: '50px 0',
     },
     card: {
         maxWidth: 1024,
@@ -34,6 +34,7 @@ const styles = (theme: Theme) => createStyles({
         borderRadius: '3px',
         boxShadow: '0px 2px 4px -1px rgba(0, 0, 0, 0.4), 0px 4px 5px 0px rgba(0, 0, 0, 0.34), 0px 1px 10px 0px rgba(0, 0, 0, 0.32)',
         fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
+        margin: '0 auto',
     },
     media: {
         height: 0,
@@ -195,7 +196,7 @@ export const CountryDetails = withStyles(styles)(
                             });
                             return (
                                 <Card
-                                    id="wrapper"
+                                    id="card"
                                     key={countryDetail.alpha3Code}
                                     className={classes.card}
                                 >
@@ -222,9 +223,11 @@ export const CountryDetails = withStyles(styles)(
                                                                 right: this.state.downloadBoxPosOffset,
                                                             }}
                                                         >
-                                                            <MenuItem onClick={this.handleConfirmedDownload}>
-                                                                Download country info as .txt file
-                                                            </MenuItem>
+                                                            {menuOpen &&
+                                                                <MenuItem onClick={this.handleConfirmedDownload}>
+                                                                    Download country info as .txt file
+                                                                </MenuItem>
+                                                            }
                                                         </Paper>
                                                     </Fade>
                                                 </div>
@@ -289,7 +292,7 @@ export const CountryDetails = withStyles(styles)(
         }
 
         public downloadBoxCssPosOffsetCal = () => {
-            const cardEle: HTMLElement | null = document.getElementById('wrapper');
+            const cardEle: HTMLElement | null = document.getElementById('card');
             if (cardEle !== null) {
                 if ((this.state.downloadBoxPosOffset) !== (window.innerWidth - cardEle.clientWidth) / 2) {
                     this.setState({
@@ -318,7 +321,7 @@ export const CountryDetails = withStyles(styles)(
             window.addEventListener('resize', this.downloadBoxCssPosOffsetCal);
         }
 
-        public componentDidUpdate() {            
+        public componentDidUpdate() {
             if (this.state.loaded[2]) {
                 this.downloadBoxCssPosOffsetCal();
             }

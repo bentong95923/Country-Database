@@ -14,9 +14,3 @@ export const CContext = React.createContext("");
 export const GContext = React.createContext("");
 export const SContext = React.createContext(false);
 export const LContext = React.createContext(false);
-// Web Logo
-export const WebLogo = (props: any) => {
-    return (
-        <img style={props.style} className={props.className} src={require('./img/webLogo.png')} />
-    );
-}

@@ -44,7 +44,6 @@ export default class Background extends React.Component<{}, IBackground> {
         window.removeEventListener('resize', this.updateResolution);
     }
 
-    /* Suggestion only: Display one of the country pic if found any pics, othervise use random pics */
     public getBackgroundImage = (keyword: string) => {
         const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true&editors_choice=true";
         fetch(url)

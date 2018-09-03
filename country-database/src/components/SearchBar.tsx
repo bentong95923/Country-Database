@@ -25,12 +25,15 @@ const countryIconStyle = {
     marginRight: '10px',
 }
 
-const searchBarStyle = {
-    marginTop: '5%',
-    width: '100%',
-    maxWidth: '100%',
-    minWidth: '20%',
+const searchBarStyleHome = {
     textAlign: 'initial' as 'initial',
+    margin: '0 auto',
+}
+
+const searchBarStyleHeader = {
+    width: '90%',
+    textAlign: 'initial' as 'initial',
+    float: 'right' as 'right',
 }
 
 const IconOptions = (props: any) => {
@@ -55,30 +58,33 @@ export default class SearchBar extends React.Component<{}, IState> {
     public render() {
         return (
             <div>
-                <div style={searchBarStyle}>
-                    <AsyncSelect
-                        cacheOptions={false}
-                        loadOptions={this.handleOnInput}
-                        defaultOptions={true}
-                        placeholder={placeHolderString}
-                        noOptionsMessage={this.getNoOptText}
-                        onChange={this.getCountryDetails}
-                        escapeClearsValue={true}
-                        components={{ Option: IconOptions }}
-                    />
-                </div>
-                {this.state.confirmedQuery &&
-                    <SContext.Consumer>
-                        {onIndexPage => {
-                            if (onIndexPage) {
-                                return <Redirect to={'/details/' + this.state.alpha3Code} />
-                            } else {
-                                this.reloadDetailsPage(this.state.alpha3Code)
-                                return;
-                            }
-                        }}
-                    </SContext.Consumer>
-                }
+                <SContext.Consumer>
+                    {onIndexPage => {
+                        return (
+                            <div>
+                                <div style={onIndexPage ? searchBarStyleHome : searchBarStyleHeader}>
+                                    <AsyncSelect
+                                        cacheOptions={false}
+                                        loadOptions={this.handleOnInput}
+                                        defaultOptions={true}
+                                        placeholder={placeHolderString}
+                                        noOptionsMessage={this.getNoOptText}
+                                        onChange={this.getCountryDetails}
+                                        escapeClearsValue={true}
+                                        components={{ Option: IconOptions }}
+                                    />
+                                </div>
+                                {this.state.confirmedQuery &&
+                                    (onIndexPage ?
+                                        <Redirect to={'/details/' + this.state.alpha3Code} />
+                                        :
+                                        this.reloadDetailsPage(this.state.alpha3Code)
+                                    )
+                                }
+                            </div>
+                        );
+                    }}
+                </SContext.Consumer>
             </div>
         );
     }

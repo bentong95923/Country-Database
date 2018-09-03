@@ -2,24 +2,30 @@ import * as React from 'react';
 
 import SearchBar from './components/SearchBar';
 
-import { SContext, WebLogo } from './AppData';
+import { SContext } from './AppData';
+
+import { WebLogoDetailed } from './AppLogo';
 
 const appStyle = {
-    marginTop: '5%',
-    width: '60%',
-    textAlign: 'center' as 'center',
+    position: 'fixed' as 'fixed',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
 }
 
 const webLogoStyle = {
-    width: '450px',
+    width: '100%',
+    maxWidth: '700px',
+    minWidth: '300px',
+    marginBottom: '10%',
 }
 
 export default class Home extends React.Component<{}> {
 
     public render() {
         return (
-            <div id="wrapper" style={appStyle}>
-                <WebLogo style={webLogoStyle} />
+            <div style={appStyle}>
+                <WebLogoDetailed style={webLogoStyle} />
                 <SContext.Provider value={true}>
                     <SearchBar />
                 </SContext.Provider>
