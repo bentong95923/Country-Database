@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Background from './components/Background';
 import { CountryDetails } from './components/CountryDetails';
 
-import Home from './App';
+import { Home } from './App';
 import './css/styles.css';
 
 export const AppRouter: React.StatelessComponent<{}> = () => {

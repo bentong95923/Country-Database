@@ -8,7 +8,7 @@ import {
 
 import SearchBar from './SearchBar';
 
-import { LContext, SContext } from '../AppData';
+import { LContext } from '../AppData';
 
 import { WebLogoDetailed, WebLogoSimple } from '../AppLogo';
 
@@ -34,13 +34,18 @@ const styles = (theme: Theme) => createStyles({
     }
 });
 
+interface IHeaderProps {
+    onIndexPage: boolean,
+    getNewAlpha3Code?: (newAlpha3Code: string) => void, // '?' mean optional, if missing this prop then will use the default prop
+}
+
 interface IHeader {
     winWidth: number,
     classes: any,
 }
 
 export const Header = withStyles(styles)(
-    class extends React.Component<{}, IHeader> {
+    class extends React.Component<IHeaderProps, IHeader> {
 
         constructor(props: any) {
             super(props);
@@ -71,13 +76,17 @@ export const Header = withStyles(styles)(
                             </LContext.Consumer>
                         </Typography>
                         <div style={searchBarStyle}>
-                            <SContext.Provider value={false}>
-                                <SearchBar />
-                            </SContext.Provider>
+                            <SearchBar onIndexPage={false} getNewAlpha3Code={this.sendDataToParent} />
                         </div>
                     </Toolbar>
                 </AppBar>
             );
+        }
+
+        public sendDataToParent = (valueChild: string) => {
+            if (this.props.getNewAlpha3Code !== undefined) {
+                this.props.getNewAlpha3Code(valueChild);
+            }
         }
 
         public renderLogoByScreenWidth = (winWidth: number) => {

@@ -9,19 +9,23 @@ import Search from '@material-ui/icons/Search';
 
 import { optimizeCountryName } from '../CountryNameOptimization';
 
-import { SContext } from '../AppData';
+// Declare props for this component
+interface ISearchBarProps {
+    onIndexPage: boolean,
+    getNewAlpha3Code?: (newAlpha3Code: string) => void, // '?' mean optional, if missing this prop then will use the default prop
+}
 
 interface IState {
     countryOptions: any[],
     alpha3Code: string,
     responseReceived: boolean, // Flag indicates if results are found.
     confirmedQuery: boolean,
-};
+}
 
 const minNumInput = 2; // Minimum number of letters to trigger the search
 const placeHolderString = 'Country name...';
 
-const { Placeholder, ValueContainer, Option } = components;
+const { Placeholder, ValueContainer, Option, SingleValue } = components;
 
 const countryIconStyle = {
     width: '30px',
@@ -39,6 +43,7 @@ const searchBarStyleHeader = {
     float: 'right' as 'right',
 }
 
+// Replacing components for React Select
 const IconOptions = (props: any) => {
     return (
         <Option {...props}>
@@ -59,14 +64,25 @@ const ValueContainerBox = (props: any) => {
 const PlaceholderContainer = (props: any) => {
     return Placeholder && (
         <div>
-            <Placeholder {...props} >
-                {props.children}
-            </Placeholder>
+            <Placeholder {...props} />
         </div>
     );
 }
 
-export default class SearchBar extends React.Component<{}, IState> {
+const SingleValueBox = (props: any) => {
+    return SingleValue && (
+        <div style={{ marginRight: '5px' }}>
+            <SingleValue {...props} />
+        </div>
+    );
+}
+
+export default class SearchBar extends React.Component<ISearchBarProps, IState> {
+
+    /* public static defaultProps: Partial<ISearchBarProps> = {
+        // finished: ,
+    }; */
+
     constructor(props: any) {
         super(props);
         this.state = {
@@ -77,40 +93,39 @@ export default class SearchBar extends React.Component<{}, IState> {
         }
     }
 
+    public sendDataToParent = (data: string) => {
+        if (this.props.getNewAlpha3Code !== undefined) {
+            this.props.getNewAlpha3Code(data);
+        }
+    }
+
     public render() {
         return (
             <div>
-                <SContext.Consumer>
-                    {onIndexPage => {
-                        return (
-                            <div>
-                                <div style={onIndexPage ? searchBarStyleHome : searchBarStyleHeader}>
-                                    <AsyncSelect
-                                        cacheOptions={false}
-                                        loadOptions={this.handleOnInput}
-                                        defaultOptions={true}
-                                        placeholder={placeHolderString}
-                                        noOptionsMessage={this.getNoOptText}
-                                        onChange={this.getCountryDetails}
-                                        escapeClearsValue={true}
-                                        components={{
-                                            Option: IconOptions,
-                                            ValueContainer: ValueContainerBox,
-                                            Placeholder: PlaceholderContainer,
-                                        }}
-                                    />
-                                </div>
-                                {this.state.confirmedQuery &&
-                                    (onIndexPage ?
-                                        <Redirect to={'/details/' + this.state.alpha3Code} />
-                                        :
-                                        this.reloadDetailsPage(this.state.alpha3Code)
-                                    )
-                                }
-                            </div>
-                        );
-                    }}
-                </SContext.Consumer>
+                <div style={this.props.onIndexPage ? searchBarStyleHome : searchBarStyleHeader}>
+                    <AsyncSelect
+                        cacheOptions={false}
+                        loadOptions={this.handleOnInput}
+                        defaultOptions={true}
+                        placeholder={placeHolderString}
+                        noOptionsMessage={this.getNoOptText}
+                        onChange={this.getCountryDetails}
+                        escapeClearsValue={true}
+                        components={{
+                            Option: IconOptions,
+                            ValueContainer: ValueContainerBox,
+                            Placeholder: PlaceholderContainer,
+                            SingleValue: SingleValueBox,
+                        }}
+                    />
+                </div>
+                {this.state.confirmedQuery &&
+                    (this.props.onIndexPage &&
+                        <Redirect to={'/details/' + this.state.alpha3Code} />
+                        /* :
+                        this.reloadDetailsPage(this.state.alpha3Code) */
+                    )
+                }
             </div>
         );
     }
@@ -126,6 +141,7 @@ export default class SearchBar extends React.Component<{}, IState> {
                     alpha3Code: selectedOptValue.alpha3Code,
                     confirmedQuery: true
                 });
+                this.sendDataToParent(selectedOptValue.alpha3Code);
             }
         }
     }

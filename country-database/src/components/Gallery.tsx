@@ -107,7 +107,7 @@ export const Gallery = withStyles(styles)(
                     {this.state.numImage > 0 &&
                         <div className={classes.refTxt}>
                             Photos provided by
-                                <a href="https://pixabay.com/" target="_blank">
+                            <a href="https://pixabay.com/" target="_blank">
                                 <img src="https://pixabay.com/static/img/logo.png" className={classes.pixabay} />
                             </a>
                         </div>

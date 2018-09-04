@@ -31,7 +31,7 @@ const styles = (theme: Theme) => createStyles({
     card: {
         maxWidth: 1024,
         background: 'rgba(255, 255, 255, 0.7)',
-        borderRadius: '3px',
+        borderRadius: '5px',
         boxShadow: '0px 2px 4px -1px rgba(0, 0, 0, 0.4), 0px 4px 5px 0px rgba(0, 0, 0, 0.34), 0px 1px 10px 0px rgba(0, 0, 0, 0.32)',
         fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
         margin: '0 auto',
@@ -132,7 +132,7 @@ export const CountryDetails = withStyles(styles)(
             this.setState(preState => ({ expanded: !preState.expanded }));
         };
 
-        public openDownloadMenu = () => {
+        public toggleDownloadMenu = () => {
             this.setState(preState => ({
                 menuOpen: !preState.menuOpen,
             }));
@@ -149,12 +149,21 @@ export const CountryDetails = withStyles(styles)(
             this.downloadTxtFile();
         }
 
+        public setNewAlpha3Code = (newAlpha3Code: string) => {
+            this.setState({alpha3Code: newAlpha3Code});
+            this.setState({
+                apiError: [false, false, false],
+                loaded: [false, false, false],
+                countryDetailsList: [],
+            });
+        }
+
         public render() {
             const { classes } = this.state.classes;
             return (
                 <div>
                     <LContext.Provider value={this.state.loaded[2]}>
-                        <Header />
+                        <Header getNewAlpha3Code={this.setNewAlpha3Code}/>
                     </LContext.Provider>
                     {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
                         // Bad request, redirect to homepage
@@ -210,24 +219,23 @@ export const CountryDetails = withStyles(styles)(
                                             <ClickAwayListener onClickAway={this.closeDownloadMenu}>
                                                 <div>
                                                     <IconButton
-                                                        onClick={this.openDownloadMenu}
+                                                        onClick={this.toggleDownloadMenu}
                                                         aria-label="Download"
                                                     >
                                                         <GetApp />
                                                     </IconButton>
-                                                    <Fade in={menuOpen}>
+                                                    <Fade in={menuOpen} unmountOnExit={true}>
                                                         <Paper
                                                             style={{
                                                                 position: 'absolute',
                                                                 background: 'rgba(255, 255, 255, 0.7)',
                                                                 right: this.state.downloadBoxPosOffset,
                                                             }}
+                                                            onClick={this.handleConfirmedDownload}
                                                         >
-                                                            {menuOpen &&
-                                                                <MenuItem onClick={this.handleConfirmedDownload}>
-                                                                    Download country info as .txt file
-                                                                </MenuItem>
-                                                            }
+                                                            <MenuItem>
+                                                                Download country info as .txt file
+                                                            </MenuItem>
                                                         </Paper>
                                                     </Fade>
                                                 </div>
@@ -324,6 +332,16 @@ export const CountryDetails = withStyles(styles)(
         public componentDidUpdate() {
             if (this.state.loaded[2]) {
                 this.downloadBoxCssPosOffsetCal();
+            }
+            if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
+                this.searchCountryDetails(this.state.alpha3Code);
+            }
+            // Load extract if country detail list is loaded but have not loaded the extract
+            if (this.state.countryDetailsList.length > 0 && !this.state.loaded[2]) {
+                this.state.countryDetailsList.map(value => {
+                    // Loading extract
+                    this.getExtract(value.name);
+                });
             }
         }
 

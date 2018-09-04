@@ -46,8 +46,9 @@ const styles = (theme: Theme) => createStyles({
 
 interface ICountryDetails {
     tabValue: number,
+    tabScrollable: boolean,
     classes: any,
-    apiError: boolean
+    apiError: boolean,
 }
 
 const TabContainer = (props: any) => {
@@ -65,6 +66,7 @@ export const DetailsTables = withStyles(styles)(
             super(props);
             this.state = {
                 tabValue: 0,
+                tabScrollable: this.isTabsNeedScrolling(),
                 classes: props,
                 apiError: false
             }
@@ -72,7 +74,30 @@ export const DetailsTables = withStyles(styles)(
 
         public handleChange = (event: any, val: number) => {
             this.setState({ tabValue: val });
-        };
+        }
+
+        // Add commas for each thoudsand
+        public numberWithCommas = (n: number) => {
+            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        public setTableScrollable = () => {
+            this.setState({
+                tabScrollable: this.isTabsNeedScrolling(),
+            });
+        }
+
+        public isTabsNeedScrolling = () => {
+            return window.innerWidth < 400;
+        }
+
+        public componentDidMount() {
+            window.addEventListener('resize', this.setTableScrollable);
+        }
+
+        public componentWillUnmount() {
+            window.removeEventListener('resize', this.setTableScrollable);
+        }
 
         public render() {
             const { classes } = this.state.classes;
@@ -85,7 +110,8 @@ export const DetailsTables = withStyles(styles)(
                             scrollButtons="on"
                             indicatorColor="primary"
                             textColor="primary"
-                            centered={true}
+                            centered={!this.state.tabScrollable}
+                            scrollable={this.state.tabScrollable}
                         >
                             <Tab icon={<Info />} title="General Info" />
                             <Tab icon={<Place />} title="Location, Area &amp; Borders" />
@@ -128,7 +154,7 @@ export const DetailsTables = withStyles(styles)(
             );
         }
 
-        public renderGeneralInfoTable(population: number, capital: string, demonym: string, timezones: string[], flag: string) {
+        public renderGeneralInfoTable = (population: number, capital: string, demonym: string, timezones: string[], flag: string) => {
             return (
                 <Table>
                     <TableHead>
@@ -140,25 +166,25 @@ export const DetailsTables = withStyles(styles)(
                     <TableBody>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <People /> Population (estimate):
+                                <People className="material-ui-icon" /> Population (estimate):
                                 </TableCell>
                             <TableCell> {this.numberWithCommas(population)}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <LocationCity /> Capital:
+                                <LocationCity className="material-ui-icon" /> Capital:
                                 </TableCell>
                             <TableCell> {capital.length > 0 ? capital : 'n/a'}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Face /> Demonym:
+                                <Face className="material-ui-icon" /> Demonym:
                                 </TableCell>
                             <TableCell> {demonym.length !== 0 ? demonym : "n/a"}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <AccessTime /> Time zone(s):
+                                <AccessTime className="material-ui-icon" /> Time zone(s):
                                 </TableCell>
                             <TableCell> {timezones.toString().toString().replace(/,/g, ', ')}</TableCell>
                         </TableRow>
@@ -167,7 +193,7 @@ export const DetailsTables = withStyles(styles)(
             );
         }
 
-        public renderLocationTable(region: string, subregion: string, latlng: number[], area: number, borders: string[]) {
+        public renderLocationTable = (region: string, subregion: string, latlng: number[], area: number, borders: string[]) => {
             return (
                 <Table>
                     <TableHead>
@@ -179,25 +205,25 @@ export const DetailsTables = withStyles(styles)(
                     <TableBody>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Public /> Region:
+                                <Public className="material-ui-icon" /> Region:
                             </TableCell>
                             <TableCell> {region} &mdash; {subregion}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <PinDrop /> Geo coordinates:
+                                <PinDrop className="material-ui-icon" /> Geo coordinates:
                             </TableCell>
                             <TableCell> {latlng.length > 0 ? 'Lat: ' + latlng[0].toFixed(1) + ', Long: ' + latlng[1].toFixed(1) : "No data"}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <ZoomOutMap /> Area:
+                                <ZoomOutMap className="material-ui-icon" /> Area:
                             </TableCell>
                             {area !== null ? <TableCell>{this.numberWithCommas(area) + " km"}<sup>2</sup></TableCell> : <TableCell>No data</TableCell>}
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <VerticalAlignCenter /> Country border(s):
+                                <VerticalAlignCenter className="material-ui-icon" /> Country border(s):
                             </TableCell>
                             <TableCell> {borders.length > 0 ? borders.toString().replace(/,/g, ', ') : "No country surrounded"}</TableCell>
                         </TableRow>
@@ -206,7 +232,7 @@ export const DetailsTables = withStyles(styles)(
             );
         }
 
-        public renderEconmonyTable(gini: number, currencies: any[], regionalBlocs: any[]) {
+        public renderEconmonyTable = (gini: number, currencies: any[], regionalBlocs: any[]) => {
             return (
                 <Table>
                     <TableHead>
@@ -218,13 +244,13 @@ export const DetailsTables = withStyles(styles)(
                     <TableBody>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Timeline /> Gini Coefficient (%):
+                                <Timeline className="material-ui-icon" /> Gini Coefficient (%):
                             </TableCell>
                             <TableCell> {gini !== null ? gini : "No data"}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <MonetizationOn /> Currencies:
+                                <MonetizationOn className="material-ui-icon" /> Currencies:
                             </TableCell>
                             <TableCell component="th" scope="row">
                                 {currencies.map((v: any) => {
@@ -240,13 +266,13 @@ export const DetailsTables = withStyles(styles)(
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Group /> Regional Trade BLOCs:
+                                <Group className="material-ui-icon" /> Regional Trade BLOCs:
                             </TableCell>
                             <TableCell component="th" scope="row">
                                 {regionalBlocs.length > 0 ? regionalBlocs.map((v: any) => {
                                     return (
                                         <div key={v.acronym}>
-                                            <Assignment /> {v.acronym} &mdash; {v.name}
+                                            <Assignment className="material-ui-icon" /> {v.acronym} &mdash; {v.name}
                                         </div>
                                     );
                                 }) : "None"}
@@ -257,7 +283,7 @@ export const DetailsTables = withStyles(styles)(
             );
         }
 
-        public renderLanguagesNamesTable(name: string, altSpellings: string[], nativeName: string, translations: any[], languages: any[]) {
+        public renderLanguagesNamesTable = (name: string, altSpellings: string[], nativeName: string, translations: any[], languages: any[]) => {
             return (
                 <Table>
                     <TableHead>
@@ -269,31 +295,31 @@ export const DetailsTables = withStyles(styles)(
                     <TableBody>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Public /> Original / Official Name:
+                                <Public className="material-ui-icon" /> Original / Official Name:
                             </TableCell>
                             <TableCell> {name}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <GTranslate /> Also know as:
+                                <GTranslate className="material-ui-icon" /> Also know as:
                             </TableCell>
                             <TableCell> {altSpellings.toString().replace(/,/g, ', ')}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Comment /> Native people call their country:
+                                <Comment className="material-ui-icon" /> Native people call their country:
                             </TableCell>
                             <TableCell> {nativeName.toString().replace(/,/g, ', ')}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Language /> Language they speak:
+                                <Language className="material-ui-icon" /> Language they speak:
                             </TableCell>
                             <TableCell component="th" scope="row">
                                 {languages.map(value => {
                                     return (
                                         <div key={value.iso639_1}>
-                                            <Done /> {value.name}
+                                            <Done className="material-ui-icon" /> {value.name}
                                         </div>
                                     );
                                 })}
@@ -304,7 +330,7 @@ export const DetailsTables = withStyles(styles)(
             );
         }
 
-        public renderCodeDomainTable(topLevelDomain: string[], alpha2Code: string, alpha3Code: string, callingCodes: string[], numericCode: string) {
+        public renderCodeDomainTable = (topLevelDomain: string[], alpha2Code: string, alpha3Code: string, callingCodes: string[], numericCode: string) => {
             return (
                 <Table>
                     <TableHead>
@@ -316,13 +342,13 @@ export const DetailsTables = withStyles(styles)(
                     <TableBody>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Http /> Top Level Domain:
+                                <Http className="material-ui-icon" /> Top Level Domain:
                             </TableCell>
                             <TableCell> {topLevelDomain.toString().length !== 0 ? topLevelDomain.toString().split(',\s') : "Not assigned yet"}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Phone /> Calling Code:
+                                <Phone className="material-ui-icon" /> Calling Code:
                                 </TableCell>
                             <TableCell component="th" scope="row">
                                 {callingCodes.map(value => {
@@ -336,7 +362,7 @@ export const DetailsTables = withStyles(styles)(
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">
-                                <Public /> ISO Code:
+                                <Public className="material-ui-icon" /> ISO Code:
                                 </TableCell>
                             <TableCell>
                                 <div> {"Alpha-2"} &mdash; {alpha2Code} </div>
@@ -347,11 +373,6 @@ export const DetailsTables = withStyles(styles)(
                     </TableBody>
                 </Table>
             );
-        }
-
-        // Add commas for each thoudsand
-        public numberWithCommas = (n: number) => {
-            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
     }
