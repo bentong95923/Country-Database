@@ -17,7 +17,7 @@ interface ISearchBarProps {
 
 interface IState {
     countryOptions: any[],
-    alpha3Code: string,
+    alpha3Code: string, // Use to track if user selects the same country as last time
     responseReceived: boolean, // Flag indicates if results are found.
     confirmedQuery: boolean,
 }
@@ -32,12 +32,12 @@ const countryIconStyle = {
     marginRight: '10px',
 }
 
-const searchBarStyleHome = {
+const searchBarPosHome = {
     textAlign: 'initial' as 'initial',
     margin: '0 auto',
 }
 
-const searchBarStyleHeader = {
+const searchBarPosHeader = {
     width: '90%',
     textAlign: 'initial' as 'initial',
     float: 'right' as 'right',
@@ -79,15 +79,11 @@ const SingleValueBox = (props: any) => {
 
 export default class SearchBar extends React.Component<ISearchBarProps, IState> {
 
-    /* public static defaultProps: Partial<ISearchBarProps> = {
-        // finished: ,
-    }; */
-
     constructor(props: any) {
         super(props);
         this.state = {
             countryOptions: [],
-            alpha3Code: "None",
+            alpha3Code: "",
             responseReceived: false,
             confirmedQuery: false,
         }
@@ -102,14 +98,14 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
     public render() {
         return (
             <div>
-                <div style={this.props.onIndexPage ? searchBarStyleHome : searchBarStyleHeader}>
+                <div style={this.props.onIndexPage ? searchBarPosHome : searchBarPosHeader}>
                     <AsyncSelect
-                        cacheOptions={false}
+                        cacheOptions={true}
                         loadOptions={this.handleOnInput}
-                        defaultOptions={true}
+                        defaultOptions={[]}
                         placeholder={placeHolderString}
                         noOptionsMessage={this.getNoOptText}
-                        onChange={this.getCountryDetails}
+                        onChange={this.getSelectedCountryDetails}
                         escapeClearsValue={true}
                         components={{
                             Option: IconOptions,
@@ -117,29 +113,28 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
                             Placeholder: PlaceholderContainer,
                             SingleValue: SingleValueBox,
                         }}
+                        isOptionSelected={this.checkOptionIsSelected}
                     />
                 </div>
-                {this.state.confirmedQuery &&
-                    (this.props.onIndexPage &&
-                        <Redirect to={'/details/' + this.state.alpha3Code} />
-                        /* :
-                        this.reloadDetailsPage(this.state.alpha3Code) */
-                    )
+                {this.state.confirmedQuery && this.props.onIndexPage &&
+                    <Redirect to={'/details/' + this.state.alpha3Code} />
                 }
             </div>
         );
     }
 
-    public reloadDetailsPage = (alpha3Code: string) => {
-        window.open(window.location.origin + '/details/' + alpha3Code, "_self");
+    // Call every time upon each opton arrives
+    public checkOptionIsSelected = (option: any) => {
+        // To determine if the option is same as the current chosen option
+        return (option.alpha3Code === this.state.alpha3Code);
     }
 
-    public getCountryDetails = (selectedOptValue: any) => {
+    public getSelectedCountryDetails = (selectedOptValue: any) => {
         if (selectedOptValue.alpha3Code !== undefined) {
             if (selectedOptValue.alpha3Code.length === 3) {
                 this.setState({
                     alpha3Code: selectedOptValue.alpha3Code,
-                    confirmedQuery: true
+                    confirmedQuery: true,
                 });
                 this.sendDataToParent(selectedOptValue.alpha3Code);
             }
@@ -159,7 +154,6 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
                 noOptTxt = 'Not Found';
             }
         });
-
         return noOptTxt;
     }
 
@@ -191,11 +185,11 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
             .then(response => response.json())
             .then((out) => {
                 if (out.status !== 404) {
-                    out.map((value: any) => {
+                    out.map((data: any) => {
                         output.push({
-                            alpha3Code: value.alpha3Code,
-                            label: optimizeCountryName(value.name, 'e'),
-                            flag: value.flag
+                            alpha3Code: data.alpha3Code,
+                            label: optimizeCountryName(data.name, 'e'),
+                            flag: data.flag,
                         });
                     });
                 }
