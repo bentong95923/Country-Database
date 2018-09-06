@@ -20,12 +20,15 @@ interface IState {
     alpha3Code: string, // Use to track if user selects the same country as last time
     responseReceived: boolean, // Flag indicates if results are found.
     confirmedQuery: boolean,
+    apiError: boolean,
 }
 
-const minNumInput = 2; // Minimum number of letters to trigger the search
+// Number of letters required to enter for country search
+const MIN_NUM_INPUT = 2; // Minimum 
+const MAX_NUM_INPUT_NAME = 70; // Maximum
 const placeHolderString = 'Country name...';
 
-const { Placeholder, ValueContainer, Option, SingleValue } = components;
+const { Input, ValueContainer, Option } = components;
 
 const countryIconStyle = {
     width: '30px',
@@ -44,38 +47,59 @@ const searchBarPosHeader = {
 }
 
 // Replacing components for React Select
-const IconOptions = (props: any) => {
+const NewOption = (props: any) => {
+    // Adding its country icon for each country option
     return (
         <Option {...props}>
-            <img style={countryIconStyle} src={props.data.flag} /> {props.data.label}
+            <img style={countryIconStyle} src={props.data.flag} />
+            {props.data.label}
         </Option>
     );
 }
 
-const ValueContainerBox = (props: any) => {
+const NewValueContainer = (props: any) => {
     return ValueContainer && (
         <ValueContainer {...props}>
-            <Search style={{ color: '#333', marginRight: '5px' }} />
+            <Search style={{ color: '#333' }} />
             {props.children}
         </ValueContainer>
     );
 }
 
-const PlaceholderContainer = (props: any) => {
-    return Placeholder && (
-        <div>
-            <Placeholder {...props} />
-        </div>
+const NewInput = (props: any) => {
+    return Input && (
+        <Input maxLength={MAX_NUM_INPUT_NAME} {...props} />
     );
 }
 
-const SingleValueBox = (props: any) => {
-    return SingleValue && (
-        <div style={{ marginRight: '5px' }}>
-            <SingleValue {...props} />
-        </div>
-    );
+const searchBarStyle = {
+    input: (styles: any) => ({
+        ...styles,
+        margin: '2px 2px 2px 5px',
+        wordWrap: "normal",
+    }),
+    singleValue: (styles: any) => ({
+        ...styles,
+        left: '36px',
+        wordWrap: "normal",
+    }),
+    placeholder: (styles: any) => ({
+        ...styles,
+        left: '36px',
+        wordWrap: "normal",
+    }),
+    dropdownIndicator: () => ({
+        display: 'none',
+    }),
+    indicatorSeparator: () => ({
+        display: 'none',
+    }),
 }
+
+/* const debugReactSelectInnerStyle = (styles: any, props: any) => {
+    console.log(JSON.stringify(styles));
+    return props;
+} */
 
 export default class SearchBar extends React.Component<ISearchBarProps, IState> {
 
@@ -86,6 +110,8 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
             alpha3Code: "",
             responseReceived: false,
             confirmedQuery: false,
+            // The 404 error does not consider an apiError for user entnering a non-existing country name
+            apiError: false,
         }
     }
 
@@ -100,20 +126,19 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
             <div>
                 <div style={this.props.onIndexPage ? searchBarPosHome : searchBarPosHeader}>
                     <AsyncSelect
+                        styles={searchBarStyle}
                         cacheOptions={true}
                         loadOptions={this.handleOnInput}
                         defaultOptions={[]}
                         placeholder={placeHolderString}
                         noOptionsMessage={this.getNoOptText}
                         onChange={this.getSelectedCountryDetails}
-                        escapeClearsValue={true}
-                        components={{
-                            Option: IconOptions,
-                            ValueContainer: ValueContainerBox,
-                            Placeholder: PlaceholderContainer,
-                            SingleValue: SingleValueBox,
-                        }}
                         isOptionSelected={this.checkOptionIsSelected}
+                        components={{
+                            Option: NewOption,
+                            ValueContainer: NewValueContainer,
+                            Input: NewInput,
+                        }}
                     />
                 </div>
                 {this.state.confirmedQuery && this.props.onIndexPage &&
@@ -147,21 +172,25 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
         tempArray.push(data);
         tempArray.map((value: any) => {
             if (value.inputValue.trim().length === 0) {
-                noOptTxt = 'Enter a country or territory name...';
-            } else if (value.inputValue.trim().length < minNumInput) {
-                noOptTxt = 'Keep typing...';
+                noOptTxt = "Enter a country or territory name...";
+            } else if (value.inputValue.trim().length < MIN_NUM_INPUT) {
+                noOptTxt = "Keep typing...";
+            } else if (this.state.apiError) {
+                noOptTxt = "Server Error. Please try again.";
             } else {
-                noOptTxt = 'Not Found';
+                noOptTxt = "Not Found";
             }
         });
         return noOptTxt;
     }
 
     public handleOnInput = async (inputValue: string, callback: any) => {
+        // Reset flag
+        this.setState({ responseReceived: false, apiError: false });
         // Remove any space from both sides of the input
         const inputTrimmed = inputValue.trim();
         // User are required to input at least 3 letters (no space on both sides) to display any results
-        if (inputTrimmed.length >= minNumInput) {
+        if (inputTrimmed.length >= MIN_NUM_INPUT) {
             await this.getCountryList(inputTrimmed);
         }
         callback(this.loadOptions(inputTrimmed));
@@ -169,11 +198,12 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
 
     public loadOptions = (inputValue: string) => {
         // User are required to input the required number of charachers specified to display any results
-        if (inputValue.length < minNumInput) {
+        if (inputValue.length < MIN_NUM_INPUT) {
             return new Array();
         } else {
-            while (!this.state.responseReceived) { continue };
-            return this.state.countryOptions;
+            // Blocking until there is an api error or result found
+            while (!(this.state.responseReceived || this.state.apiError)) { continue };
+            return (this.state.apiError ? new Array() : this.state.countryOptions);
         }
     }
 
@@ -194,8 +224,9 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
                     });
                 }
                 this.setState({ countryOptions: output, responseReceived: true });
-            })
-            .catch(err => alert('getCountryList(): ' + err)
-            );
+            }).catch(err => {
+                // Error handling
+                this.setState({ apiError: true });
+            });
     }
 }
