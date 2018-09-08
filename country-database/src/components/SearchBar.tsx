@@ -12,12 +12,14 @@ import { optimizeCountryName } from '../CountryNameOptimization';
 // Declare props for this component
 interface ISearchBarProps {
     onIndexPage: boolean,
+    preLoadCountryData?: string,
     getNewAlpha3Code?: (newAlpha3Code: string) => void, // '?' mean optional, if missing this prop then will use the default prop
 }
 
 interface IState {
     countryOptions: any[],
-    alpha3Code: string, // Use to track if user selects the same country as last time
+    defaultValue: any[],
+    alpha3Code: string,
     responseReceived: boolean, // Flag indicates if results are found.
     confirmedQuery: boolean,
     apiError: boolean,
@@ -103,10 +105,15 @@ const searchBarStyle = {
 
 export default class SearchBar extends React.Component<ISearchBarProps, IState> {
 
+    static defaultProps = {
+        preLoadCountryData: ""
+    }
+
     constructor(props: any) {
         super(props);
         this.state = {
             countryOptions: [],
+            defaultValue: this.getDefaultValue(),
             alpha3Code: "",
             responseReceived: false,
             confirmedQuery: false,
@@ -128,12 +135,14 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
                     <AsyncSelect
                         styles={searchBarStyle}
                         cacheOptions={true}
+                        openMenuOnClick={false}
                         loadOptions={this.handleOnInput}
                         defaultOptions={[]}
                         placeholder={placeHolderString}
                         noOptionsMessage={this.getNoOptText}
                         onChange={this.getSelectedCountryDetails}
                         isOptionSelected={this.checkOptionIsSelected}
+                        defaultValue={this.state.defaultValue}
                         components={{
                             Option: NewOption,
                             ValueContainer: NewValueContainer,
@@ -172,7 +181,7 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
         tempArray.push(data);
         tempArray.map((value: any) => {
             if (value.inputValue.trim().length === 0) {
-                noOptTxt = "Enter a country or territory name...";
+                noOptTxt = "Enter a country name / alpha 2 code...";
             } else if (value.inputValue.trim().length < MIN_NUM_INPUT) {
                 noOptTxt = "Keep typing...";
             } else if (this.state.apiError) {
@@ -205,6 +214,23 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
             while (!(this.state.responseReceived || this.state.apiError)) { continue };
             return (this.state.apiError ? new Array() : this.state.countryOptions);
         }
+    }
+
+    public getDefaultValue = () => {
+        const props = this.props;
+        const defaultValue = new Array();
+        if (props.preLoadCountryData !== undefined && !props.onIndexPage) {
+            const countryData = JSON.parse(props.preLoadCountryData);
+            defaultValue.push({
+                alpha3Code: countryData.alpha3Code,
+                label: optimizeCountryName(countryData.name, 'e'),
+            });
+        }
+        return defaultValue;
+    }
+
+    public componentDidMount() {
+        this.setState({ defaultValue: this.getDefaultValue() });
     }
 
     public getCountryList = async (country: string) => {

@@ -351,13 +351,17 @@ export const DetailsTables = withStyles(styles)(
                                 <Phone className="material-ui-icon" /> Calling Code:
                                 </TableCell>
                             <TableCell component="th" scope="row">
-                                {callingCodes.map(value => {
-                                    return (
-                                        <div key={value}>
-                                            {"+ " + value}
-                                        </div>
-                                    );
-                                })}
+                                {callingCodes[0].length > 0 ?
+                                    callingCodes.map(value => {
+                                        return (
+                                            <div key={value}>
+                                                {"+ " + value}
+                                            </div>
+                                        );
+                                    })
+                                    :
+                                    'Not assigned yet'
+                                }
                             </TableCell>
                         </TableRow>
                         <TableRow>

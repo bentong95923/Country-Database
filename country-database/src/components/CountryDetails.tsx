@@ -22,7 +22,7 @@ import { Gallery } from './Gallery';
 import { Header } from './Header';
 import LoadingScreen from './LoadingScreen';
 
-import { CContext, GContext, LContext } from '../AppData';
+import { CContext, GContext, HContext } from '../AppData';
 
 const styles = (theme: Theme) => createStyles({
     cardContainer: {
@@ -88,6 +88,7 @@ interface ICard {
     menuOpen: boolean,
     fadeChecked: boolean,
     dataGallery: string,
+    dataHeader: string,
     extractContent: string,
     downloadBoxPosOffset: number,
     loaded: boolean[],
@@ -107,6 +108,7 @@ export const CountryDetails = withStyles(styles)(
                 menuOpen: false,
                 fadeChecked: false,
                 dataGallery: "",
+                dataHeader: "",
                 extractContent: "",
                 downloadBoxPosOffset: 0,
                 // details, borderFullName, extract
@@ -150,7 +152,7 @@ export const CountryDetails = withStyles(styles)(
         }
 
         public setNewAlpha3Code = (newAlpha3Code: string) => {
-            this.setState({alpha3Code: newAlpha3Code});
+            this.setState({ alpha3Code: newAlpha3Code });
             this.setState({
                 apiError: [false, false, false],
                 loaded: [false, false, false],
@@ -162,9 +164,9 @@ export const CountryDetails = withStyles(styles)(
             const { classes } = this.state.classes;
             return (
                 <div>
-                    <LContext.Provider value={this.state.loaded[2]}>
-                        <Header getNewAlpha3Code={this.setNewAlpha3Code}/>
-                    </LContext.Provider>
+                    <HContext.Provider value={this.state.dataHeader}>
+                        <Header getNewAlpha3Code={this.setNewAlpha3Code} />
+                    </HContext.Provider>
                     {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
                         // Bad request, redirect to homepage
                         <Redirect to={'/'} />
@@ -372,13 +374,14 @@ export const CountryDetails = withStyles(styles)(
                 strOutput += "Region: ";
                 strOutput += country.region;
                 strOutput += (country.subregion.length > 0 ? " - " + country.subregion + "\n" : "\n");
-                strOutput += "Geo coordinates: " + country.latlng.toString() + "\n";
-                strOutput += "Area: " + country.area.toString() + " sq km\n";
+                strOutput += "Geo coordinates: ";
+                strOutput += (country.latlng !== null ? country.latlng.toString() + "\n" : "No data\n");
+                strOutput += "Area: ";
+                strOutput += country.area !== null ? country.area + " sq km\n" : "No data\n";
                 strOutput += "Country border(s): ";
                 strOutput += (country.borders.length > 0 ? country.borders.toString() + "\n\n" : "No country surrounded\n\n");
                 strOutput += "------- Economy -------\n\n";
                 strOutput += "Gini Coefficient (%): ";
-
                 strOutput += (country.gini !== null ? country.gini + "\n" : "No data\n");
                 strOutput += "Currencies: \n";
                 country.currencies.map((data: any) => {
@@ -407,7 +410,18 @@ export const CountryDetails = withStyles(styles)(
                 strOutput += "\n------- Code / Domain -------\n\n";
                 strOutput += "Top Level Domain: ";
                 strOutput += (country.topLevelDomain.length > 0 ? country.topLevelDomain.toString() + "\n" : "Not assigned yet\n");
-                strOutput += "Calling code: " + "+ " + country.callingCodes + "\n";
+                strOutput += "Calling code:";
+                for (const i in country.callingCodes) {
+                    if (country.callingCodes[0].length > 0) {
+                        if (i === '0') {
+                            strOutput += "\n";
+                        }
+                        strOutput += "\t+ " + country.callingCodes[i] + "\n";
+                    } else {
+                        strOutput += " Not assigned yet" + "\n";
+                        break;
+                    }
+                }
                 strOutput += "ISO code:\n";
                 strOutput += "\tAlpha-2 -- " + country.alpha2Code + "\n";
                 strOutput += "\tAlpha-3 -- " + country.alpha3Code + "\n";
@@ -433,6 +447,7 @@ export const CountryDetails = withStyles(styles)(
                         name: optimizeCountryName(nameTemp, 'i'),
                         capital: out.capital
                     });
+
                     this.setState({
                         countryDetailsList: output,
                         dataGallery: dataGalleryStr,
@@ -499,8 +514,14 @@ export const CountryDetails = withStyles(styles)(
                             }
                         });
                     }
+                    const dataHeaderStr = JSON.stringify({
+                        alpha3Code: this.state.alpha3Code,
+                        name: countryName,
+                        pageLoaded: this.state.loaded[2],
+                    });
                     this.setState({
                         extractContent: extract,
+                        dataHeader: dataHeaderStr,
                         loaded: [this.state.loaded[0], this.state.loaded[1], true]
                     });
                 })

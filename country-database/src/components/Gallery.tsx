@@ -94,9 +94,7 @@ export const Gallery = withStyles(styles)(
                                     this.getImageList(JSON.parse(dataGallery).name);
                                     break;
                                 case 1:
-                                    if (JSON.parse(dataGallery).capital.length > 0) {
-                                        this.getImageList(JSON.parse(dataGallery).capital);
-                                    }
+                                    this.getImageList(JSON.parse(dataGallery).capital);
                                     break;
                                 case 2:
                                     break;
@@ -172,22 +170,26 @@ export const Gallery = withStyles(styles)(
             await fetch(url)
                 .then(response => response.json())
                 .then((out) => {
-                    // alert(JSON.stringify(out));
                     if (out.hits !== undefined) {
                         if (out.hits.length >= 3 || this.state.getImageListStatus === 2) {
-                            this.setState({
-                                imageList: out.hits,
-                                getImageListStatus: 2
-                            });
+                            if (nameOrCapital.length > 0) {
+                                this.setState({
+                                    imageList: out.hits,
+                                    getImageListStatus: 2,
+                                    numImage: out.hits.length,
+                                });
+                            }
                             // Abort search if it has already been searched twice
                             this.setState({ finishLoading: true });
                         } else if (this.state.getImageListStatus === 1) {
-                            this.setState({ getImageListStatus: 2 });
+                            this.setState({
+                                finishLoading: true,
+                                getImageListStatus: 2,
+                            });
                             // Else Keep searching
                         } else {
                             this.setState({ getImageListStatus: 1 });
                         }
-                        this.setState({ numImage: out.hits.length });
                     }
                 })
                 .catch(err => {

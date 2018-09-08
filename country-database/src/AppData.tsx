@@ -7,10 +7,10 @@ export const API_KEY_PIXABAY = "***REMOVED***";
     CContext: Context for Country Details
     GContext: Context for Gallery
     SContext: Context for Search Bar
-    LContext: Context of letting component know if the page finished loading
+    HContext: Context of for Header
 
 */
 export const CContext = React.createContext("");
 export const GContext = React.createContext("");
 export const SContext = React.createContext(false);
-export const LContext = React.createContext(false);
+export const HContext = React.createContext("");

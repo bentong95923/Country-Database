@@ -8,7 +8,7 @@ import {
 
 import SearchBar from './SearchBar';
 
-import { LContext } from '../AppData';
+import { HContext } from '../AppData';
 
 import { WebLogoDetailed, WebLogoSimple } from '../AppLogo';
 
@@ -58,28 +58,35 @@ export const Header = withStyles(styles)(
         public render() {
             const { classes } = this.state.classes;
             return (
-                <AppBar className={classes.appBar} position="sticky">
-                    <Toolbar variant="dense">
-                        <Typography variant="title">
-                            <LContext.Consumer>
-                                {pageFinishedLoading => {
-                                    return (
-                                        (pageFinishedLoading ?
-                                            <Link to="/">
-                                                {this.renderLogoByScreenWidth(this.state.winWidth)}
-                                            </Link>
-                                            :
-                                            this.renderLogoByScreenWidth(this.state.winWidth)
-                                        )
-                                    );
-                                }}
-                            </LContext.Consumer>
-                        </Typography>
-                        <div style={searchBarStyle}>
-                            <SearchBar onIndexPage={false} getNewAlpha3Code={this.sendDataToParent} />
-                        </div>
-                    </Toolbar>
-                </AppBar>
+                <HContext.Consumer>
+                    {data => {
+                        if (data.length > 0) {
+                            const pageLoaded = JSON.parse(data).pageLoaded;
+                            return (
+                                <AppBar className={classes.appBar} position="sticky">
+                                    <Toolbar variant="dense">
+                                        <Typography variant="title">
+                                            {pageLoaded ?
+                                                <Link to="/">
+                                                    {this.renderLogoByScreenWidth(this.state.winWidth)}
+                                                </Link>
+                                                :
+                                                this.renderLogoByScreenWidth(this.state.winWidth)
+                                            }
+                                        </Typography>
+                                        <div style={searchBarStyle}>
+                                            {JSON.parse(data).alpha3Code.length === 3 &&
+                                                <SearchBar onIndexPage={false} getNewAlpha3Code={this.sendDataToParent} preLoadCountryData={data} />
+                                            }
+                                        </div>
+                                    </Toolbar>
+                                </AppBar>
+                            );
+                        } else {
+                            return '';
+                        }
+                    }}
+                </HContext.Consumer>
             );
         }
 
