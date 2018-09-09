@@ -457,18 +457,20 @@ export const CountryDetails = withStyles(styles)(
                         capital: out.capital
                     });
                     document.title = optimizeCountryName(nameTemp, 'e') + " | " + APP_TITLE;
-                    this.setState({
+                    this.setState(preState => ({
                         countryDetailsList: output,
                         dataGallery: dataGalleryStr,
-                        loaded: [true, this.state.loaded[1], this.state.loaded[2]]
-                    });
+                        loaded: [true, preState.loaded[1], preState.loaded[2]]
+                    }));
                     if (borders.length > 0 && borders[0].length === 3) {
                         this.getCountryFullNameArray(borders);
                     }
                 })
                 .catch(err => {
                     if (!this.state.apiError[0]) {
-                        this.setState({ apiError: [true, this.state.apiError[1], this.state.apiError[2]] });
+                        this.setState(preState => ({
+                            apiError: [true, preState.apiError[1], preState.apiError[2]]
+                        }));
                     }
                     return;
                 });
@@ -494,7 +496,9 @@ export const CountryDetails = withStyles(styles)(
                         .catch(err => {
                             if (!this.state.apiError[1]) {
                                 // alert('getCountryFullNameArray(): ' + err);
-                                this.setState({ apiError: [this.state.apiError[0], true, this.state.apiError[2]] });
+                                this.setState(preState => ({
+                                    apiError: [preState.apiError[0], true, preState.apiError[2]]
+                                }));
                             }
                             return;
                         });
@@ -529,13 +533,13 @@ export const CountryDetails = withStyles(styles)(
                     const dataHeaderStr = JSON.stringify({
                         alpha3Code: this.state.alpha3Code,
                         name: countryName,
-                        pageLoaded: this.state.loaded[2],
+                        pageLoaded: true,
                     });
-                    this.setState({
+                    this.setState(preState => ({
                         extractContent: extract,
                         dataHeader: dataHeaderStr,
-                        loaded: [this.state.loaded[0], this.state.loaded[1], true]
-                    });
+                        loaded: [preState.loaded[0], preState.loaded[1], true]
+                    }));
                 })
                 .catch(err => {
                     if (!this.state.apiError[2]) {
