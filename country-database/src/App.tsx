@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import SearchBar from './components/SearchBar';
 
+import { APP_TITLE } from './AppData';
 import { WebLogoDetailed } from './AppLogo';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core';
@@ -72,6 +73,7 @@ export const Home = withStyles(styles)(
 
         public render() {
             const { classes } = this.state.classes;
+            document.title = APP_TITLE;
             return (
                 <div style={this.state.styleForSmallScreen} className={classes.appDefaultStyle}>
                     <div

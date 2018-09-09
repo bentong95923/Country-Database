@@ -1,7 +1,7 @@
 import * as React from 'react';
 // Pixabay API key for image search
 export const API_KEY_PIXABAY = "***REMOVED***";
-
+export const APP_TITLE = "Country Database"
 /*
     --------- App Context ---------
     CContext: Context for Country Details

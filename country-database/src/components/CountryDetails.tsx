@@ -22,7 +22,7 @@ import { Gallery } from './Gallery';
 import { Header } from './Header';
 import LoadingScreen from './LoadingScreen';
 
-import { CContext, GContext, HContext } from '../AppData';
+import { APP_TITLE, CContext, GContext, HContext } from '../AppData';
 
 const styles = (theme: Theme) => createStyles({
     cardContainer: {
@@ -92,7 +92,11 @@ interface ICard {
     extractContent: string,
     downloadBoxPosOffset: number,
     loaded: boolean[],
-    alpha3Code: string,
+    /*
+        index 0: pre-alpha 3 code
+        index 1: current-alpha 3 code
+    */
+    alpha3Code: string[],
     expanded: boolean,
     classes: any,
     apiError: boolean[],
@@ -113,7 +117,7 @@ export const CountryDetails = withStyles(styles)(
                 downloadBoxPosOffset: 0,
                 // details, borderFullName, extract
                 loaded: [false, false, false],
-                alpha3Code: props.match.params.alpha3Code,
+                alpha3Code: [props.match.params.alpha3Code, props.match.params.alpha3Code],
                 expanded: false,
                 classes: props,
                 /*
@@ -124,10 +128,7 @@ export const CountryDetails = withStyles(styles)(
                 */
                 apiError: [false, false, false],
             }
-            // Rewrite URL parameter to upper case
-            if (props.match.params.alpha3Code.length === 3) {
-                props.history.push('/details/' + props.match.params.alpha3Code.toUpperCase());
-            }
+            this.rewriteURI(props);
         }
 
         public toggleCardExpand = () => {
@@ -152,12 +153,18 @@ export const CountryDetails = withStyles(styles)(
         }
 
         public setNewAlpha3Code = (newAlpha3Code: string) => {
-            this.setState({ alpha3Code: newAlpha3Code });
-            this.setState({
+            this.setState(preState => ({
+                alpha3Code: [preState.alpha3Code[1], newAlpha3Code],
                 apiError: [false, false, false],
                 loaded: [false, false, false],
                 countryDetailsList: [],
-            });
+            }));
+            /* const props = this.state.classes;
+            props.map((value: any) => {
+                if (this.state.classes.match.params.alpha3Code.length === 3) {
+                    value.history.push('/details/' + value.match.params.alpha3Code.toUpperCase());
+                }
+            }); */
         }
 
         public render() {
@@ -167,7 +174,7 @@ export const CountryDetails = withStyles(styles)(
                     <HContext.Provider value={this.state.dataHeader}>
                         <Header getNewAlpha3Code={this.setNewAlpha3Code} />
                     </HContext.Provider>
-                    {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
+                    {(this.state.apiError[0] || this.state.alpha3Code[1].length !== 3) ?
                         // Bad request, redirect to homepage
                         <Redirect to={'/'} />
                         :
@@ -190,12 +197,7 @@ export const CountryDetails = withStyles(styles)(
             return (
                 <div>
                     {this.state.countryDetailsList.map(countryDetail => {
-                        if (extractContent.length <= 0) {
-                            if (!this.state.loaded[2]) {
-                                this.getExtract(countryDetail.name)
-                            }
-                            return;
-                        } else {
+                        if (extractContent.length > 0) {
                             const extractBuf = extractContent.split('\n');
                             const extract = new Array();
                             let count = 0;
@@ -295,10 +297,21 @@ export const CountryDetails = withStyles(styles)(
                                     }
                                 </Card>
                             );
+                        } else {
+                            return;
                         }
                     })}
                 </div>
             );
+        }
+
+        public rewriteURI = (props: any) => {
+            // props.map((value: any) => {
+            // Rewrite URL parameter to upper case
+            if (props.match.params.alpha3Code.length === 3) {
+                props.history.push('/details/' + this.state.alpha3Code[1].toUpperCase());
+            }
+            // });
         }
 
         public downloadBoxCssPosOffsetCal = () => {
@@ -318,8 +331,8 @@ export const CountryDetails = withStyles(styles)(
 
         // Will be called if there is any component(s) updated for re-rendering
         public componentDidMount() {
-            if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
-                this.searchCountryDetails(this.state.alpha3Code);
+            if (!this.state.loaded[0] && this.state.alpha3Code[1].length === 3) {
+                this.searchCountryDetails(this.state.alpha3Code[1]);
             }
             // Load extract if country detail list is loaded but have not loaded the extract
             if (this.state.countryDetailsList.length > 0 && !this.state.loaded[2]) {
@@ -331,12 +344,12 @@ export const CountryDetails = withStyles(styles)(
             window.addEventListener('resize', this.downloadBoxCssPosOffsetCal);
         }
 
-        public componentDidUpdate() {
+        public componentDidUpdate(props: any) {
             if (this.state.loaded[2]) {
                 this.downloadBoxCssPosOffsetCal();
             }
-            if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
-                this.searchCountryDetails(this.state.alpha3Code);
+            if (!this.state.loaded[0] && this.state.alpha3Code[1].length === 3) {
+                this.searchCountryDetails(this.state.alpha3Code[1]);
             }
             // Load extract if country detail list is loaded but have not loaded the extract
             if (this.state.countryDetailsList.length > 0 && !this.state.loaded[2]) {
@@ -344,6 +357,9 @@ export const CountryDetails = withStyles(styles)(
                     // Loading extract
                     this.getExtract(value.name);
                 });
+            }
+            if (props.location.pathname !== props.location.pathname.toUpperCase() && props.match.params.alpha3Code !== this.state.alpha3Code[1]) {
+                this.rewriteURI(props);
             }
         }
 
@@ -447,7 +463,7 @@ export const CountryDetails = withStyles(styles)(
                         name: optimizeCountryName(nameTemp, 'i'),
                         capital: out.capital
                     });
-
+                    document.title = optimizeCountryName(nameTemp, 'e') + " | " + APP_TITLE;
                     this.setState({
                         countryDetailsList: output,
                         dataGallery: dataGalleryStr,
@@ -496,7 +512,10 @@ export const CountryDetails = withStyles(styles)(
             tempCountryDetailsList.map(value => {
                 value.borders = tempArray;
             });
-            this.setState(preState => ({ countryDetailsList: tempCountryDetailsList, loaded: [preState.loaded[0], true, preState.loaded[2]] }));
+            this.setState(preState => ({
+                countryDetailsList: tempCountryDetailsList,
+                loaded: [preState.loaded[0], true, preState.loaded[2]]
+            }));
         }
 
         public getExtract = (countryName: string) => {
@@ -515,7 +534,7 @@ export const CountryDetails = withStyles(styles)(
                         });
                     }
                     const dataHeaderStr = JSON.stringify({
-                        alpha3Code: this.state.alpha3Code,
+                        alpha3Code: this.state.alpha3Code[1],
                         name: countryName,
                         pageLoaded: this.state.loaded[2],
                     });
