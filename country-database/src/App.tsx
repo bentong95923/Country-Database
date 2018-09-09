@@ -20,7 +20,7 @@ const styles = (theme: Theme) => createStyles({
         left: '50%',
         transform: 'translate(-50%, -50%)',
         backgroundColor: 'rgba(255,255,255,0.5)',
-        padding: '50px 25px',
+        padding: '70px 40px',
     },
     webLogoStyle: {
         width: '100%',
@@ -30,7 +30,7 @@ const styles = (theme: Theme) => createStyles({
     }
 });
 
-const minScreenWidth = 400; // Minimum width of screen in px to NOT consider as small screen device
+const minScreenWidth = 410; // Minimum width of screen in px to NOT consider as small screen device
 
 export const Home = withStyles(styles)(
     class extends React.Component<{}, IHome> {

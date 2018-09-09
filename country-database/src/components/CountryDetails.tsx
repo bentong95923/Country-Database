@@ -96,7 +96,7 @@ interface ICard {
         index 0: pre-alpha 3 code
         index 1: current-alpha 3 code
     */
-    alpha3Code: string[],
+    alpha3Code: string,
     expanded: boolean,
     classes: any,
     apiError: boolean[],
@@ -117,7 +117,7 @@ export const CountryDetails = withStyles(styles)(
                 downloadBoxPosOffset: 0,
                 // details, borderFullName, extract
                 loaded: [false, false, false],
-                alpha3Code: [props.match.params.alpha3Code, props.match.params.alpha3Code],
+                alpha3Code: props.match.params.alpha3Code.toUpperCase(),
                 expanded: false,
                 classes: props,
                 /*
@@ -153,18 +153,12 @@ export const CountryDetails = withStyles(styles)(
         }
 
         public setNewAlpha3Code = (newAlpha3Code: string) => {
-            this.setState(preState => ({
-                alpha3Code: [preState.alpha3Code[1], newAlpha3Code],
+            this.setState({
+                alpha3Code: newAlpha3Code,
                 apiError: [false, false, false],
                 loaded: [false, false, false],
                 countryDetailsList: [],
-            }));
-            /* const props = this.state.classes;
-            props.map((value: any) => {
-                if (this.state.classes.match.params.alpha3Code.length === 3) {
-                    value.history.push('/details/' + value.match.params.alpha3Code.toUpperCase());
-                }
-            }); */
+            });
         }
 
         public render() {
@@ -174,7 +168,7 @@ export const CountryDetails = withStyles(styles)(
                     <HContext.Provider value={this.state.dataHeader}>
                         <Header getNewAlpha3Code={this.setNewAlpha3Code} />
                     </HContext.Provider>
-                    {(this.state.apiError[0] || this.state.alpha3Code[1].length !== 3) ?
+                    {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
                         // Bad request, redirect to homepage
                         <Redirect to={'/'} />
                         :
@@ -306,12 +300,13 @@ export const CountryDetails = withStyles(styles)(
         }
 
         public rewriteURI = (props: any) => {
-            // props.map((value: any) => {
             // Rewrite URL parameter to upper case
-            if (props.match.params.alpha3Code.length === 3) {
-                props.history.push('/details/' + this.state.alpha3Code[1].toUpperCase());
+            const alpha3CodeProps = props.match.params.alpha3Code;
+            if (alpha3CodeProps !== alpha3CodeProps.toUpperCase() || alpha3CodeProps !== this.state.alpha3Code) {
+                if (alpha3CodeProps.length === 3) {
+                    props.history.push('/details/' + this.state.alpha3Code.toUpperCase());
+                }
             }
-            // });
         }
 
         public downloadBoxCssPosOffsetCal = () => {
@@ -331,8 +326,8 @@ export const CountryDetails = withStyles(styles)(
 
         // Will be called if there is any component(s) updated for re-rendering
         public componentDidMount() {
-            if (!this.state.loaded[0] && this.state.alpha3Code[1].length === 3) {
-                this.searchCountryDetails(this.state.alpha3Code[1]);
+            if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
+                this.searchCountryDetails(this.state.alpha3Code);
             }
             // Load extract if country detail list is loaded but have not loaded the extract
             if (this.state.countryDetailsList.length > 0 && !this.state.loaded[2]) {
@@ -348,8 +343,8 @@ export const CountryDetails = withStyles(styles)(
             if (this.state.loaded[2]) {
                 this.downloadBoxCssPosOffsetCal();
             }
-            if (!this.state.loaded[0] && this.state.alpha3Code[1].length === 3) {
-                this.searchCountryDetails(this.state.alpha3Code[1]);
+            if (!this.state.loaded[0] && this.state.alpha3Code.length === 3) {
+                this.searchCountryDetails(this.state.alpha3Code);
             }
             // Load extract if country detail list is loaded but have not loaded the extract
             if (this.state.countryDetailsList.length > 0 && !this.state.loaded[2]) {
@@ -358,9 +353,7 @@ export const CountryDetails = withStyles(styles)(
                     this.getExtract(value.name);
                 });
             }
-            if (props.location.pathname !== props.location.pathname.toUpperCase() && props.match.params.alpha3Code !== this.state.alpha3Code[1]) {
-                this.rewriteURI(props);
-            }
+            this.rewriteURI(props);
         }
 
         public downloadTxtFile = () => {
@@ -534,7 +527,7 @@ export const CountryDetails = withStyles(styles)(
                         });
                     }
                     const dataHeaderStr = JSON.stringify({
-                        alpha3Code: this.state.alpha3Code[1],
+                        alpha3Code: this.state.alpha3Code,
                         name: countryName,
                         pageLoaded: this.state.loaded[2],
                     });
