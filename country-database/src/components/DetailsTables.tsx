@@ -20,7 +20,7 @@ import {
 } from '@material-ui/icons';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
-import { CContext } from "../AppData";
+import { CContext, MIN_SCREEN_WIDTH } from "../AppData";
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
@@ -88,7 +88,7 @@ export const DetailsTables = withStyles(styles)(
         }
 
         public isTabsNeedScrolling = () => {
-            return window.innerWidth < 400;
+            return window.innerWidth < MIN_SCREEN_WIDTH;
         }
 
         public componentDidMount() {

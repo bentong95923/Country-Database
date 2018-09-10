@@ -7,6 +7,7 @@ import AsyncSelect from 'react-select/lib/Async';
 
 import Search from '@material-ui/icons/Search';
 
+import { MAX_NUM_INPUT_NAME, MIN_NUM_INPUT, SEARCH_BAR_INPUT_PLACEHOLDER } from '../AppData';
 import { optimizeCountryName } from '../CountryNameOptimization';
 
 // Declare props for this component
@@ -24,11 +25,6 @@ interface IState {
     confirmedQuery: boolean,
     apiError: boolean,
 }
-
-// Number of letters required to enter for country search
-const MIN_NUM_INPUT = 2; // Minimum 
-const MAX_NUM_INPUT_NAME = 70; // Maximum
-const placeHolderString = 'Country name...';
 
 const { Input, ValueContainer, Option } = components;
 
@@ -114,7 +110,7 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
         this.state = {
             countryOptions: [],
             defaultValue: this.getDefaultValue(),
-            alpha3Code: "",
+            alpha3Code: props.preLoadCountryData.length > 0 ? JSON.parse(props.preLoadCountryData).alpha3Code : "",
             responseReceived: false,
             confirmedQuery: false,
             // The 404 error does not consider an apiError for user entnering a non-existing country name
@@ -138,7 +134,7 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
                         openMenuOnClick={false}
                         loadOptions={this.handleOnInput}
                         defaultOptions={[]}
-                        placeholder={placeHolderString}
+                        placeholder={SEARCH_BAR_INPUT_PLACEHOLDER}
                         noOptionsMessage={this.getNoOptText}
                         onChange={this.getSelectedCountryDetails}
                         isOptionSelected={this.checkOptionIsSelected}
@@ -227,10 +223,6 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
             });
         }
         return defaultValue;
-    }
-
-    public componentDidMount() {
-        this.setState({ defaultValue: this.getDefaultValue() });
     }
 
     public getCountryList = async (country: string) => {

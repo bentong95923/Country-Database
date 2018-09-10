@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import SearchBar from './components/SearchBar';
 
-import { APP_TITLE } from './AppData';
+import { APP_TITLE, MIN_SCREEN_WIDTH } from './AppData';
 import { WebLogoDetailed } from './AppLogo';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core';
@@ -25,12 +25,11 @@ const styles = (theme: Theme) => createStyles({
     webLogoStyle: {
         width: '100%',
         maxWidth: '700px',
-        minWidth: '270px',
+        minWidth: '230px',
         marginBottom: '10%',
     }
 });
 
-const minScreenWidth = 410; // Minimum width of screen in px to NOT consider as small screen device
 
 export const Home = withStyles(styles)(
     class extends React.Component<{}, IHome> {
@@ -41,22 +40,15 @@ export const Home = withStyles(styles)(
                 contentLoaded: false,
                 classes: props,
                 styleForSmallScreen: this.getHomePageStyle(),
-
             }
         }
 
         public showContent = () => this.setState({ contentLoaded: true });
 
         public getHomePageStyle = () => {
-            if (window.innerWidth < minScreenWidth) {
-                return ({
-                    width: '100%',
-                });
-            } else {
-                return ({
-                    borderRadius: '5px',
-                });
-            }
+            return (
+                window.innerWidth < MIN_SCREEN_WIDTH) ? ({ width: '100%' }) : ({ borderRadius: '5px' }
+                );
         }
 
         public setHomePageStyle = () => {

@@ -44,7 +44,7 @@ const styles = (theme: Theme) => createStyles({
     },
     pixabay: {
         width: '100px',
-        display: 'block',
+        // display: 'block',
         marginTop: '10px',
     }
 });
@@ -106,7 +106,11 @@ export const Gallery = withStyles(styles)(
                         <div className={classes.refTxt}>
                             Photos provided by
                             <a href="https://pixabay.com/" target="_blank">
-                                <img src="https://pixabay.com/static/img/logo.png" className={classes.pixabay} />
+                            <br />
+                                <img
+                                    src="https://pixabay.com/static/img/logo.png"
+                                    className={classes.pixabay}
+                                />
                             </a>
                         </div>
                     }
