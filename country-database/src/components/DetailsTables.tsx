@@ -27,7 +27,7 @@ const styles = (theme: Theme) => createStyles({
     reftxt: {
         textAlign: 'left',
         color: 'rgba(0, 0, 0, 0.54)',
-        padding: '5px 0 15px 0',
+        padding: '15px 0',
         fontSize: '11px',
     },
     refProviderTxt: {
