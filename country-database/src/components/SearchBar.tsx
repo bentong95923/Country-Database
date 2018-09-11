@@ -49,8 +49,16 @@ const NewOption = (props: any) => {
     // Adding its country icon for each country option
     return (
         <Option {...props}>
-            <img style={countryIconStyle} src={props.data.flag} />
-            {props.data.label}
+            <div style={{ display: 'table' }}>
+                <span
+                    style={{
+                        display: 'table-cell',
+                    }}
+                >
+                    <img style={countryIconStyle} src={props.data.flag} />
+                </span>
+                <span style={{ display: 'table-cell' }}>{props.data.label}</span>
+            </div>
         </Option>
     );
 }
@@ -80,6 +88,9 @@ const searchBarStyle = {
         ...styles,
         left: '36px',
         wordWrap: "normal",
+        width: '75%',
+        maxWidth: 'unset',
+
     }),
     placeholder: (styles: any) => ({
         ...styles,
@@ -97,8 +108,8 @@ const searchBarStyle = {
 /* const debugReactSelectInnerStyle = (styles: any, props: any) => {
     console.log(JSON.stringify(styles));
     return props;
-} */
-
+}
+ */
 export default class SearchBar extends React.Component<ISearchBarProps, IState> {
 
     static defaultProps = {
