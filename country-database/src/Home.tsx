@@ -1,14 +1,13 @@
 import * as React from 'react';
 
-import SearchBar from './components/SearchBar';
-
 import { APP_TITLE, MIN_SCREEN_WIDTH } from './AppData';
 import { WebLogoDetailed } from './AppLogo';
+import SearchBar from './components/SearchBar';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core';
 
 interface IHome {
-    contentLoaded: boolean,
+    loaded: boolean,
     classes: any,
     styleForSmallScreen: any,
 }
@@ -37,13 +36,13 @@ export const Home = withStyles(styles)(
         constructor(props: any) {
             super(props);
             this.state = {
-                contentLoaded: false,
+                loaded: false,
                 classes: props,
                 styleForSmallScreen: this.getHomePageStyle(),
             }
         }
 
-        public showContent = () => this.setState({ contentLoaded: true });
+        public showComponent = () => this.setState({ loaded: true });
 
         public getHomePageStyle = () => {
             return (
@@ -71,10 +70,10 @@ export const Home = withStyles(styles)(
                     <div
                         /* Prevent user from seeing the internal state of loading the weblogo */
                         style={{
-                            visibility: this.state.contentLoaded ? 'visible' : 'hidden',
+                            visibility: this.state.loaded ? 'visible' : 'hidden',
                         }}
                     >
-                        <WebLogoDetailed className={classes.webLogoStyle} onLoad={this.showContent} />
+                        <WebLogoDetailed className={classes.webLogoStyle} onLoad={this.showComponent} />
                         <SearchBar onIndexPage={true} />
                     </div>
                 </div>

@@ -25,14 +25,15 @@ import { CContext, MIN_SCREEN_WIDTH } from "../AppData";
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
     reftxt: {
-        textAlign: 'right',
-        padding: '20px 10px 0px 0px',
+        textAlign: 'left',
         color: 'rgba(0, 0, 0, 0.54)',
+        padding: '5px 0 15px 0',
         fontSize: '11px',
     },
     refProviderTxt: {
-        fontSize: "14px",
-        marginTop: '5px',
+        fontSize: '13px',
+        display: 'inline-block',
+        marginLeft: '3px',
     },
     // Override classes
     appBar: {
@@ -120,10 +121,6 @@ export const DetailsTables = withStyles(styles)(
                             <Tab icon={<SettingsEthernet />} title="Code / Domain" />
                         </Tabs>
                     </AppBar>
-                    <div className={classes.reftxt}>
-                        Data provided by <br />
-                        <div className={classes.refProviderTxt}>REST Countries</div>
-                    </div>
                     <CContext.Consumer>
                         {dataCountryDetails => {
                             const countryDetailsList = JSON.parse(dataCountryDetails);
@@ -140,6 +137,11 @@ export const DetailsTables = withStyles(styles)(
                                                         {this.state.tabValue === 3 && this.renderLanguagesNamesTable(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
                                                         {this.state.tabValue === 4 && this.renderCodeDomainTable(country.topLevelDomain, country.alpha2Code, country.alpha3Code, country.callingCodes, country.numericCode)}
                                                     </Paper>
+
+                                                    <div className={classes.reftxt}>
+                                                        Data provided by
+                                                        <div className={classes.refProviderTxt}>REST Countries</div>
+                                                    </div>
                                                 </TabContainer>
                                             );
                                         })}

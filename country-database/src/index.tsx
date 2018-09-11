@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
-import { AppRouter } from './router';
+import { AppRouter } from './Router';
 
 ReactDOM.render(
   <AppRouter />,

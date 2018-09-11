@@ -20,9 +20,9 @@ import GetApp from '@material-ui/icons/GetApp';
 import { DetailsTables } from './DetailsTables';
 import { Gallery } from './Gallery';
 import { Header } from './Header';
-import LoadingScreen from './LoadingScreen';
+import LoadingLogo from './LoadingLogo';
 
-import { APP_TITLE, CContext, GContext, HContext } from '../AppData';
+import { APP_TITLE, CContext, HContext } from '../AppData';
 
 const styles = (theme: Theme) => createStyles({
     cardContainer: {
@@ -68,8 +68,9 @@ const styles = (theme: Theme) => createStyles({
         overflow: 'auto'
     },
     refProviderTxt: {
-        fontSize: "14px",
-        marginTop: '5px',
+        fontSize: '13px',
+        display: 'inline-block',
+        marginLeft: '3px',
     },
     reftxt: {
         textAlign: 'right',
@@ -79,6 +80,7 @@ const styles = (theme: Theme) => createStyles({
     },
     extractContent: {
         textAlign: 'justify',
+        margin: '10px 0',
     },
 });
 
@@ -175,8 +177,7 @@ export const CountryDetails = withStyles(styles)(
                         // Loading extract content
                         <div className={classes.cardContainer}>
                             {/* Display loading spinner screen until the page is loaded. */}
-                            {!this.state.loaded[2] && <LoadingScreen />}
-
+                            {!this.state.loaded[2] && <LoadingLogo />}
                             {this.state.countryDetailsList.length > 0 && this.loadnRenderExtractCardContent()}
                         </div>
                     }
@@ -246,19 +247,19 @@ export const CountryDetails = withStyles(styles)(
                                         <CContext.Provider value={JSON.stringify(this.state.countryDetailsList)}>
                                             <DetailsTables />
                                         </CContext.Provider>
-                                        <GContext.Provider value={this.state.dataGallery}>
-                                            <Gallery />
-                                        </GContext.Provider>
-                                        <div className={classes.reftxt}>
-                                            Content provided by
-                                            <div className={classes.refProviderTxt}>Wikipedia</div>
-                                        </div>
+                                        {this.state.dataGallery.length > 0 &&
+                                            <Gallery data={this.state.dataGallery} />
+                                        }
                                         <Typography className={classes.extractContent} component="p">
                                             {extract[count++].str}
                                         </Typography>
                                     </CardContent>
                                     {extract.length > 1 &&
                                         <CardActions className={classes.actions} disableActionSpacing={true}>
+                                            <div className={classes.reftxt}>
+                                                Content provided by
+                                                <div className={classes.refProviderTxt}>Wikipedia</div>
+                                            </div>
                                             <IconButton
                                                 className={classnames(classes.expand, {
                                                     [classes.expandOpen]: this.state.expanded,

@@ -13,7 +13,7 @@ import {
 
 import { API_KEY_PIXABAY } from '../AppData';
 
-import { GContext } from '../AppData';
+// import { GContext } from '../AppData';
 
 // Material-UI style for Horizontal Grid List
 const styles = (theme: Theme) => createStyles({
@@ -40,12 +40,11 @@ const styles = (theme: Theme) => createStyles({
     refTxt: {
         color: 'rgba(0, 0, 0, 0.54)',
         fontSize: '11px',
-        marginTop: '20px',
+        textAlign: 'right',
     },
     pixabay: {
         width: '100px',
-        // display: 'block',
-        marginTop: '10px',
+        margin: '10px 0',
     }
 });
 
@@ -55,14 +54,18 @@ interface IGallery {
     winHeight: number,
     numImage: number,
     classes: any,
-    getImageListStatus: number,
+    // getImageListStatus: number,
     finishLoading: boolean,
     apiError: boolean
 }
 
+interface IGalleryProps {
+    data: string,
+}
+
 export const Gallery = withStyles(styles)(
 
-    class extends React.Component<{}, IGallery> {
+    class extends React.Component<IGalleryProps, IGallery> {
 
         constructor(props: any) {
             super(props);
@@ -77,7 +80,7 @@ export const Gallery = withStyles(styles)(
                     1: called using country name but not enough photos
                     2: called using capital name or abort search
                 */
-                getImageListStatus: 0,
+                // getImageListStatus: 0,
                 finishLoading: false,
                 apiError: false
             }
@@ -87,36 +90,11 @@ export const Gallery = withStyles(styles)(
             const { classes } = this.state.classes;
             return (
                 <div>
-                    <GContext.Consumer>
-                        {dataGallery => {
-                            switch (this.state.getImageListStatus) {
-                                case 0:
-                                    this.getImageList(JSON.parse(dataGallery).name);
-                                    break;
-                                case 1:
-                                    this.getImageList(JSON.parse(dataGallery).capital);
-                                    break;
-                                case 2:
-                                    break;
-                            }
-                            return '';
-                        }}
-                    </GContext.Consumer>
-                    {this.state.numImage > 0 &&
-                        <div className={classes.refTxt}>
-                            Photos provided by
-                            <a href="https://pixabay.com/" target="_blank">
-                            <br />
-                                <img
-                                    src="https://pixabay.com/static/img/logo.png"
-                                    className={classes.pixabay}
-                                />
-                            </a>
-                        </div>
-                    }
-                    <br />
+
                     <div className={classes.root}>
-                        {!this.state.finishLoading ? <CircularProgress /> :
+                        {!this.state.finishLoading ?
+                            <CircularProgress />
+                            :
                             <GridList className={classes.gridList} cellHeight={220} cols={this.responsiveDisplay()}>
                                 {this.state.imageList.map(tile => {
                                     return (
@@ -139,6 +117,18 @@ export const Gallery = withStyles(styles)(
                             </GridList>
                         }
                     </div>
+                    {this.state.numImage > 0 &&
+                        <div className={classes.refTxt}>
+                            Photos provided by
+                            <a href="https://pixabay.com/" target="_blank">
+                                <br />
+                                <img
+                                    src="https://pixabay.com/static/img/logo.png"
+                                    className={classes.pixabay}
+                                />
+                            </a>
+                        </div>
+                    }
                 </div>
             );
         }
@@ -148,6 +138,7 @@ export const Gallery = withStyles(styles)(
         }
 
         public componentDidMount() {
+            this.getImageList([JSON.parse(this.props.data).name, JSON.parse(this.props.data).capital], 0);
             window.addEventListener('resize', this.updateResolution);
         }
 
@@ -169,13 +160,41 @@ export const Gallery = withStyles(styles)(
             window.open(url, "_blank");
         }
 
-        public getImageList = async (nameOrCapital: string) => {
-            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(nameOrCapital) + "&image_type=photo&safesearch=true";
+        // Recursive
+        public getImageList = async (nameNCapital: any[], nthTimeToRun: number) => {
+            const keywords = nthTimeToRun <= 1 ? nameNCapital[0] : nameNCapital[1]; // First two times uses country name, last two time uses its capital
+            if (nameNCapital[1].length === 0) {
+                this.setState({ finishLoading: true });
+                return;
+            }
+            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keywords) + "&image_type=photo&safesearch=true";
             await fetch(url)
                 .then(response => response.json())
                 .then((out) => {
                     if (out.hits !== undefined) {
-                        if (out.hits.length >= 3 || this.state.getImageListStatus === 2) {
+                        if (out.hits.length >= 3 || nthTimeToRun === 2) {
+                            this.setState({
+                                imageList: out.hits,
+                                numImage: out.hits.length,
+                            });
+                            // Abort search if it has already been searched twice
+                            this.setState({ finishLoading: true });
+                        } else {
+                            // No Result
+                            // alert('hi')
+                            switch (nthTimeToRun) {
+                                case 0:
+                                    this.getImageList(nameNCapital, ++nthTimeToRun);
+                                    break;
+                                case 1:
+                                case 2:
+                                    this.getImageList(nameNCapital, ++nthTimeToRun);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        /* if (out.hits.length >= 3 || this.state.getImageListStatus === 2) {
                             if (nameOrCapital.length > 0) {
                                 this.setState({
                                     imageList: out.hits,
@@ -193,7 +212,7 @@ export const Gallery = withStyles(styles)(
                             // Else Keep searching
                         } else {
                             this.setState({ getImageListStatus: 1 });
-                        }
+                        } */
                     }
                 })
                 .catch(err => {
