@@ -45,6 +45,7 @@ const styles = (theme: Theme) => createStyles({
     }
 });
 
+// Interface
 interface ICountryDetails {
     tabValue: number,
     tabScrollable: boolean,
@@ -73,7 +74,7 @@ export const DetailsTables = withStyles(styles)(
             }
         }
 
-        public handleChange = (event: any, val: number) => {
+        public selectTab = (event: any, val: number) => {
             this.setState({ tabValue: val });
         }
 
@@ -88,14 +89,17 @@ export const DetailsTables = withStyles(styles)(
             });
         }
 
+        // Make the tab bar scrollable for small screen device
         public isTabsNeedScrolling = () => {
             return window.innerWidth < MIN_SCREEN_WIDTH;
         }
 
+        // Re-set scrollable if window is resized
         public componentDidMount() {
             window.addEventListener('resize', this.setTableScrollable);
         }
 
+        // Deregister the event listener when the component is being destroyed
         public componentWillUnmount() {
             window.removeEventListener('resize', this.setTableScrollable);
         }
@@ -107,7 +111,7 @@ export const DetailsTables = withStyles(styles)(
                     <AppBar position="static" color="default" classes={{ root: classes.appBar }}>
                         <Tabs
                             value={this.state.tabValue}
-                            onChange={this.handleChange}
+                            onChange={this.selectTab}
                             scrollButtons="on"
                             indicatorColor="primary"
                             textColor="primary"
@@ -124,32 +128,27 @@ export const DetailsTables = withStyles(styles)(
                     <CContext.Consumer>
                         {dataCountryDetails => {
                             const countryDetailsList = JSON.parse(dataCountryDetails);
-                            if (countryDetailsList.length > 0) {
-                                return (
-                                    <div>
-                                        {countryDetailsList.map((country: any) => {
-                                            return (
-                                                <TabContainer key={country.alpha3Code}>
-                                                    <Paper classes={{ root: classes.table }}>
-                                                        {this.state.tabValue === 0 && this.renderGeneralInfoTable(country.population, country.capital, country.demonym, country.timezones, country.flag)}
-                                                        {this.state.tabValue === 1 && this.renderLocationTable(country.region, country.subregion, country.latlng, country.area, country.borders)}
-                                                        {this.state.tabValue === 2 && this.renderEconmonyTable(country.gini, country.currencies, country.regionalBlocs)}
-                                                        {this.state.tabValue === 3 && this.renderLanguagesNamesTable(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
-                                                        {this.state.tabValue === 4 && this.renderCodeDomainTable(country.topLevelDomain, country.alpha2Code, country.alpha3Code, country.callingCodes, country.numericCode)}
-                                                    </Paper>
-
-                                                    <div className={classes.reftxt}>
-                                                        Data provided by
-                                                        <div className={classes.refProviderTxt}>REST Countries</div>
-                                                    </div>
-                                                </TabContainer>
-                                            );
-                                        })}
-                                    </div>
-                                );
-                            } else {
-                                return "dataCountryDetails is empty.";
-                            }
+                            return (countryDetailsList.length > 0 &&
+                                <div>
+                                    {countryDetailsList.map((country: any) => {
+                                        return (
+                                            <TabContainer key={country.alpha3Code}>
+                                                <Paper classes={{ root: classes.table }}>
+                                                    {this.state.tabValue === 0 && this.renderGeneralInfoTable(country.population, country.capital, country.demonym, country.timezones, country.flag)}
+                                                    {this.state.tabValue === 1 && this.renderLocationTable(country.region, country.subregion, country.latlng, country.area, country.borders)}
+                                                    {this.state.tabValue === 2 && this.renderEconmonyTable(country.gini, country.currencies, country.regionalBlocs)}
+                                                    {this.state.tabValue === 3 && this.renderLanguagesNamesTable(country.name, country.altSpellings, country.nativeName, country.translations, country.languages)}
+                                                    {this.state.tabValue === 4 && this.renderCodeDomainTable(country.topLevelDomain, country.alpha2Code, country.alpha3Code, country.callingCodes, country.numericCode)}
+                                                </Paper>
+                                                <div className={classes.reftxt}>
+                                                    Data provided by
+                                                    <div className={classes.refProviderTxt}>REST Countries</div>
+                                                </div>
+                                            </TabContainer>
+                                        );
+                                    })}
+                                </div>
+                            );
                         }}
                     </CContext.Consumer>
                 </div>

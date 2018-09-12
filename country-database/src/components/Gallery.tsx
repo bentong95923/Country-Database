@@ -11,9 +11,7 @@ import {
     IconButton
 } from '@material-ui/core';
 
-import { API_KEY_PIXABAY } from '../AppData';
-
-// import { GContext } from '../AppData';
+import { API_KEY_PIXABAY, PIC_GALLERY_HEIGHT } from '../AppData';
 
 // Material-UI style for Horizontal Grid List
 const styles = (theme: Theme) => createStyles({
@@ -22,7 +20,6 @@ const styles = (theme: Theme) => createStyles({
         flexWrap: 'wrap',
         justifyContent: 'space-around',
         overflow: 'hidden',
-        // backgroundColor: theme.palette.background.paper,
         marginBottom: '20px',
     },
     gridList: {
@@ -48,6 +45,7 @@ const styles = (theme: Theme) => createStyles({
     }
 });
 
+// Interface
 interface IGallery {
     imageList: any[],
     winWidth: number,
@@ -59,6 +57,7 @@ interface IGallery {
     apiError: boolean
 }
 
+// Customized props
 interface IGalleryProps {
     data: string,
 }
@@ -75,27 +74,20 @@ export const Gallery = withStyles(styles)(
                 winHeight: window.innerHeight,
                 classes: props,
                 numImage: 0,
-                /*
-                    0: never called
-                    1: called using country name but not enough photos
-                    2: called using capital name or abort search
-                */
-                // getImageListStatus: 0,
                 finishLoading: false,
                 apiError: false
             }
         }
-        // Next step: use context to pass country name to ge the correct pictures. Also need to address the resource that the pics come from (PIXABAY)
+
         public render() {
             const { classes } = this.state.classes;
             return (
                 <div>
-
                     <div className={classes.root}>
                         {!this.state.finishLoading ?
                             <CircularProgress />
                             :
-                            <GridList className={classes.gridList} cellHeight={220} cols={this.responsiveDisplay()}>
+                            <GridList className={classes.gridList} cellHeight={PIC_GALLERY_HEIGHT} cols={this.responsiveDisplay()}>
                                 {this.state.imageList.map(tile => {
                                     return (
                                         <GridListTile key={tile.id}>
@@ -160,10 +152,16 @@ export const Gallery = withStyles(styles)(
             window.open(url, "_blank");
         }
 
-        // Recursive
+        /*
+            Get a list of images from Pixabay (Recursive)
+            nameNCapital: an array stores the country name and its capital name
+            nthTimeToRun: a number passing into the recursive function to record number of times has been called. (First time calling then put this as 0)
+        */
         public getImageList = async (nameNCapital: any[], nthTimeToRun: number) => {
-            const keywords = nthTimeToRun <= 1 ? nameNCapital[0] : nameNCapital[1]; // First two times uses country name, last two time uses its capital
-            if (nameNCapital[1].length === 0) {
+            // First two times uses country name, last two time uses its capital
+            const keywords = nthTimeToRun <= 1 ? nameNCapital[0] : nameNCapital[1];
+            // If the function has been called at least once and the capital is not found then stop the search
+            if (nameNCapital[1].length === 0 && nthTimeToRun > 0) {
                 this.setState({ finishLoading: true });
                 return;
             }
@@ -172,6 +170,7 @@ export const Gallery = withStyles(styles)(
                 .then(response => response.json())
                 .then((out) => {
                     if (out.hits !== undefined) {
+                        // End search if results are found or had been run 3 times
                         if (out.hits.length >= 3 || nthTimeToRun === 2) {
                             this.setState({
                                 imageList: out.hits,
@@ -181,46 +180,14 @@ export const Gallery = withStyles(styles)(
                             this.setState({ finishLoading: true });
                         } else {
                             // No Result
-                            // alert('hi')
-                            switch (nthTimeToRun) {
-                                case 0:
-                                    this.getImageList(nameNCapital, ++nthTimeToRun);
-                                    break;
-                                case 1:
-                                case 2:
-                                    this.getImageList(nameNCapital, ++nthTimeToRun);
-                                    break;
-                                default:
-                                    break;
-                            }
+                            this.getImageList(nameNCapital, ++nthTimeToRun);
                         }
-                        /* if (out.hits.length >= 3 || this.state.getImageListStatus === 2) {
-                            if (nameOrCapital.length > 0) {
-                                this.setState({
-                                    imageList: out.hits,
-                                    getImageListStatus: 2,
-                                    numImage: out.hits.length,
-                                });
-                            }
-                            // Abort search if it has already been searched twice
-                            this.setState({ finishLoading: true });
-                        } else if (this.state.getImageListStatus === 1) {
-                            this.setState({
-                                finishLoading: true,
-                                getImageListStatus: 2,
-                            });
-                            // Else Keep searching
-                        } else {
-                            this.setState({ getImageListStatus: 1 });
-                        } */
                     }
                 })
                 .catch(err => {
                     if (!this.state.apiError) {
-                        // alert('getImageList(): ' + err);
                         this.setState({ apiError: true })
                     }
-                    return;
                 });
         }
 

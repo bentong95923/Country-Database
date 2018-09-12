@@ -1,13 +1,12 @@
 import * as React from "react";
-import { API_KEY_PIXABAY } from '../AppData';
+import { API_KEY_PIXABAY, SEARCH_BACKGROUND_KEYWORD } from '../AppData';
 
+// Interface
 interface IBackground {
     winHeight: number,
     backgroundImgUrl: string,
     apiError: boolean,
 }
-
-const searchBackgroundKeyword = "scenery";
 
 export default class Background extends React.Component<{}, IBackground> {
 
@@ -36,7 +35,7 @@ export default class Background extends React.Component<{}, IBackground> {
     }
 
     public componentDidMount() {
-        this.getBackgroundImage(searchBackgroundKeyword);
+        this.getBackgroundImage(SEARCH_BACKGROUND_KEYWORD);
         window.addEventListener('resize', this.updateResolution);
     }
 
@@ -49,7 +48,6 @@ export default class Background extends React.Component<{}, IBackground> {
         fetch(url)
             .then(response => response.json())
             .then((out) => {
-                // alert(JSON.stringify(out));
                 if (out.hits !== undefined) {
                     if (out.hits.length >= 3) {
                         const randNum = Math.floor(Math.random() * out.hits.length);
@@ -59,10 +57,8 @@ export default class Background extends React.Component<{}, IBackground> {
             })
             .catch(err => {
                 if (!this.state.apiError) {
-                    // alert('getBackgroundImage(): ' + err);
                     this.setState({ apiError: true })
                 }
-                return;
             });
     }
 }

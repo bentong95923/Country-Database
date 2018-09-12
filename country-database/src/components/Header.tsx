@@ -12,6 +12,19 @@ import { HContext } from '../AppData';
 
 import { WebLogoDetailed, WebLogoSimple } from '../AppLogo';
 
+// Declare props for this component
+interface IHeaderProps {
+    onIndexPage: boolean,
+    getNewAlpha3Code?: (newAlpha3Code: string) => void, // '?' mean optional, if missing this prop then will use the default prop
+}
+
+// Interface
+interface IHeader {
+    winWidth: number,
+    classes: any,
+}
+
+// Styles
 const searchBarStyle = {
     width: '70%',
     padding: 'auto',
@@ -33,16 +46,6 @@ const styles = (theme: Theme) => createStyles({
         backgroundColor: 'rgba(255,255,255,0.5)',
     }
 });
-
-interface IHeaderProps {
-    onIndexPage: boolean,
-    getNewAlpha3Code?: (newAlpha3Code: string) => void, // '?' mean optional, if missing this prop then will use the default prop
-}
-
-interface IHeader {
-    winWidth: number,
-    classes: any,
-}
 
 export const Header = withStyles(styles)(
     class extends React.Component<IHeaderProps, IHeader> {
