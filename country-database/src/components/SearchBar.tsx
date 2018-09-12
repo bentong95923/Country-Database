@@ -7,7 +7,7 @@ import AsyncSelect from 'react-select/lib/Async';
 
 import Search from '@material-ui/icons/Search';
 
-import { MAX_NUM_INPUT_NAME, MIN_NUM_INPUT, SEARCH_BAR_INPUT_PLACEHOLDER } from '../AppData';
+import { MAX_NUM_INPUT_NAME, MIN_NUM_INPUT, SEARCH_BAR_INPUT_PLACEHOLDER, URI_NAME_DETAILS } from '../AppData';
 import { optimizeCountryName } from '../CountryNameOptimization';
 
 // Declare props for this component
@@ -158,7 +158,7 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
                     />
                 </div>
                 {this.state.confirmedQuery && this.props.onIndexPage &&
-                    <Redirect to={'/details/' + this.state.alpha3Code} />
+                    <Redirect to={"/" + URI_NAME_DETAILS + "/" + this.state.alpha3Code} />
                 }
             </div>
         );

@@ -22,7 +22,7 @@ import { Gallery } from './Gallery';
 import { Header } from './Header';
 import LoadingLogo from './LoadingLogo';
 
-import { APP_TITLE, CContext, HContext } from '../AppData';
+import { APP_TITLE, CContext, HContext, URI_NAME_DETAILS } from '../AppData';
 
 const styles = (theme: Theme) => createStyles({
     cardContainer: {
@@ -305,7 +305,7 @@ export const CountryDetails = withStyles(styles)(
             const alpha3CodeProps = props.match.params.alpha3Code;
             if (alpha3CodeProps !== alpha3CodeProps.toUpperCase() || alpha3CodeProps !== this.state.alpha3Code) {
                 if (alpha3CodeProps.length === 3) {
-                    props.history.push('/details/' + this.state.alpha3Code.toUpperCase());
+                    props.history.push("/" + URI_NAME_DETAILS + "/" + this.state.alpha3Code.toUpperCase());
                 }
             }
         }

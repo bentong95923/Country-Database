@@ -1,7 +1,9 @@
+/* Material UI icon vertical positioning */
 .material-ui-icon {
     vertical-align: bottom;
 }
 
+/* Background style */
 #background {
     background-size: cover;
     display: block;
