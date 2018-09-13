@@ -44,11 +44,13 @@ export default class Background extends React.Component<{}, IBackground> {
         window.removeEventListener('resize', this.updateResolution);
     }
 
+    // Search for background picture using the keyword specified in AppConfig.tsx file
     public getBackgroundImage = (keyword: string) => {
         const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true&editors_choice=true";
         fetch(url)
             .then(response => response.json())
             .then((out) => {
+                // After finding a list of images, it randomly selects one to be the background picture for this webapp
                 if (out.hits !== undefined) {
                     if (out.hits.length >= 3) {
                         const randNum = Math.floor(Math.random() * out.hits.length);
