@@ -21,6 +21,7 @@ interface IHeaderProps {
 // Interface
 interface IHeader {
     winWidth: number,
+    // Classes for styling material ui components
     classes: any,
 }
 
@@ -32,14 +33,17 @@ const searchBarStyle = {
     color: 'initial',
 }
 
+// Big logo style
 const webLogoDetailedStyle = {
     width: '250px',
 }
 
+// Small logo style
 const webLogoSimpleStyle = {
     width: '80px',
 }
 
+// App bar style
 const styles = (theme: Theme) => createStyles({
     appBar: {
         padding: '15px 0',
@@ -48,6 +52,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export const Header = withStyles(styles)(
+
     class extends React.Component<IHeaderProps, IHeader> {
 
         constructor(props: any) {
@@ -63,31 +68,27 @@ export const Header = withStyles(styles)(
             return (
                 <HContext.Consumer>
                     {data => {
-                        if (data.length > 0) {
-                            const pageLoaded = JSON.parse(data).pageLoaded;
-                            return (
-                                <AppBar className={classes.appBar} position="sticky">
-                                    <Toolbar variant="dense">
-                                        <Typography variant="title">
-                                            {pageLoaded ?
-                                                <Link to="/">
-                                                    {this.renderLogoByScreenWidth(this.state.winWidth)}
-                                                </Link>
-                                                :
-                                                this.renderLogoByScreenWidth(this.state.winWidth)
-                                            }
-                                        </Typography>
-                                        <div style={searchBarStyle}>
-                                            {JSON.parse(data).alpha3Code.length === 3 &&
-                                                <SearchBar onIndexPage={false} getNewAlpha3Code={this.sendDataToParent} preLoadCountryData={data} />
-                                            }
-                                        </div>
-                                    </Toolbar>
-                                </AppBar>
-                            );
-                        } else {
-                            return '';
-                        }
+                        return (data.length > 0 &&
+                            <AppBar className={classes.appBar} position="sticky">
+                                <Toolbar variant="dense">
+                                    <Typography variant="title">
+                                        {/* Load hyperlink (link back to home page) after the content has been loaded */}
+                                        {JSON.parse(data).pageLoaded ?
+                                            <Link to="/">
+                                                {this.renderLogoByScreenWidth(this.state.winWidth)}
+                                            </Link>
+                                            :
+                                            this.renderLogoByScreenWidth(this.state.winWidth)
+                                        }
+                                    </Typography>
+                                    <div style={searchBarStyle}>
+                                        {JSON.parse(data).alpha3Code.length === 3 &&
+                                            <SearchBar onIndexPage={false} getNewAlpha3Code={this.sendDataToParent} preLoadCountryData={data} />
+                                        }
+                                    </div>
+                                </Toolbar>
+                            </AppBar>
+                        );
                     }}
                 </HContext.Consumer>
             );

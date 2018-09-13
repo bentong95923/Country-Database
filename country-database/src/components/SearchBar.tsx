@@ -7,27 +7,34 @@ import AsyncSelect from 'react-select/lib/Async';
 
 import Search from '@material-ui/icons/Search';
 
-import { MAX_NUM_INPUT_NAME, MIN_NUM_INPUT, SEARCH_BAR_INPUT_PLACEHOLDER, URI_NAME_DETAILS } from '../AppData';
+import { MAX_NUM_INPUT, MIN_NUM_INPUT, SEARCH_BAR_INPUT_PLACEHOLDER, URI_NAME_DETAILS } from '../AppConfig';
 import { optimizeCountryName } from '../CountryNameOptimization';
 
 // Declare props for this component
 interface ISearchBarProps {
     onIndexPage: boolean,
     preLoadCountryData?: string,
-    getNewAlpha3Code?: (newAlpha3Code: string) => void, // '?' mean optional, if missing this prop then will use the default prop
+    // Optional props for other components getting new country by user
+    getNewAlpha3Code?: (newAlpha3Code: string) => void,
 }
 
 interface IState {
     countryOptions: any[],
+    // Default selected country
     defaultValue: any[],
     alpha3Code: string,
-    responseReceived: boolean, // Flag indicates if results are found.
+    // Flag indicates if a response received from API
+    responseReceived: boolean,
+    // Flag indicates if user hits the enter key
     confirmedQuery: boolean,
+    // Error flag of API
     apiError: boolean,
 }
 
+// React select components
 const { Input, ValueContainer, Option } = components;
 
+// Style
 const countryIconStyle = {
     width: '30px',
     marginRight: '10px',
@@ -74,7 +81,7 @@ const NewValueContainer = (props: any) => {
 
 const NewInput = (props: any) => {
     return Input && (
-        <Input maxLength={MAX_NUM_INPUT_NAME} {...props} />
+        <Input maxLength={MAX_NUM_INPUT} {...props} />
     );
 }
 
@@ -82,15 +89,12 @@ const searchBarStyle = {
     input: (styles: any) => ({
         ...styles,
         margin: '2px 2px 2px 5px',
-        wordWrap: "normal",
     }),
     singleValue: (styles: any) => ({
         ...styles,
         left: '36px',
-        wordWrap: "normal",
         width: '75%',
         maxWidth: 'unset',
-
     }),
     placeholder: (styles: any) => ({
         ...styles,
@@ -108,8 +112,8 @@ const searchBarStyle = {
 /* const debugReactSelectInnerStyle = (styles: any, props: any) => {
     console.log(JSON.stringify(styles));
     return props;
-}
- */
+} */
+
 export default class SearchBar extends React.Component<ISearchBarProps, IState> {
 
     static defaultProps = {

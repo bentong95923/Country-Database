@@ -22,8 +22,10 @@ import { Gallery } from './Gallery';
 import { Header } from './Header';
 import LoadingLogo from './LoadingLogo';
 
-import { APP_TITLE, CContext, HContext, URI_NAME_DETAILS } from '../AppData';
+import { APP_TITLE, URI_NAME_DETAILS } from '../AppConfig';
+import { CContext, HContext } from '../AppData';
 
+// Styling
 const styles = (theme: Theme) => createStyles({
     cardContainer: {
         padding: '50px 0',
@@ -84,28 +86,44 @@ const styles = (theme: Theme) => createStyles({
     },
 });
 
+// Interface
 interface ICard {
+    // Background image URL
     backgroundImgUrl: string,
     countryDetailsList: any[],
+    // Download menu toggle
     menuOpen: boolean,
+    // Fade toggle
     fadeChecked: boolean,
-    dataGallery: string,
-    dataHeader: string,
-    extractContent: string,
-    downloadBoxPosOffset: number,
-    loaded: boolean[],
     /*
-        index 0: pre-alpha 3 code
-        index 1: current-alpha 3 code
+        Stringified JSON data for Gallery
+        Property: name, capital
     */
+    dataGallery: string,
+    /* 
+        Stringified JSON data for Header
+        Property: alpha3Code, name, pageLoaded
+    */
+    dataHeader: string,
+    // Extract content from Wikipedia
+    extractContent: string,
+    // Offset position of download menu
+    downloadBoxPosOffset: number,
+    // Flag indicates if APIs are loaded.
+    loaded: boolean[],
+    // Current country's alpha 3 code
     alpha3Code: string,
+    // Expanding extract content toggle
     expanded: boolean,
+    // Material UI style classes
     classes: any,
     apiError: boolean[],
 }
 
 export const CountryDetails = withStyles(styles)(
+
     class extends React.Component<{}, ICard> {
+
         constructor(props: any) {
             super(props);
             this.state = {
@@ -117,7 +135,7 @@ export const CountryDetails = withStyles(styles)(
                 dataHeader: "",
                 extractContent: "",
                 downloadBoxPosOffset: 0,
-                // details, borderFullName, extract
+                // APIs: details, borderFullName, extract (in order)
                 loaded: [false, false, false],
                 alpha3Code: props.match.params.alpha3Code.toUpperCase(),
                 expanded: false,
@@ -130,6 +148,7 @@ export const CountryDetails = withStyles(styles)(
                 */
                 apiError: [false, false, false],
             }
+            // Rewrite url when user inputs new country or convert the alpha 3 code to upper case if user did query via url.
             this.rewriteURI(props);
         }
 
@@ -154,6 +173,7 @@ export const CountryDetails = withStyles(styles)(
             this.downloadTxtFile();
         }
 
+        // Clear previous state value
         public setNewAlpha3Code = (newAlpha3Code: string) => {
             this.setState({
                 alpha3Code: newAlpha3Code,
@@ -171,14 +191,14 @@ export const CountryDetails = withStyles(styles)(
                         <Header getNewAlpha3Code={this.setNewAlpha3Code} />
                     </HContext.Provider>
                     {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
-                        // Bad request, redirect to homepage
-                        <Redirect to={'/'} />
+                        // Bad request, redirect to not found page
+                        <Redirect to={'/404'} />
                         :
                         // Loading extract content
                         <div className={classes.cardContainer}>
                             {/* Display loading spinner screen until the page is loaded. */}
                             {!this.state.loaded[2] && <LoadingLogo />}
-                            {this.state.countryDetailsList.length > 0 && this.loadnRenderExtractCardContent()}
+                            {(this.state.countryDetailsList.length > 0 && this.state.extractContent.length > 0) && this.loadnRenderExtractCardContent()}
                         </div>
                     }
                 </div>
@@ -186,115 +206,107 @@ export const CountryDetails = withStyles(styles)(
         }
 
         public loadnRenderExtractCardContent = () => {
-            const extractContent = this.state.extractContent;
             const { classes } = this.state.classes;
             const menuOpen = this.state.menuOpen;
+            const extractContent = this.state.extractContent;
+            const extractBuf = extractContent.split('\n');
+            const extract = new Array();
+            extractBuf.forEach((s, i) => {
+                // Filter out any empty element due to extra \n.
+                if (s.length > 0) {
+                    // Assign id for each paragraph
+                    extract.push({ id: i, str: s });
+                }
+            });
             return (
                 <div>
                     {this.state.countryDetailsList.map(countryDetail => {
-                        if (extractContent.length > 0) {
-                            const extractBuf = extractContent.split('\n');
-                            const extract = new Array();
-                            let count = 0;
-                            extractBuf.forEach((s, i) => {
-                                // Filter out any empty element due to extra \n.
-                                if (s.length > 0) {
-                                    extract.push({ id: i, str: s });
-                                }
-                            });
-                            return (
-                                <Card
-                                    id="card"
-                                    key={countryDetail.alpha3Code}
-                                    className={classes.card}
-                                >
-                                    <CardHeader
-                                        avatar={
-                                            <a href={countryDetail.flag} target="_blank">
-                                                <img title={"Click to see the large version of this flag"} className={classes.countryFlag} src={countryDetail.flag} />
-                                            </a>
-                                        }
-                                        action={
-                                            <ClickAwayListener onClickAway={this.closeDownloadMenu}>
-                                                <div>
-                                                    <IconButton
-                                                        onClick={this.toggleDownloadMenu}
-                                                        aria-label="Download"
+                        let count = 0;
+                        return (
+                            <Card
+                                id="card"
+                                key={countryDetail.alpha3Code}
+                                className={classes.card}
+                            >
+                                <CardHeader
+                                    avatar={
+                                        <a href={countryDetail.flag} target="_blank">
+                                            <img title={"Click to see the large version of this flag"} className={classes.countryFlag} src={countryDetail.flag} />
+                                        </a>
+                                    }
+                                    action={
+                                        <ClickAwayListener onClickAway={this.closeDownloadMenu}>
+                                            <div>
+                                                <IconButton onClick={this.toggleDownloadMenu} aria-label="Download">
+                                                    <GetApp />
+                                                </IconButton>
+                                                <Fade in={menuOpen} unmountOnExit={true}>
+                                                    <Paper
+                                                        style={{
+                                                            position: 'absolute',
+                                                            background: 'rgba(255, 255, 255, 0.7)',
+                                                            right: this.state.downloadBoxPosOffset,
+                                                        }}
+                                                        onClick={this.handleConfirmedDownload}
                                                     >
-                                                        <GetApp />
-                                                    </IconButton>
-                                                    <Fade in={menuOpen} unmountOnExit={true}>
-                                                        <Paper
-                                                            style={{
-                                                                position: 'absolute',
-                                                                background: 'rgba(255, 255, 255, 0.7)',
-                                                                right: this.state.downloadBoxPosOffset,
-                                                            }}
-                                                            onClick={this.handleConfirmedDownload}
-                                                        >
-                                                            <MenuItem>
-                                                                Download country info as .txt file
-                                                            </MenuItem>
-                                                        </Paper>
-                                                    </Fade>
-                                                </div>
-                                            </ClickAwayListener>
-                                        }
-                                        title={countryDetail.name}
-                                        subheader={countryDetail.subregion.length > 0 ? "Country in " + countryDetail.subregion : ''}
-                                    />
-                                    <CardContent>
-                                        <CContext.Provider value={JSON.stringify(this.state.countryDetailsList)}>
-                                            <DetailsTables />
-                                        </CContext.Provider>
-                                        {this.state.dataGallery.length > 0 &&
-                                            <Gallery data={this.state.dataGallery} />
-                                        }
-                                        <Typography className={classes.extractContent} component="p">
-                                            {extract[count++].str}
-                                        </Typography>
-                                    </CardContent>
-                                    {extract.length > 1 &&
-                                        <CardActions className={classes.actions} disableActionSpacing={true}>
-                                            <div className={classes.reftxt}>
-                                                Content provided by
-                                                <div className={classes.refProviderTxt}>Wikipedia</div>
+                                                        <MenuItem>
+                                                            Download country info as .txt file
+                                                        </MenuItem>
+                                                    </Paper>
+                                                </Fade>
                                             </div>
-                                            <IconButton
-                                                className={classnames(classes.expand, {
-                                                    [classes.expandOpen]: this.state.expanded,
-                                                })}
-                                                onClick={this.toggleCardExpand}
-                                                aria-expanded={this.state.expanded}
-                                                aria-label="Show more"
-                                                title="Click to expand"
-                                            >
-                                                <ExpandMoreIcon />
-                                            </IconButton>
-                                        </CardActions>
+                                        </ClickAwayListener>
                                     }
-                                    {extract.length > 1 &&
-                                        <Collapse in={this.state.expanded} timeout="auto" unmountOnExit={true}>
-                                            <CardContent>
-                                                <Typography className={classes.extractContent} paragraph={extract.length - 1 !== count}>
-                                                    {extract[count++].str}
-                                                </Typography>
-                                                {extract.map((v: any, i: number) => {
-                                                    // Not display the repeated contents
-                                                    if (i >= count) {
-                                                        return (
-                                                            <Typography key={v.id} className={classes.extractContent} paragraph={extract.length - 1 !== i}>{v.str}</Typography>
-                                                        );
-                                                    } return
-                                                })}
-                                            </CardContent>
-                                        </Collapse>
+                                    title={countryDetail.name}
+                                    subheader={countryDetail.subregion.length > 0 ? "Country in " + countryDetail.subregion : ''}
+                                />
+                                <CardContent>
+                                    <CContext.Provider value={JSON.stringify(this.state.countryDetailsList)}>
+                                        <DetailsTables />
+                                    </CContext.Provider>
+                                    {this.state.dataGallery.length > 0 &&
+                                        <Gallery data={this.state.dataGallery} />
                                     }
-                                </Card>
-                            );
-                        } else {
-                            return;
-                        }
+                                    <Typography className={classes.extractContent} component="p">
+                                        {extract[count++].str}
+                                    </Typography>
+                                </CardContent>
+                                {extract.length > 1 &&
+                                    <CardActions className={classes.actions} disableActionSpacing={true}>
+                                        <div className={classes.reftxt}>
+                                            Content provided by
+                                            <div className={classes.refProviderTxt}>Wikipedia</div>
+                                        </div>
+                                        <IconButton
+                                            className={classnames(classes.expand, {
+                                                [classes.expandOpen]: this.state.expanded,
+                                            })}
+                                            onClick={this.toggleCardExpand}
+                                            aria-expanded={this.state.expanded}
+                                            aria-label="Show more"
+                                            title="Click to expand"
+                                        >
+                                            <ExpandMoreIcon />
+                                        </IconButton>
+                                    </CardActions>
+                                }
+                                {extract.length > 1 &&
+                                    <Collapse in={this.state.expanded} timeout="auto" unmountOnExit={true}>
+                                        <CardContent>
+                                            <Typography className={classes.extractContent} paragraph={extract.length - 1 !== count}>
+                                                {extract[count++].str}
+                                            </Typography>
+                                            {extract.map((v: any, i: number) => {
+                                                // Not display the repeated contents
+                                                return (i >= count &&
+                                                    <Typography key={v.id} className={classes.extractContent} paragraph={extract.length - 1 !== i}>{v.str}</Typography>
+                                                );
+                                            })}
+                                        </CardContent>
+                                    </Collapse>
+                                }
+                            </Card>
+                        );
                     })}
                 </div>
             );
@@ -311,8 +323,10 @@ export const CountryDetails = withStyles(styles)(
         }
 
         public downloadBoxCssPosOffsetCal = () => {
+            // Get card element
             const cardEle: HTMLElement | null = document.getElementById('card');
             if (cardEle !== null) {
+                // Apply offset to the download menu
                 if ((this.state.downloadBoxPosOffset) !== (window.innerWidth - cardEle.clientWidth) / 2) {
                     this.setState({
                         downloadBoxPosOffset: (window.innerWidth - cardEle.clientWidth) / 2,
@@ -446,6 +460,7 @@ export const CountryDetails = withStyles(styles)(
             fetch(url)
                 .then(response => response.json())
                 .then((out) => {
+                    // Store the response received from the server
                     const output = [out];
                     const nameTemp = out.name;
                     let borders = new Array();
@@ -457,12 +472,17 @@ export const CountryDetails = withStyles(styles)(
                         name: optimizeCountryName(nameTemp, 'i'),
                         capital: out.capital
                     });
+                    // Set title
                     document.title = optimizeCountryName(nameTemp, 'e') + " | " + APP_TITLE;
                     this.setState(preState => ({
                         countryDetailsList: output,
                         dataGallery: dataGalleryStr,
                         loaded: [true, preState.loaded[1], preState.loaded[2]]
                     }));
+                    /*
+                        As the format of country borders received from the server is alpha 3 code,
+                        it is needed to be converted into country name
+                    */
                     if (borders.length > 0 && borders[0].length === 3) {
                         this.getCountryFullNameArray(borders);
                     }
@@ -473,9 +493,7 @@ export const CountryDetails = withStyles(styles)(
                             apiError: [true, preState.apiError[1], preState.apiError[2]]
                         }));
                     }
-                    return;
                 });
-
         }
 
         public getCountryFullNameArray = async (countryArray: string[]) => {
@@ -496,14 +514,11 @@ export const CountryDetails = withStyles(styles)(
                         })
                         .catch(err => {
                             if (!this.state.apiError[1]) {
-                                // alert('getCountryFullNameArray(): ' + err);
                                 this.setState(preState => ({
                                     apiError: [preState.apiError[0], true, preState.apiError[2]]
                                 }));
                             }
-                            return;
                         });
-
                 }
             }
             const tempCountryDetailsList = this.state.countryDetailsList;
@@ -523,7 +538,6 @@ export const CountryDetails = withStyles(styles)(
                 .then(response => response.json())
                 .then((out) => {
                     let extract = "";
-                    // out.query.pages.extract cannot read length property
                     if (out.query.pages !== undefined) {
                         out.query.pages.map((data: any) => {
                             if (data.extract.length > 0) {
@@ -544,10 +558,8 @@ export const CountryDetails = withStyles(styles)(
                 })
                 .catch(err => {
                     if (!this.state.apiError[2]) {
-                        // alert('getExtract(): ' + err);
                         this.setState(preState => ({ apiError: [preState.apiError[0], preState.apiError[1], true] }))
                     }
-                    return;
                 });
         }
     }

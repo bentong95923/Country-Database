@@ -11,7 +11,8 @@ import {
     IconButton
 } from '@material-ui/core';
 
-import { API_KEY_PIXABAY, PIC_GALLERY_HEIGHT } from '../AppData';
+import { PIC_GALLERY_HEIGHT } from '../AppConfig';
+import { API_KEY_PIXABAY } from '../AppData';
 
 // Material-UI style for Horizontal Grid List
 const styles = (theme: Theme) => createStyles({
@@ -52,7 +53,6 @@ interface IGallery {
     winHeight: number,
     numImage: number,
     classes: any,
-    // getImageListStatus: number,
     finishLoading: boolean,
     apiError: boolean
 }
@@ -138,6 +138,7 @@ export const Gallery = withStyles(styles)(
             window.removeEventListener('resize', this.updateResolution);
         }
 
+        // Determine maximun number of pictures allowed to be displayed in a row
         public responsiveDisplay = () => {
             let numCmp = 1;
             if (this.state.winWidth >= 720) {

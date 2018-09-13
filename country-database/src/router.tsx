@@ -4,9 +4,10 @@ import Background from './components/Background';
 import { CountryDetails } from './components/CountryDetails';
 
 import { Home } from './Home';
+import NotFound from './NotFound';
 
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core';
-import { URI_NAME_DETAILS } from './AppData';
+import { URI_NAME_DETAILS } from './AppConfig';
 import './css/styles.css';
 
 // Theme: black
@@ -33,7 +34,7 @@ export const AppRouter: React.StatelessComponent<{}> = () => {
                             <Route exact={true} path="/" component={Home} />
                             <Route exact={true} path={"/" + URI_NAME_DETAILS + "/:alpha3Code"} component={CountryDetails} />
                             {/* Path not matched will redirect back to home page */}
-                            <Route component={Home} />
+                            <Route component={NotFound} />
                         </Switch>
                     </main>
                 </MuiThemeProvider>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { APP_TITLE, MIN_SCREEN_HEIGHT, MIN_SCREEN_WIDTH } from './AppData';
+import { APP_TITLE, MIN_SCREEN_HEIGHT, MIN_SCREEN_WIDTH } from './AppConfig';
 import { WebLogoDetailed } from './AppLogo';
 import SearchBar from './components/SearchBar';
 
@@ -14,6 +14,11 @@ interface IHome {
     classes: any,
     // Variable stores the style required to be changed for small screen device
     styleForSmallScreen: any,
+}
+
+interface IHomeProps {
+    // Flag indicates if page or country is not found
+    notFound?: boolean,
 }
 
 // Style using material ui method
@@ -30,12 +35,20 @@ const styles = (theme: Theme) => createStyles({
         maxWidth: '700px',
         minWidth: '230px',
         marginBottom: '10%',
+    },
+    notFoundTxt: {
+        color: "red",
+        marginBottom: "20px",
     }
 });
 
 export const Home = withStyles(styles)(
 
-    class extends React.Component<{}, IHome> {
+    class extends React.Component<IHomeProps, IHome> {
+
+        static defaultProps = {
+            notFound: "",
+        }
 
         constructor(props: any) {
             super(props);
@@ -82,6 +95,12 @@ export const Home = withStyles(styles)(
                         }}
                     >
                         <WebLogoDetailed className={classes.webLogoStyle} onLoad={this.showComponent} />
+                        {/* Display page not found message */}
+                        {this.props.notFound &&
+                            <div className={classes.notFoundTxt}>
+                                Oops! Page Not Found (404)
+                            </div>
+                        }
                         <SearchBar onIndexPage={true} />
                     </div>
                 </div>

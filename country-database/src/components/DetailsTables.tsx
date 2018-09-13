@@ -20,7 +20,8 @@ import {
 } from '@material-ui/icons';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
-import { CContext, MIN_SCREEN_WIDTH } from "../AppData";
+import { MIN_SCREEN_WIDTH } from "../AppConfig";
+import { CContext } from "../AppData";
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
