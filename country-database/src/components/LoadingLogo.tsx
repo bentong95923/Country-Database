@@ -41,6 +41,28 @@ export default class LoadingLogo extends React.Component<{},ILoadingLogo> {
 
     public showComponent = () => this.setState({ loaded: true });
 
+    public disableScrolling = () => {
+        if (document.getElementsByTagName('body').length !== 0) {
+            document.getElementsByTagName('body')[0].style.overflowY = 'hidden'
+        }
+    }
+
+    public enableScrolling = () => {        
+        if (document.getElementsByTagName('body').length !== 0) {
+            document.getElementsByTagName('body')[0].style.overflowY = 'visible'
+        }
+    }
+
+    public componentDidMount() {
+        // Disable scrolling while loading the content
+        this.disableScrolling();
+    }
+
+    public componentWillUnmount() {
+        // Enable scrolling after the content is loaded.
+        this.enableScrolling();
+    }
+
     public render() {
         return (
             <div

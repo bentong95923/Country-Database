@@ -5,14 +5,13 @@ import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 import Launch from '@material-ui/icons/Launch';
 
 import {
-    CircularProgress,
     GridList, GridListTile,
     GridListTileBar,
     IconButton
 } from '@material-ui/core';
 
-import { PIC_GALLERY_HEIGHT } from '../AppConfig';
-import { API_KEY_PIXABAY } from '../AppData';
+import { API_KEY_PIXABAY } from '../ApiKey';
+import { MIN_NUM_PIC_FOUND, PIC_GALLERY_HEIGHT } from '../AppConfig';
 
 // Material-UI style for Horizontal Grid List
 const styles = (theme: Theme) => createStyles({
@@ -21,7 +20,7 @@ const styles = (theme: Theme) => createStyles({
         flexWrap: 'wrap',
         justifyContent: 'space-around',
         overflow: 'hidden',
-        marginBottom: '20px',
+        margin: '20px 0',
     },
     gridList: {
         flexWrap: 'nowrap',
@@ -52,7 +51,9 @@ interface IGallery {
     winWidth: number,
     winHeight: number,
     numImage: number,
+    numImageLoaded: number,
     classes: any,
+    resultFound: boolean,
     finishLoading: boolean,
     apiError: boolean
 }
@@ -60,6 +61,7 @@ interface IGallery {
 // Customized props
 interface IGalleryProps {
     data: string,
+    getFinishLoading?: (loaded: boolean) => void,
 }
 
 export const Gallery = withStyles(styles)(
@@ -74,6 +76,8 @@ export const Gallery = withStyles(styles)(
                 winHeight: window.innerHeight,
                 classes: props,
                 numImage: 0,
+                numImageLoaded: 0,
+                resultFound: false,
                 finishLoading: false,
                 apiError: false
             }
@@ -84,14 +88,17 @@ export const Gallery = withStyles(styles)(
             return (
                 <div>
                     <div className={classes.root}>
-                        {!this.state.finishLoading ?
-                            <CircularProgress />
-                            :
-                            <GridList className={classes.gridList} cellHeight={PIC_GALLERY_HEIGHT} cols={this.responsiveDisplay()}>
+                        {this.state.resultFound &&
+                            <GridList
+                                className={classes.gridList}
+                                style={{ visibility: (this.state.finishLoading) ? 'visible' : 'hidden' }}
+                                cellHeight={PIC_GALLERY_HEIGHT}
+                                cols={this.responsiveDisplay()}
+                            >
                                 {this.state.imageList.map(tile => {
                                     return (
                                         <GridListTile key={tile.id}>
-                                            <img src={tile.webformatURL} />
+                                            <img src={tile.webformatURL} onLoad={this.trackNumImageLoaded} />
                                             <GridListTileBar
                                                 classes={{
                                                     root: classes.titleBar,
@@ -123,6 +130,25 @@ export const Gallery = withStyles(styles)(
                     }
                 </div>
             );
+        }
+
+        public runAfterFinishLoading = () => {
+            this.setState({ finishLoading: true });
+            this.sendDataToParent(true);
+        }
+
+        public trackNumImageLoaded = () => {
+            // setState() does not immediately update the state variable
+            if (this.state.numImage > 0 && this.state.numImageLoaded + 1 === this.state.numImage) {
+                this.runAfterFinishLoading();
+            }
+            this.setState(preState => ({ numImageLoaded: preState.numImageLoaded + 1 }));
+        }
+
+        public sendDataToParent = (data: boolean) => {
+            if (this.props.getFinishLoading !== undefined) {
+                this.props.getFinishLoading(data);
+            }
         }
 
         public updateResolution = () => {
@@ -163,7 +189,7 @@ export const Gallery = withStyles(styles)(
             const keywords = nthTimeToRun <= 1 ? nameNCapital[0] : nameNCapital[1];
             // If the function has been called at least once and the capital is not found then stop the search
             if (nameNCapital[1].length === 0 && nthTimeToRun > 0) {
-                this.setState({ finishLoading: true });
+                this.runAfterFinishLoading();
                 return;
             }
             const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keywords) + "&image_type=photo&safesearch=true";
@@ -171,14 +197,18 @@ export const Gallery = withStyles(styles)(
                 .then(response => response.json())
                 .then((out) => {
                     if (out.hits !== undefined) {
-                        // End search if results are found or had been run 3 times
-                        if (out.hits.length >= 3 || nthTimeToRun === 2) {
-                            this.setState({
-                                imageList: out.hits,
-                                numImage: out.hits.length,
-                            });
-                            // Abort search if it has already been searched twice
-                            this.setState({ finishLoading: true });
+                        // End search if minimum results are found
+                        if (out.hits.length >= MIN_NUM_PIC_FOUND || nthTimeToRun === 2) {
+                            if (out.hits.length >= MIN_NUM_PIC_FOUND) {
+                                this.setState({
+                                    imageList: out.hits,
+                                    numImage: out.hits.length,
+                                });
+                                this.setState({ resultFound: true });
+                            } else if (nthTimeToRun === 2) {
+                                // Abort search if it has already been searched twice
+                                this.runAfterFinishLoading();
+                            }
                         } else {
                             // No Result
                             this.getImageList(nameNCapital, ++nthTimeToRun);

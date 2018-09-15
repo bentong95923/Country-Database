@@ -8,8 +8,9 @@ import {
 
 import SearchBar from './SearchBar';
 
-import { HContext } from '../AppData';
+import { HContext } from '../AppContext';
 
+import { MIN_SCREEN_WIDTH } from '../AppConfig';
 import { WebLogoDetailed, WebLogoSimple } from '../AppLogo';
 
 // Declare props for this component
@@ -102,7 +103,7 @@ export const Header = withStyles(styles)(
 
         public renderLogoByScreenWidth = (winWidth: number) => {
             return (
-                winWidth >= 500 ?
+                winWidth >= MIN_SCREEN_WIDTH ?
                     <WebLogoDetailed style={webLogoDetailedStyle} />
                     :
                     <WebLogoSimple style={webLogoSimpleStyle} />

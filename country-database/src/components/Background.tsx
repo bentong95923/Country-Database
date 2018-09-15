@@ -1,6 +1,6 @@
 import * as React from "react";
+import { API_KEY_PIXABAY } from '../ApiKey';
 import { SEARCH_BACKGROUND_KEYWORD } from "../AppConfig";
-import { API_KEY_PIXABAY } from '../AppData';
 
 // Interface
 interface IBackground {

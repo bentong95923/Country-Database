@@ -9,6 +9,9 @@
 # production
 /build
 
+# api key (important!)
+/src/ApiKey.tsx
+
 # misc
 .DS_Store
 .env.local

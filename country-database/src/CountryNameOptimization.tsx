@@ -1,5 +1,4 @@
 /* 
-    
     3 types of keywords: use for listing or getting (e) or getting image (i)
 */
 export const optimizeCountryName = (countryName: string, keyWordType: string) => {
@@ -39,7 +38,7 @@ const nameSwapped = (countryName: string, flag: string) => {
                     if (matches !== null) {
                         const strInside = matches[1];
                         const strBefore = countryName.split('(')[0];
-                        outputName = strInside + ' ' + strBefore.trim();
+                        outputName = strInside + ' ' + strBefore;
                     }
                 }
             case (','):
@@ -51,7 +50,7 @@ const nameSwapped = (countryName: string, flag: string) => {
                 }
         }
     }
-    return outputName;
+    return outputName.trim();
 }
 
 const needSpecialKeyword = (countryName: string) => {

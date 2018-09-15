@@ -21,14 +21,14 @@ import {
 
 import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 import { MIN_SCREEN_WIDTH } from "../AppConfig";
-import { CContext } from "../AppData";
+import { CContext } from "../AppContext";
 
 // Material UI default style
 const styles = (theme: Theme) => createStyles({
     reftxt: {
         textAlign: 'left',
         color: 'rgba(0, 0, 0, 0.54)',
-        padding: '15px 0',
+        padding: '5px 0',
         fontSize: '11px',
     },
     refProviderTxt: {
@@ -209,7 +209,19 @@ export const DetailsTables = withStyles(styles)(
                             <TableCell component="th" scope="row">
                                 <Public className="material-ui-icon" /> Region:
                             </TableCell>
-                            <TableCell> {region} &mdash; {subregion}</TableCell>
+                            <TableCell>
+                                {region.length > 0 ?
+                                    (region +
+                                        (subregion.length > 0 ?
+                                            " — " + subregion
+                                            :
+                                            ""
+                                        )
+                                    )
+                                    :
+                                    "No data"
+                                }
+                            </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell component="th" scope="row">

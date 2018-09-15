@@ -16,14 +16,16 @@ import { createStyles, Theme, withStyles } from '@material-ui/core/styles';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import GetApp from '@material-ui/icons/GetApp';
+import Map from '@material-ui/icons/Map';
 
 import { DetailsTables } from './DetailsTables';
 import { Gallery } from './Gallery';
 import { Header } from './Header';
 import LoadingLogo from './LoadingLogo';
 
+import { API_KEY_GOOGLE } from '../ApiKey';
 import { APP_TITLE, URI_NAME_DETAILS } from '../AppConfig';
-import { CContext, HContext } from '../AppData';
+import { CContext, HContext } from '../AppContext';
 
 // Styling
 const styles = (theme: Theme) => createStyles({
@@ -45,7 +47,7 @@ const styles = (theme: Theme) => createStyles({
     actions: {
         display: 'flex',
     },
-    expand: {
+    expandExtract: {
         transform: 'rotate(0deg)',
         transition: theme.transitions.create('transform', {
             duration: theme.transitions.duration.shortest,
@@ -54,6 +56,10 @@ const styles = (theme: Theme) => createStyles({
         [theme.breakpoints.up('sm')]: {
             marginRight: -8,
         },
+    },
+    expandMap: {
+        marginRight: 'auto',
+        marginLeft: -15,
     },
     expandOpen: {
         transform: 'rotate(180deg)',
@@ -68,6 +74,14 @@ const styles = (theme: Theme) => createStyles({
         backgroundColor: 'rbga(255, 255, 255, 0.4)',
         top: 50,
         overflow: 'auto'
+    },
+    // Google map iframe
+    map: {
+        display: 'block',
+        margin: '0 auto',
+        width: '100%',
+        height: '400px',
+        border: 0
     },
     refProviderTxt: {
         fontSize: '13px',
@@ -113,8 +127,8 @@ interface ICard {
     loaded: boolean[],
     // Current country's alpha 3 code
     alpha3Code: string,
-    // Expanding extract content toggle
-    expanded: boolean,
+    // Toggle expansion of content: 0 - extract, 1 - map
+    expanded: boolean[],
     // Material UI style classes
     classes: any,
     apiError: boolean[],
@@ -135,10 +149,11 @@ export const CountryDetails = withStyles(styles)(
                 dataHeader: "",
                 extractContent: "",
                 downloadBoxPosOffset: 0,
-                // APIs: details, borderFullName, extract (in order)
-                loaded: [false, false, false],
+                // APIs: details, borderFullName, extract, gallery
+                loaded: [false, false, false, false],
                 alpha3Code: props.match.params.alpha3Code.toUpperCase(),
-                expanded: false,
+                // extract, map
+                expanded: [false, false],
                 classes: props,
                 /*
                     API Fetch error flag:
@@ -152,8 +167,21 @@ export const CountryDetails = withStyles(styles)(
             this.rewriteURI(props);
         }
 
-        public toggleCardExpand = () => {
-            this.setState(preState => ({ expanded: !preState.expanded }));
+        public toggleCardExpand = (item: number) => (event: any) => {
+            switch (item) {
+                case 0:
+                    this.setState(preState => ({
+                        expanded: [!preState.expanded[0], preState.expanded[1]]
+                    }));
+                    break;
+                case 1:
+                    this.setState(preState => ({
+                        expanded: [preState.expanded[0], !preState.expanded[1]]
+                    }));
+                    break;
+                default:
+                    break;
+            }
         };
 
         public toggleDownloadMenu = () => {
@@ -178,9 +206,16 @@ export const CountryDetails = withStyles(styles)(
             this.setState({
                 alpha3Code: newAlpha3Code,
                 apiError: [false, false, false],
-                loaded: [false, false, false],
+                loaded: [false, false, false, false],
+                expanded: [false, false],
                 countryDetailsList: [],
             });
+        }
+
+        public setGalleryLoaded = (isGalleryLoaded: boolean) => {
+            this.setState(preState => ({
+                loaded: [preState.loaded[0], preState.loaded[1], preState.loaded[2], isGalleryLoaded]
+            }));
         }
 
         public render() {
@@ -197,7 +232,7 @@ export const CountryDetails = withStyles(styles)(
                         // Loading extract content
                         <div className={classes.cardContainer}>
                             {/* Display loading spinner screen until the page is loaded. */}
-                            {!this.state.loaded[2] && <LoadingLogo />}
+                            {!this.state.loaded[3] && <LoadingLogo />}
                             {(this.state.countryDetailsList.length > 0 && this.state.extractContent.length > 0) && this.loadnRenderExtractCardContent()}
                         </div>
                     }
@@ -235,6 +270,7 @@ export const CountryDetails = withStyles(styles)(
                                         </a>
                                     }
                                     action={
+                                        this.state.loaded[1] &&
                                         <ClickAwayListener onClickAway={this.closeDownloadMenu}>
                                             <div>
                                                 <IconButton onClick={this.toggleDownloadMenu} aria-label="Download">
@@ -265,8 +301,22 @@ export const CountryDetails = withStyles(styles)(
                                         <DetailsTables />
                                     </CContext.Provider>
                                     {this.state.dataGallery.length > 0 &&
-                                        <Gallery data={this.state.dataGallery} />
+                                        <Gallery data={this.state.dataGallery} getFinishLoading={this.setGalleryLoaded} />
                                     }
+                                    <IconButton
+                                        className={classes.expandMap}
+                                        onClick={this.toggleCardExpand(1)}
+                                        aria-expanded={this.state.expanded[1]}
+                                        aria-label="Show more"
+                                        title={(!this.state.expanded[1] ? "Show" : "Hide") + " map"}
+                                    >
+                                        <Map />
+                                    </IconButton>
+                                    <Collapse in={this.state.expanded[1]} timeout="auto" unmountOnExit={true}>
+                                        <CardContent>
+                                            {this.loadMap(countryDetail.name)}
+                                        </CardContent>
+                                    </Collapse>
                                     <Typography className={classes.extractContent} component="p">
                                         {extract[count++].str}
                                     </Typography>
@@ -278,20 +328,20 @@ export const CountryDetails = withStyles(styles)(
                                             <div className={classes.refProviderTxt}>Wikipedia</div>
                                         </div>
                                         <IconButton
-                                            className={classnames(classes.expand, {
-                                                [classes.expandOpen]: this.state.expanded,
+                                            className={classnames(classes.expandExtract, {
+                                                [classes.expandOpen]: this.state.expanded[0],
                                             })}
-                                            onClick={this.toggleCardExpand}
-                                            aria-expanded={this.state.expanded}
+                                            onClick={this.toggleCardExpand(0)}
+                                            aria-expanded={this.state.expanded[0]}
                                             aria-label="Show more"
-                                            title="Click to expand"
+                                            title={(!this.state.expanded[0] ? "Expand" : "Hide") + " content"}
                                         >
                                             <ExpandMoreIcon />
                                         </IconButton>
                                     </CardActions>
                                 }
                                 {extract.length > 1 &&
-                                    <Collapse in={this.state.expanded} timeout="auto" unmountOnExit={true}>
+                                    <Collapse in={this.state.expanded[0]} timeout="auto" unmountOnExit={true}>
                                         <CardContent>
                                             <Typography className={classes.extractContent} paragraph={extract.length - 1 !== count}>
                                                 {extract[count++].str}
@@ -309,6 +359,25 @@ export const CountryDetails = withStyles(styles)(
                         );
                     })}
                 </div>
+            );
+        }
+
+        public loadMap = (name: string) => {
+            const { classes } = this.state.classes;
+            let keywords = "";
+            // Fix: google map cannot find South Sudan with "(country" token
+            if (name === "South Sudan") {
+                keywords = name;
+            } else {
+                keywords = name + " (country)";
+            }
+            return (
+                <iframe
+                    className={classes.map}
+                    frameBorder={"0"}
+                    src={"https://www.google.com/maps/embed/v1/place?key=" + API_KEY_GOOGLE + "&q=" + encodeURI(keywords)}
+                    allowFullScreen={true}
+                />
             );
         }
 
@@ -375,22 +444,18 @@ export const CountryDetails = withStyles(styles)(
             const element = document.createElement('a');
             const file = new Blob([this.printNormalTxtFile(this.state.countryDetailsList)], { type: 'text/plain' });
             element.href = URL.createObjectURL(file);
-            let tempCountry = "";
-            this.state.countryDetailsList.map((country: any) => {
-                tempCountry = country.name;
-            });
-            element.download = tempCountry.replace(" ", "_") + ".txt";
+            element.download = this.state.alpha3Code + ".txt";
             element.click();
         }
 
         public printNormalTxtFile = (countryDetailsList: any) => {
             let strOutput = "";
             countryDetailsList.map((country: any) => {
-                strOutput += "\nDetails for " + country.name + ":\n\n";
+                strOutput += "Details for " + country.name + ":\n\n";
                 strOutput += "------- General Info -------\n\n";
                 strOutput += "Population: " + country.population.toString() + "\n";
                 strOutput += "Capital: ";
-                strOutput += (country.capital.length > 0 ? country.capitial + "\n" : "n/a\n");
+                strOutput += (country.capital.length > 0 ? country.capital + "\n" : "n/a\n");
                 strOutput += "Demonym: ";
                 strOutput += (country.capital.length > 0 ? country.demonym + "\n" : "n/a\n");
                 strOutput += "Time zone(s):\n\t" + country.timezones + "\n\n";
@@ -477,7 +542,7 @@ export const CountryDetails = withStyles(styles)(
                     this.setState(preState => ({
                         countryDetailsList: output,
                         dataGallery: dataGalleryStr,
-                        loaded: [true, preState.loaded[1], preState.loaded[2]]
+                        loaded: [true, preState.loaded[1], preState.loaded[2], preState.loaded[3]]
                     }));
                     /*
                         As the format of country borders received from the server is alpha 3 code,
@@ -485,6 +550,10 @@ export const CountryDetails = withStyles(styles)(
                     */
                     if (borders.length > 0 && borders[0].length === 3) {
                         this.getCountryFullNameArray(borders);
+                    } else {
+                        this.setState(preState => ({
+                            loaded: [preState.loaded[0], true, preState.loaded[2], preState.loaded[3]]
+                        }));
                     }
                 })
                 .catch(err => {
@@ -506,7 +575,7 @@ export const CountryDetails = withStyles(styles)(
                         .then(response => response.json())
                         .then((out) => {
                             if (out.status !== 404) {
-                                tempArray.push(optimizeCountryName(out.name, 'e'));
+                                tempArray.push(optimizeCountryName(out.name, 'e').replace(" (", "("));
                             } else {
                                 // 404 Not result found error, but should not reach here
                                 tempArray.push(out.message);
@@ -527,7 +596,7 @@ export const CountryDetails = withStyles(styles)(
             });
             this.setState(preState => ({
                 countryDetailsList: tempCountryDetailsList,
-                loaded: [preState.loaded[0], true, preState.loaded[2]]
+                loaded: [preState.loaded[0], true, preState.loaded[2], preState.loaded[3]]
             }));
         }
 
@@ -553,7 +622,7 @@ export const CountryDetails = withStyles(styles)(
                     this.setState(preState => ({
                         extractContent: extract,
                         dataHeader: dataHeaderStr,
-                        loaded: [preState.loaded[0], preState.loaded[1], true]
+                        loaded: [preState.loaded[0], preState.loaded[1], true, preState.loaded[3]]
                     }));
                 })
                 .catch(err => {
