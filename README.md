@@ -1,4 +1,4 @@
-# MSA_P1_assignment - CountryDatabase
+# CountryDatabase - NZMSA Assignment 1
 by Benjamin Tong
 
 This app is the work for NZMSA 2018 Assignment 1. It allows user to search any country keywords to access any country information, with great appearance and easy to use. The following REST APIs are used in this app:
