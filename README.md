@@ -1,27 +1,30 @@
-# MSA_P1_assignment
+# MSA_P1_assignment - CountryDatabase
+by Benjamin Tong
 
-intro
+This app is the work for NZMSA 2018 Assignment 1. It allows user to search any country keywords to access any country information, with great appearance and easy to use. The following REST APIs are used in this app:
 
-# Dependency Required
+* Google Map
+* Wikipedia
+* RESTCountries
+* Pixabay
+
+## Dependency Required
 
 1. node.js - https://nodejs.org/en/
 
 2. MaterialUI
-### npm install --save @material-ui/core
-### npm install --save @material-ui/icons
+npm install --save @material-ui/core
+npm install --save @material-ui/icons
 
 3. React Router DOM
-### npm install --save @types/react-router-dom react-router-dom
+npm install --save @types/react-router-dom react-router-dom
 
-4. React Bootstrap and React Router Bootstrap
-### npm install --save @types/react-bootstrap @types/react-router-bootstrap react-bootstrap react-router-bootstrap
+4. React-Select
+npm install --save @types/react-select
+npm i react-select
 
-5. React-Select
-### npm install --save @types/react-select
-### npm i react-select
+5. Chroma.js
+npm install --save @types/chroma-js
 
-6. Chroma.js
-### npm install --save @types/chroma-js
-
-7. Classnames
-### npm install --save @types/classnames
+6. Classnames
+npm install --save @types/classnames
