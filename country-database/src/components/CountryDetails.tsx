@@ -21,7 +21,7 @@ import Map from '@material-ui/icons/Map';
 import { DetailsTables } from './DetailsTables';
 import { Gallery } from './Gallery';
 import { Header } from './Header';
-import LoadingLogo from './LoadingLogo';
+import { LoadingLogo } from './LoadingLogo';
 
 import { API_KEY_GOOGLE } from '../ApiKey';
 import { APP_TITLE, URI_NAME_DETAILS } from '../AppConfig';
@@ -222,6 +222,8 @@ export const CountryDetails = withStyles(styles)(
             const { classes } = this.state.classes;
             return (
                 <div>
+                    {/* Display loading spinner screen until the page is loaded. */}
+                    {!this.state.loaded[3] && <LoadingLogo />}
                     <HContext.Provider value={this.state.dataHeader}>
                         <Header getNewAlpha3Code={this.setNewAlpha3Code} />
                     </HContext.Provider>
@@ -231,8 +233,6 @@ export const CountryDetails = withStyles(styles)(
                         :
                         // Loading extract content
                         <div className={classes.cardContainer}>
-                            {/* Display loading spinner screen until the page is loaded. */}
-                            {!this.state.loaded[3] && <LoadingLogo />}
                             {(this.state.countryDetailsList.length > 0 && this.state.extractContent.length > 0) && this.loadnRenderExtractCardContent()}
                         </div>
                     }
@@ -617,7 +617,6 @@ export const CountryDetails = withStyles(styles)(
                     const dataHeaderStr = JSON.stringify({
                         alpha3Code: this.state.alpha3Code,
                         name: countryName,
-                        pageLoaded: true,
                     });
                     this.setState(preState => ({
                         extractContent: extract,

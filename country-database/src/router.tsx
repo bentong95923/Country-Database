@@ -2,6 +2,7 @@ import * as React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Background from './components/Background';
 import { CountryDetails } from './components/CountryDetails';
+import { LoadingLogo } from './components/LoadingLogo';
 
 import { Home } from './Home';
 import NotFound from './NotFound';
@@ -33,6 +34,7 @@ export const AppRouter: React.StatelessComponent<{}> = () => {
                         <Switch>
                             <Route exact={true} path="/" component={Home} />
                             <Route exact={true} path={"/" + URI_NAME_DETAILS + "/:alpha3Code"} component={CountryDetails} />
+                            <Route exact={true} path={"/loading"} component={LoadingLogo} />
                             {/* Path not matched will redirect back to home page */}
                             <Route component={NotFound} />
                         </Switch>

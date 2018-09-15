@@ -3,7 +3,6 @@
 */
 export const optimizeCountryName = (countryName: string, keyWordType: string) => {
     const keyWord = keyWordType.toLowerCase();
-    // alert(countryName+' '+needSpecialKeyword(countryName)+ ' '+ keyWordType)
     if (needSpecialKeyword(countryName)) {
         return getSpecialName(countryName, keyWord);
     } else {

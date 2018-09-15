@@ -13,6 +13,8 @@ import { HContext } from '../AppContext';
 import { MIN_SCREEN_WIDTH } from '../AppConfig';
 import { WebLogoDetailed, WebLogoSimple } from '../AppLogo';
 
+const HeaderBackgroundColor = 'rgba(255,255,255,0.5)';
+
 // Declare props for this component
 interface IHeaderProps {
     onIndexPage: boolean,
@@ -48,7 +50,8 @@ const webLogoSimpleStyle = {
 const styles = (theme: Theme) => createStyles({
     appBar: {
         padding: '15px 0',
-        backgroundColor: 'rgba(255,255,255,0.5)',
+        backgroundColor: HeaderBackgroundColor,
+        zIndex: 200, // Need to be less than the loading screen logo
     }
 });
 
@@ -70,17 +73,12 @@ export const Header = withStyles(styles)(
                 <HContext.Consumer>
                     {data => {
                         return (data.length > 0 &&
-                            <AppBar className={classes.appBar} position="sticky">
+                            <AppBar id="appBar" className={classes.appBar} position="sticky">
                                 <Toolbar variant="dense">
                                     <Typography variant="title">
-                                        {/* Load hyperlink (link back to home page) after the content has been loaded */}
-                                        {JSON.parse(data).pageLoaded ?
-                                            <Link to="/">
-                                                {this.renderLogoByScreenWidth(this.state.winWidth)}
-                                            </Link>
-                                            :
-                                            this.renderLogoByScreenWidth(this.state.winWidth)
-                                        }
+                                        <Link to="/">
+                                            {this.renderLogoByScreenWidth(this.state.winWidth)}
+                                        </Link>
                                     </Typography>
                                     <div style={searchBarStyle}>
                                         {JSON.parse(data).alpha3Code.length === 3 &&
@@ -109,6 +107,18 @@ export const Header = withStyles(styles)(
                     <WebLogoSimple style={webLogoSimpleStyle} />
             );
         }
+        
+        public appBarBackground = () => {
+            const appBarEle: HTMLElement | null = document.getElementById("appBar");
+            const htmlEle: HTMLElement | null = document.documentElement;
+            if (appBarEle !== null && htmlEle !== null) {
+                if (htmlEle.scrollTop > appBarEle.clientHeight) {
+                    appBarEle.style.backgroundColor = 'rgb(210, 210, 210)';
+                } else {
+                    appBarEle.style.backgroundColor = HeaderBackgroundColor;
+                }
+            }
+        }
 
         public updateResolution = () => {
             this.setState({ winWidth: window.innerWidth });
@@ -116,10 +126,12 @@ export const Header = withStyles(styles)(
 
         public componentDidMount() {
             window.addEventListener('resize', this.updateResolution);
+            window.addEventListener('scroll', this.appBarBackground);
         }
 
         public componentWillUnmount() {
             window.removeEventListener('resize', this.updateResolution);
+            window.removeEventListener('scroll', this.appBarBackground);
         }
 
     }
