@@ -12,7 +12,7 @@ interface ILoadingLogo {
 
 const styles = (theme: Theme) => createStyles({
     loadingScreenBackground: {
-         backgroundColor: 'rgb(0,0,0,0.1)',
+        backgroundColor: 'rgb(0,0,0,0.1)',
         position: 'fixed' as 'fixed',
         zIndex: 300,
     },
