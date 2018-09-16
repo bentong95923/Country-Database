@@ -1,6 +1,7 @@
 /* Material UI icon vertical positioning */
 .material-ui-icon {
     vertical-align: bottom;
+    display: table-cell;
 }
 
 /* Background style */

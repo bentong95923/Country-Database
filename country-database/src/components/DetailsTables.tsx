@@ -62,6 +62,24 @@ const TabContainer = (props: any) => {
     );
 }
 
+const TableCellContainer = (props: any) => {
+    return (
+        <TableCell component="th" scope="row">
+            <div style={{ display: 'table-row' }}>
+                {props.children}
+            </div>
+        </TableCell>
+    );
+}
+
+const TableCellText = (props: any) => {
+    return (
+        <span style={{ display: 'table-cell', paddingLeft: '5px' }}>
+            {props.children}
+        </span>
+    );
+}
+
 export const DetailsTables = withStyles(styles)(
 
     class extends React.Component<{}, ICountryDetails> {
@@ -167,27 +185,39 @@ export const DetailsTables = withStyles(styles)(
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <People className="material-ui-icon" /> Population (estimate):
-                                </TableCell>
+                            <TableCellContainer>
+                                <People className="material-ui-icon" />
+                                <TableCellText>
+                                    Population (estimate):
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {this.numberWithCommas(population)}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <LocationCity className="material-ui-icon" /> Capital:
-                                </TableCell>
+                            <TableCellContainer>
+                                <LocationCity className="material-ui-icon" />
+                                <TableCellText>
+                                    Capital:
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {capital.length > 0 ? capital : 'n/a'}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Face className="material-ui-icon" /> Demonym:
-                                </TableCell>
+                            <TableCellContainer>
+                                <Face className="material-ui-icon" />
+                                <TableCellText>
+                                    Demonym:
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {demonym.length !== 0 ? demonym : "n/a"}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <AccessTime className="material-ui-icon" /> Time zone(s):
-                                </TableCell>
+                            <TableCellContainer>
+                                <AccessTime className="material-ui-icon" />
+                                <TableCellText>
+                                    Time zone(s):
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {timezones.toString().toString().replace(/,/g, ', ')}</TableCell>
                         </TableRow>
                     </TableBody>
@@ -206,9 +236,12 @@ export const DetailsTables = withStyles(styles)(
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Public className="material-ui-icon" /> Region:
-                            </TableCell>
+                            <TableCellContainer>
+                                <Public className="material-ui-icon" />
+                                <TableCellText>
+                                    Region:
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell>
                                 {region.length > 0 ?
                                     (region +
@@ -224,21 +257,30 @@ export const DetailsTables = withStyles(styles)(
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <PinDrop className="material-ui-icon" /> Geo coordinates:
-                            </TableCell>
+                            <TableCellContainer>
+                                <PinDrop className="material-ui-icon" />
+                                <TableCellText>
+                                    Geo coordinates:
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {latlng.length > 0 ? 'Lat: ' + latlng[0].toFixed(1) + ', Long: ' + latlng[1].toFixed(1) : "No data"}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <ZoomOutMap className="material-ui-icon" /> Area:
-                            </TableCell>
+                            <TableCellContainer>
+                                <ZoomOutMap className="material-ui-icon" />
+                                <TableCellText>
+                                    Area:
+                                 </TableCellText>
+                            </TableCellContainer>
                             {area !== null ? <TableCell>{this.numberWithCommas(area) + " km"}<sup>2</sup></TableCell> : <TableCell>No data</TableCell>}
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <VerticalAlignCenter className="material-ui-icon" /> Country border(s):
-                            </TableCell>
+                            <TableCellContainer>
+                                <VerticalAlignCenter className="material-ui-icon" />
+                                <TableCellText>
+                                    Country border(s):
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {borders.length > 0 ? borders.toString().replace(/,/g, ', ') : "No country surrounded"}</TableCell>
                         </TableRow>
                     </TableBody>
@@ -257,16 +299,22 @@ export const DetailsTables = withStyles(styles)(
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Timeline className="material-ui-icon" /> Gini Coefficient (%):
-                            </TableCell>
+                            <TableCellContainer>
+                                <Timeline className="material-ui-icon" />
+                                <TableCellText>
+                                    Gini Coefficient (%):
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {gini !== null ? gini : "No data"}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <MonetizationOn className="material-ui-icon" /> Currencies:
-                            </TableCell>
-                            <TableCell component="th" scope="row">
+                            <TableCellContainer>
+                                <MonetizationOn className="material-ui-icon" />
+                                <TableCellText>
+                                    Currencies:
+                                </TableCellText>
+                            </TableCellContainer>
+                            <TableCellContainer>
                                 {currencies.map((v: any) => {
                                     {/* In case the server returns 'null' for currency symbol */ }
                                     const sym = (v.symbol !== null ? ' (' + v.symbol + ')' : "");
@@ -276,13 +324,16 @@ export const DetailsTables = withStyles(styles)(
                                         </div>
                                     );
                                 })}
-                            </TableCell>
+                            </TableCellContainer>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Group className="material-ui-icon" /> Regional Trade BLOCs:
-                            </TableCell>
-                            <TableCell component="th" scope="row">
+                            <TableCellContainer>
+                                <Group className="material-ui-icon" />
+                                <TableCellText>
+                                    Regional Trade BLOCs:
+                                </TableCellText>
+                            </TableCellContainer>
+                            <TableCellContainer>
                                 {regionalBlocs.length > 0 ? regionalBlocs.map((v: any) => {
                                     return (
                                         <div key={v.acronym}>
@@ -290,7 +341,7 @@ export const DetailsTables = withStyles(styles)(
                                         </div>
                                     );
                                 }) : "None"}
-                            </TableCell>
+                            </TableCellContainer>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -308,28 +359,40 @@ export const DetailsTables = withStyles(styles)(
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Public className="material-ui-icon" /> Original / Official Name:
-                            </TableCell>
+                            <TableCellContainer>
+                                <Public className="material-ui-icon" />
+                                <TableCellText>
+                                    Original / Official Name:
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {name}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <GTranslate className="material-ui-icon" /> Also know as:
-                            </TableCell>
+                            <TableCellContainer>
+                                <GTranslate className="material-ui-icon" />
+                                <TableCellText>
+                                    Also know as:
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {altSpellings.toString().replace(/,/g, ', ')}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Comment className="material-ui-icon" /> Native people call their country:
-                            </TableCell>
+                            <TableCellContainer>
+                                <Comment className="material-ui-icon" />
+                                <TableCellText>
+                                    Native people call their country:
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {nativeName.toString().replace(/,/g, ', ')}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Language className="material-ui-icon" /> Language they speak:
-                            </TableCell>
-                            <TableCell component="th" scope="row">
+                            <TableCellContainer>
+                                <Language className="material-ui-icon" />
+                                <TableCellText>
+                                    Language they speak:
+                                </TableCellText>
+                            </TableCellContainer>
+                            <TableCellContainer>
                                 {languages.map(value => {
                                     return (
                                         <div key={value.iso639_1}>
@@ -337,7 +400,7 @@ export const DetailsTables = withStyles(styles)(
                                         </div>
                                     );
                                 })}
-                            </TableCell>
+                            </TableCellContainer>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -355,16 +418,22 @@ export const DetailsTables = withStyles(styles)(
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Http className="material-ui-icon" /> Top Level Domain:
-                            </TableCell>
+                            <TableCellContainer>
+                                <Http className="material-ui-icon" />
+                                <TableCellText>
+                                    Top Level Domain:
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell> {topLevelDomain.toString().length !== 0 ? topLevelDomain.toString().split(',\s') : "Not assigned yet"}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Phone className="material-ui-icon" /> Calling Code:
-                                </TableCell>
-                            <TableCell component="th" scope="row">
+                            <TableCellContainer>
+                                <Phone className="material-ui-icon" />
+                                <TableCellText>
+                                    Calling Code:
+                                </TableCellText>
+                            </TableCellContainer>
+                            <TableCellContainer>
                                 {callingCodes[0].length > 0 ?
                                     callingCodes.map(value => {
                                         return (
@@ -376,12 +445,15 @@ export const DetailsTables = withStyles(styles)(
                                     :
                                     'Not assigned yet'
                                 }
-                            </TableCell>
+                            </TableCellContainer>
                         </TableRow>
                         <TableRow>
-                            <TableCell component="th" scope="row">
-                                <Public className="material-ui-icon" /> ISO Code:
-                                </TableCell>
+                            <TableCellContainer>
+                                <Public className="material-ui-icon" />
+                                <TableCellText>
+                                    ISO Code:
+                                </TableCellText>
+                            </TableCellContainer>
                             <TableCell>
                                 <div> {"Alpha-2"} &mdash; {alpha2Code} </div>
                                 <div> {"Alpha-3"} &mdash; {alpha3Code} </div>
