@@ -227,15 +227,21 @@ export const CountryDetails = withStyles(styles)(
                     <HContext.Provider value={this.state.dataHeader}>
                         <Header getNewAlpha3Code={this.setNewAlpha3Code} />
                     </HContext.Provider>
-                    {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
-                        // Bad request, redirect to not found page
-                        <Redirect to={'/404'} />
-                        :
-                        // Loading extract content
-                        <div className={classes.cardContainer}>
-                            {(this.state.countryDetailsList.length > 0 && this.state.extractContent.length > 0) && this.loadnRenderExtractCardContent()}
-                        </div>
-                    }
+                    <span
+                        style={{
+                            visibility: !this.state.loaded[3] ? 'hidden' : 'visible',
+                        }}
+                    >
+                        {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
+                            // Bad request, redirect to not found page
+                            <Redirect to={'/404'} />
+                            :
+                            // Loading extract content
+                            <div className={classes.cardContainer}>
+                                {(this.state.countryDetailsList.length > 0 && this.state.extractContent.length > 0) && this.loadnRenderExtractCardContent()}
+                            </div>
+                        }
+                    </span>
                 </div>
             );
         }
