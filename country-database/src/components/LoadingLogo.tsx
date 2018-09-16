@@ -89,15 +89,11 @@ export const LoadingLogo = withStyles(styles)(
                     style={{
                         /* Prevent user from seeing the internal state of loading the weblogo */
                         visibility: this.state.loaded ? 'visible' : 'hidden',
+                        width: this.state.winResolution[0],
+                        height: this.state.winResolution[1],
                     }}
+                    className={classes.loadingScreenBackground}
                 >
-                    <div
-                        style={{
-                            width: this.state.winResolution[0],
-                            height: this.state.winResolution[1],
-                        }}
-                        className={classes.loadingScreenBackground}
-                    />
                     <div className={classes.loadingScreenStyle}>
                         <img src={require("../img/world.svg")} className={classes.webLogoStyle} onLoad={this.showComponent} />
                         <CircularProgress className={classes.spinnerStyle} />
