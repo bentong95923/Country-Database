@@ -327,12 +327,12 @@ export const CountryDetails = withStyles(styles)(
                                         {extract[count++].str}
                                     </Typography>
                                 </CardContent>
-                                {extract.length > 1 &&
-                                    <CardActions className={classes.actions} disableActionSpacing={true}>
-                                        <div className={classes.reftxt}>
-                                            Content provided by
+                                <CardActions className={classes.actions} disableActionSpacing={true}>
+                                    <div className={classes.reftxt}>
+                                        Content provided by
                                             <div className={classes.refProviderTxt}>Wikipedia</div>
-                                        </div>
+                                    </div>
+                                    {extract.length > 1 &&
                                         <IconButton
                                             className={classnames(classes.expandExtract, {
                                                 [classes.expandOpen]: this.state.expanded[0],
@@ -344,8 +344,8 @@ export const CountryDetails = withStyles(styles)(
                                         >
                                             <ExpandMoreIcon />
                                         </IconButton>
-                                    </CardActions>
-                                }
+                                    }
+                                </CardActions>
                                 {extract.length > 1 &&
                                     <Collapse in={this.state.expanded[0]} timeout="auto" unmountOnExit={true}>
                                         <CardContent>
