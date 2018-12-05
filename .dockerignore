@@ -1,4 +1,4 @@
 .gitignore
 Dockerfile
-node_modules
+/country-database/node_modules
 npm-debug.log
