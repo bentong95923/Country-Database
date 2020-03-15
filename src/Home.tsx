@@ -94,7 +94,7 @@ export const Home = withStyles(styles)(
                             visibility: this.state.loaded ? 'visible' : 'hidden',
                         }}
                     >
-                        {console.log(process.env)}
+                        {alert(JSON.stringify(process.env))}
                         <WebLogoDetailed className={classes.webLogoStyle} onLoad={this.showComponent} />
                         {/* Display page not found message */}
                         {this.props.notFound &&
