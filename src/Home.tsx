@@ -86,6 +86,7 @@ export const Home = withStyles(styles)(
 
         public render() {
             const { classes } = this.state.classes;
+            alert(JSON.stringify(process.env));
             return (
                 <div style={this.state.styleForSmallScreen} className={classes.appDefaultStyle}>
                     <div
@@ -94,7 +95,6 @@ export const Home = withStyles(styles)(
                             visibility: this.state.loaded ? 'visible' : 'hidden',
                         }}
                     >
-                        {alert(JSON.stringify(process.env))}
                         <WebLogoDetailed className={classes.webLogoStyle} onLoad={this.showComponent} />
                         {/* Display page not found message */}
                         {this.props.notFound &&
