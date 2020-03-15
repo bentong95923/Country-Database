@@ -1,4 +1,0 @@
-.gitignore
-Dockerfile
-/country-database/node_modules
-npm-debug.log

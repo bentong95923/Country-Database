@@ -8,32 +8,18 @@ This app is the work for NZMSA 2018 Assignment 1. It is a country database using
 * RESTCountries - https://restcountries.eu/
 * Pixabay - https://pixabay.com
 
-URL: https://conutrydatabase.azurewebsites.net
+URL: https://conutrydatabase.azurewebsites.net (No longer online)
 
-Backup site (take longer to load): https://countrydatabase.herokuapp.com/
+Please go to this backup site (take longer to load): https://countrydatabase.herokuapp.com/
 
-## Dependency Required
+## Dependencies
 
 1. MaterialUI
 
-    `npm install --save @material-ui/core`
-
-    `npm install --save @material-ui/icons`
-
 2. React Router DOM
-
-    `npm install --save @types/react-router-dom react-router-dom`
 
 3. React-Select
 
-    `npm install --save @types/react-select`
-
-    `npm i react-select`
-
 4. Chroma.js
 
-    `npm install --save @types/chroma-js`
-
 5. Classnames
-
-    `npm install --save @types/classnames`
