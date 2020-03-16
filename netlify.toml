@@ -1,3 +1,0 @@
-[build.environment]
-    NODE_ENV = "production"
-    VARIABLE111 = "value111"
