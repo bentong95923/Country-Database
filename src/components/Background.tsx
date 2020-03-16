@@ -1,5 +1,5 @@
 import * as React from "react";
-// import { API_KEY_PIXABAY } from '../ApiKey';
+import { API_KEY_PIXABAY } from '../ApiKey';
 import { SEARCH_BACKGROUND_KEYWORD } from "../AppConfig";
 
 // Interface
@@ -46,7 +46,7 @@ export default class Background extends React.Component<{}, IBackground> {
 
     // Search for background picture using the keyword specified in AppConfig.tsx file
     public getBackgroundImage = (keyword: string) => {
-        const url = "https://pixabay.com/api/?key=" + process.env.API_KEY_PIXABAY + "&q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true&editors_choice=true";
+        const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true&editors_choice=true";
         fetch(url)
             .then(response => response.json())
             .then((out) => {

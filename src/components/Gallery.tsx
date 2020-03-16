@@ -10,7 +10,7 @@ import {
     IconButton
 } from '@material-ui/core';
 
-// import { API_KEY_PIXABAY } from '../ApiKey';
+import { API_KEY_PIXABAY } from '../ApiKey';
 import { MIN_NUM_PIC_FOUND, PIC_GALLERY_HEIGHT } from '../AppConfig';
 
 // Material-UI style for Horizontal Grid List
@@ -192,7 +192,7 @@ export const Gallery = withStyles(styles)(
                 this.runAfterFinishLoading();
                 return;
             }
-            const url = "https://pixabay.com/api/?key=" + process.env.API_KEY_PIXABAY + "&q=" + encodeURI(keywords) + "&image_type=photo&safesearch=true";
+            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keywords) + "&image_type=photo&safesearch=true";
             await fetch(url)
                 .then(response => response.json())
                 .then((out) => {
