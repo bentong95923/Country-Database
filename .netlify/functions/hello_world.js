@@ -4,7 +4,7 @@ exports.handler = async (event, context) => {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    const params = JSON.parse(event.body);
+    //const params = JSON.parse(event.body);
     console.log(event.body);
 
     return {
