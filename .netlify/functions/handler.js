@@ -1,8 +1,8 @@
-const { ENV_VAR } = process.env;
+const { GREETING  } = process.env;
 
 exports.handler = async (event, context) => {
   return {
     statusCode: 200,
-    body: ENV_VAR
+    body: GREETING 
   };
 };
