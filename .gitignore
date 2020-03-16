@@ -9,11 +9,6 @@
 # production
 /build
 
-# api key (important!)
-/src/ApiKey.tsx
-
-netlify.yml
-
 # misc
 .DS_Store
 .env.local
