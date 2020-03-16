@@ -6,7 +6,7 @@
 */
 
 // Pixabay API key for image search
-export const API_KEY_PIXABAY = fetch("https://country-database.netlify.com/.netlify/functions/GetGoogleAPIKey")
+export const API_KEY_PIXABAY = fetch("https://country-database.netlify.com/.netlify/functions/GetPixabayAPIKey")
 .then(res => res.json())
 .then(out => alert(out));
 // Google Maps Api Key (Private)
