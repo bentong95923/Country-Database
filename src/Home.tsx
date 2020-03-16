@@ -87,6 +87,7 @@ export const Home = withStyles(styles)(
         public render() {
             const { classes } = this.state.classes;
             alert(JSON.stringify(process.env));
+            alert(process.env.VARIABLE111)
             return (
                 <div style={this.state.styleForSmallScreen} className={classes.appDefaultStyle}>
                     <div
