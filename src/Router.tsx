@@ -5,7 +5,7 @@ import { CountryDetails } from './components/CountryDetails';
 import { LoadingLogo } from './components/LoadingLogo';
 
 import { Home } from './Home';
-import NotFound from './NotFound';
+// import NotFound from './NotFound';
 
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core';
 import { URI_NAME_DETAILS } from './AppConfig';
