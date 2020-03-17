@@ -10,7 +10,6 @@ import {
     IconButton
 } from '@material-ui/core';
 
-import { API_KEY_PIXABAY } from '../ApiKey';
 import { MIN_NUM_PIC_FOUND, PIC_GALLERY_HEIGHT } from '../AppConfig';
 
 // Material-UI style for Horizontal Grid List
@@ -192,8 +191,14 @@ export const Gallery = withStyles(styles)(
                 this.runAfterFinishLoading();
                 return;
             }
-            const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keywords) + "&image_type=photo&safesearch=true";
-            await fetch(url)
+            // const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keywords) + "&image_type=photo&safesearch=true";
+            const url = "https://country-database.netlify.com/.netlify/functions/GetPixabayImages";
+            await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                // Query parameters apart from the url and API key
+                body: "q=" + encodeURI(keywords) + "&image_type=photo&safesearch=true"
+            })
                 .then(response => response.json())
                 .then((out) => {
                     if (out.hits !== undefined) {
