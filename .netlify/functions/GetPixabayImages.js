@@ -7,7 +7,7 @@ exports.handler = async (event, context, callback) => {
     }
     console.log(API_KEY_PIXABAY)
     const queryParam = event.body;
-    const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&" + queryParam;
+    const url = "https://pixabay.com/api/?key=" + JSON.stringify(API_KEY_PIXABAY) + "&" + queryParam;
     fetch(url)
         .then(response => response.json())
         .then(result => {
