@@ -46,8 +46,14 @@ export default class Background extends React.Component<{}, IBackground> {
 
     // Search for background picture using the keyword specified in AppConfig.tsx file
     public getBackgroundImage = (keyword: string) => {
-        const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true&editors_choice=true";
-        fetch(url)
+        const url = "https://country-database.netlify.com/.netlify/functions/GetPixabayAPIKey"
+        // "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true&editors_choice=true";
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            // Query parameters apart from the url and API key
+            body: "q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true&editors_choice=true"
+        })
             .then(response => response.json())
             .then((out) => {
                 // After finding a list of images, it randomly selects one to be the background picture for this webapp
