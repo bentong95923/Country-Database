@@ -23,7 +23,7 @@ import { Gallery } from './Gallery';
 import { Header } from './Header';
 import { LoadingLogo } from './LoadingLogo';
 
-// import { API_KEY_GOOGLE } from '../ApiKey';
+import { API_KEY_GOOGLE } from '../ApiKey';
 import { APP_TITLE, URI_NAME_DETAILS } from '../AppConfig';
 import { CContext, HContext } from '../AppContext';
 
@@ -381,7 +381,7 @@ export const CountryDetails = withStyles(styles)(
                 <iframe
                     className={classes.map}
                     frameBorder={"0"}
-                    src={"https://www.google.com/maps/embed/v1/place?key=" + process.env.API_KEY_GOOGLE + "&q=" + encodeURI(keywords)}
+                    src={"https://www.google.com/maps/embed/v1/place?key=" + API_KEY_GOOGLE + "&q=" + encodeURI(keywords)}
                     allowFullScreen={true}
                 />
             );

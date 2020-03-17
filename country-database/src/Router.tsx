@@ -5,7 +5,7 @@ import { CountryDetails } from './components/CountryDetails';
 import { LoadingLogo } from './components/LoadingLogo';
 
 import { Home } from './Home';
-// import NotFound from './NotFound';
+import NotFound from './NotFound';
 
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core';
 import { URI_NAME_DETAILS } from './AppConfig';
@@ -36,7 +36,7 @@ export const AppRouter: React.StatelessComponent<{}> = () => {
                             <Route exact={true} path={"/" + URI_NAME_DETAILS + "/:alpha3Code"} component={CountryDetails} />
                             <Route exact={true} path={"/loading"} component={LoadingLogo} />
                             {/* Path not matched will redirect back to home page */}
-                            {/* <Route component={NotFound} /> */}
+                            <Route component={NotFound} />
                         </Switch>
                     </main>
                 </MuiThemeProvider>
