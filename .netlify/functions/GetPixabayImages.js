@@ -6,7 +6,7 @@ exports.handler = async (event, context, callback) => {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
     console.log(API_KEY_PIXABAY)
-    const queryParam = querystring.parse(event.body);
+    const queryParam = event.body;
     const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&" + queryParam;
     fetch(url)
         .then(response => response.json())
