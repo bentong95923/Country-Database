@@ -16,7 +16,8 @@ export const MAX_NUM_INPUT = 20; // Maximum
 export const SEARCH_BAR_INPUT_PLACEHOLDER = "Country name...";
 
 // Keyword for search of background image
-export const SEARCH_BACKGROUND_KEYWORD = "scenery";
+export const SEARCH_BACKGROUND_KEYWORD_0 = "landscape";
+export const SEARCH_BACKGROUND_KEYWORD_1 = "nature";
 
 // Minimum number of photos found on Pixabay to show the Gallery
 export const MIN_NUM_PIC_FOUND = 3;

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { API_KEY_PIXABAY } from '../ApiKey';
-import { SEARCH_BACKGROUND_KEYWORD } from "../AppConfig";
+import { SEARCH_BACKGROUND_KEYWORD_0, SEARCH_BACKGROUND_KEYWORD_1 } from "../AppConfig";
 
 // Interface
 interface IBackground {
@@ -36,7 +36,10 @@ export default class Background extends React.Component<{}, IBackground> {
     }
 
     public componentDidMount() {
-        this.getBackgroundImage(SEARCH_BACKGROUND_KEYWORD);
+        const random = Math.floor(Math.random() *2);
+        let keyword = "";
+        keyword = random === 0? SEARCH_BACKGROUND_KEYWORD_0 : SEARCH_BACKGROUND_KEYWORD_1;
+        this.getBackgroundImage(keyword);
         window.addEventListener('resize', this.updateResolution);
     }
 
@@ -46,7 +49,21 @@ export default class Background extends React.Component<{}, IBackground> {
 
     // Search for background picture using the keyword specified in AppConfig.tsx file
     public getBackgroundImage = (keyword: string) => {
-        const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + encodeURI(keyword) + "&image_type=photo&safesearch=true&editors_choice=true";
+        const random = Math.floor(Math.random() *3);
+        let randomOrderParam = "";
+        switch (random) {
+            case 0:
+                randomOrderParam = "latest";
+                break;
+            case 1:
+                randomOrderParam = "popular";
+            break;
+            case 2:
+            default:
+                randomOrderParam = "upcoming";
+            break;
+        }
+        const url = "https://pixabay.com/api/?key=" + API_KEY_PIXABAY + "&q=" + keyword + "&cat=nature&order=" + randomOrderParam + "&image_type=photo&safesearch=true";
         fetch(url)
             .then(response => response.json())
             .then((out) => {
