@@ -8,9 +8,12 @@ This app is the work for NZMSA 2018 Assignment 1. It is a country database using
 * RESTCountries - https://restcountries.eu/
 * Pixabay - https://pixabay.com
 
-URL: https://conutrydatabase.azurewebsites.net (No longer online)
+URL:
+1. https://countrydatabase.ml/ (now online)
 
-Please go to this backup site (take longer to load): https://countrydatabase.herokuapp.com/
+2. (take longer to load): https://countrydatabase.herokuapp.com/
+
+3. https://conutrydatabase.azurewebsites.net (No longer online)
 
 ## Dependencies
 
