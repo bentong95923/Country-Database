@@ -9,11 +9,8 @@ This app is the work for NZMSA 2018 Assignment 1. It is a country database using
 * Pixabay - https://pixabay.com
 
 URL:
-1. https://countrydatabase.ml/ (now online)
+* https://countrydatabase.ml/ (now online)
 
-2. https://countrydatabase.herokuapp.com (take longer to load)
-
-3. https://conutrydatabase.azurewebsites.net (No longer online)
 
 ## Dependencies
 
