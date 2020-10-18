@@ -3,13 +3,11 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Background from './components/Background';
 import { CountryDetails } from './components/CountryDetails';
 
-import { Helmet } from 'react-helmet';
 import { Home } from './Home';
 import NotFound from './NotFound';
 
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core';
-import { APP_TITLE, URI_NAME_DETAILS } from './AppConfig';
-import { APP_SEO_DESC, SEOImage} from './AppSEO';
+import { URI_NAME_DETAILS } from './AppConfig';
 
 import './css/styles.css';
 // Theme: black
@@ -30,42 +28,22 @@ const redirectToUrlWithTrailingSlash = (props: any) => {
 
 export const AppRouter: React.StatelessComponent<{}> = () => {
     return (
-        <>
-            <Helmet>
-                <meta
-                    name="description"
-                    content={APP_SEO_DESC}
-                />
-
-                {/* <!-- Google / Search Engine Tags --> */}
-                <meta itemProp="name" content={APP_TITLE} />
-                <meta
-                    itemProp="description"
-                    content={APP_SEO_DESC}
-                />
-                <meta
-                    itemProp="image"
-                    content={SEOImage}
-                />
-                <title>{APP_TITLE}</title>
-            </Helmet>
-            <BrowserRouter>
-                <div>
-                    <Background />
-                    <MuiThemeProvider theme={theme}>
-                        <main>
-                            {/* Switch will try to match the url to each route from top to bottom. */}
-                            <Switch>
-                                <Route exact={true} strict={true} path="/:url*" render={redirectToUrlWithTrailingSlash} />
-                                <Route exact={true} path="/" component={Home} />
-                                <Route exact={true} path={"/" + URI_NAME_DETAILS + "/:alpha3Code/"} component={CountryDetails} />
-                                {/* Path not matched will redirect back to home page */}
-                                <Route component={NotFound} />
-                            </Switch>
-                        </main>
-                    </MuiThemeProvider>
-                </div>
-            </BrowserRouter>
-        </>
+        <BrowserRouter>
+            <div>
+                <Background />
+                <MuiThemeProvider theme={theme}>
+                    <main>
+                        {/* Switch will try to match the url to each route from top to bottom. */}
+                        <Switch>
+                            <Route exact={true} strict={true} path="/:url*" render={redirectToUrlWithTrailingSlash} />
+                            <Route exact={true} path="/" component={Home} />
+                            <Route exact={true} path={"/" + URI_NAME_DETAILS + "/:alpha3Code/"} component={CountryDetails} />
+                            {/* Path not matched will redirect back to home page */}
+                            <Route component={NotFound} />
+                        </Switch>
+                    </main>
+                </MuiThemeProvider>
+            </div>
+        </BrowserRouter>
     );
 }

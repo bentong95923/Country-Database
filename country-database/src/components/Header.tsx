@@ -76,7 +76,7 @@ export const Header = withStyles(styles)(
                             <AppBar id="appBar" className={classes.appBar} position="sticky">
                                 <Toolbar variant="dense">
                                     <Typography variant="title">
-                                        <Link to="/">
+                                        <Link rel="nofollow" to="/">
                                             {this.renderLogoByScreenWidth(this.state.winWidth)}
                                         </Link>
                                     </Typography>

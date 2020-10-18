@@ -18,6 +18,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import GetApp from '@material-ui/icons/GetApp';
 import Map from '@material-ui/icons/Map';
 
+import { Helmet } from 'react-helmet';
 import { DetailsTables } from './DetailsTables';
 import { Gallery } from './Gallery';
 import { Header } from './Header';
@@ -26,6 +27,7 @@ import { LoadingLogo } from './LoadingLogo';
 import { API_KEY_GOOGLE } from '../ApiKey';
 import { APP_TITLE, URI_NAME_DETAILS } from '../AppConfig';
 import { CContext, HContext } from '../AppContext';
+import { SEOImage } from '../AppSEO';
 
 // Styling
 const styles = (theme: Theme) => createStyles({
@@ -220,7 +222,27 @@ export const CountryDetails = withStyles(styles)(
 
         public render() {
             const { classes } = this.state.classes;
+            let pageTitle = APP_TITLE;
+            if (this.state.countryDetailsList.length > 0) {
+                this.state.countryDetailsList.forEach(value => {
+                    pageTitle = value.name + " | " + APP_TITLE;
+                });
+            }
             return (
+                <>
+                    <Helmet>
+                        {/* <!-- Google / Search Engine Tags --> */}
+                        <meta itemProp="name" content={APP_TITLE} />
+                        <meta
+                            itemProp="description"
+                            content={this.state.extractContent}
+                        />
+                        <meta
+                            itemProp="image"
+                            content={SEOImage}
+                        />
+                        <title>{pageTitle}</title>
+                    </Helmet>
                 <div>
                     {/* Display loading spinner screen until the page is loaded. */}
                     {!this.state.loaded[3] && <LoadingLogo />}
@@ -242,7 +264,8 @@ export const CountryDetails = withStyles(styles)(
                             </div>
                         }
                     </span>
-                </div>
+                    </div>
+                    </>
             );
         }
 
@@ -271,7 +294,7 @@ export const CountryDetails = withStyles(styles)(
                             >
                                 <CardHeader
                                     avatar={
-                                        <a href={countryDetail.flag} target="_blank">
+                                        <a rel="nofollow" href={countryDetail.flag} target="_blank">
                                             <img title={"Click to see the large version of this flag"} className={classes.countryFlag} src={countryDetail.flag} />
                                         </a>
                                     }
@@ -543,8 +566,8 @@ export const CountryDetails = withStyles(styles)(
                         name: optimizeCountryName(nameTemp, 'i'),
                         capital: out.capital
                     });
-                    // Set title
-                    document.title = optimizeCountryName(nameTemp, 'e') + " | " + APP_TITLE;
+                    // // Set title
+                    // document.title = optimizeCountryName(nameTemp, 'e') + " | " + APP_TITLE;
                     this.setState(preState => ({
                         countryDetailsList: output,
                         dataGallery: dataGalleryStr,

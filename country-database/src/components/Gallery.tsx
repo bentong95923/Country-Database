@@ -119,7 +119,7 @@ export const Gallery = withStyles(styles)(
                     {this.state.numImage > 0 &&
                         <div className={classes.refTxt}>
                             Photos provided by
-                            <a href="https://pixabay.com/" target="_blank">
+                            <a rel="nofollow" href="https://pixabay.com/" target="_blank">
                                 <br />
                                 <img
                                     src="https://pixabay.com/static/img/logo.png"
@@ -176,7 +176,11 @@ export const Gallery = withStyles(styles)(
         }
 
         public openPicture = (url: string) => (event: any) => {
-            window.open(url, "_blank");
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = "_blank";
+            a.rel = "noopener";
+            a.click();
         }
 
         /*

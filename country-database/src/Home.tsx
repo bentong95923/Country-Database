@@ -5,6 +5,8 @@ import { WebLogoDetailed } from './AppLogo';
 import SearchBar from './components/SearchBar';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core';
+import { Helmet } from 'react-helmet';
+import { APP_SEO_DESC, SEOImage } from 'src/AppSEO';
 
 // Interface
 interface IHome {
@@ -58,8 +60,6 @@ export const Home = withStyles(styles)(
                 classes: props,
                 styleForSmallScreen: this.getResponsiveStyle(),
             }
-            // Setting the title of this page
-            document.title = APP_TITLE;
         }
 
         // Only display this component if the image has been loaded
@@ -87,23 +87,38 @@ export const Home = withStyles(styles)(
         public render() {
             const { classes } = this.state.classes;
             return (
-                <div style={this.state.styleForSmallScreen} className={classes.appDefaultStyle}>
-                    <div
-                        /* Prevent user from seeing the internal state of loading the weblogo */
-                        style={{
-                            visibility: this.state.loaded ? 'visible' : 'hidden',
-                        }}
-                    >
-                        <WebLogoDetailed className={classes.webLogoStyle} onLoad={this.showComponent} />
-                        {/* Display page not found message */}
-                        {this.props.notFound &&
-                            <div className={classes.notFoundTxt}>
-                                Oops! Page Not Found (404)
+                <>
+                    <Helmet>
+                        {/* <!-- Google / Search Engine Tags --> */}
+                        <meta itemProp="name" content={APP_TITLE} />
+                        <meta
+                            itemProp="description"
+                            content={APP_SEO_DESC}
+                        />
+                        <meta
+                            itemProp="image"
+                            content={SEOImage}
+                        />
+                        <title>{APP_TITLE}</title>
+                    </Helmet>
+                    <div style={this.state.styleForSmallScreen} className={classes.appDefaultStyle}>
+                        <div
+                            /* Prevent user from seeing the internal state of loading the weblogo */
+                            style={{
+                                visibility: this.state.loaded ? 'visible' : 'hidden',
+                            }}
+                        >
+                            <WebLogoDetailed className={classes.webLogoStyle} onLoad={this.showComponent} />
+                            {/* Display page not found message */}
+                            {this.props.notFound &&
+                                <div className={classes.notFoundTxt}>
+                                    Oops! Page Not Found (404)
                             </div>
-                        }
-                        <SearchBar onIndexPage={true} />
+                            }
+                            <SearchBar onIndexPage={true} />
+                        </div>
                     </div>
-                </div>
+                </>
             );
         }
 
