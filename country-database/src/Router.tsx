@@ -32,7 +32,7 @@ export const AppRouter: React.StatelessComponent<{}> = () => {
                         {/* Switch will try to match the url to each route from top to bottom. */}
                         <Switch>
                             <Route exact={true} path="/" component={Home} />
-                            <Route exact={true} path={"/" + URI_NAME_DETAILS + "/:alpha3Code"} component={CountryDetails} />
+                            <Route exact={true} path={"/" + URI_NAME_DETAILS + "/:alpha3Code/"} component={CountryDetails} />
                             {/* Path not matched will redirect back to home page */}
                             <Route component={NotFound} />
                         </Switch>

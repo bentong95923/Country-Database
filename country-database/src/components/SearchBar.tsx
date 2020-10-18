@@ -162,7 +162,7 @@ export default class SearchBar extends React.Component<ISearchBarProps, IState> 
                     />
                 </div>
                 {this.state.confirmedQuery && this.props.onIndexPage &&
-                    <Redirect to={"/" + URI_NAME_DETAILS + "/" + this.state.alpha3Code} />
+                    <Redirect to={"/" + URI_NAME_DETAILS + "/" + this.state.alpha3Code + "/"} />
                 }
             </div>
         );

@@ -4,7 +4,7 @@ import { Home } from './Home';
 export default class NotFound extends React.Component<{}> {
     constructor(props: any) {
         super(props);
-        props.history.push("/404");
+        props.history.push("/404/");
     }
 
     public render() {

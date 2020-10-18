@@ -234,7 +234,7 @@ export const CountryDetails = withStyles(styles)(
                     >
                         {(this.state.apiError[0] || this.state.alpha3Code.length !== 3) ?
                             // Bad request, redirect to not found page
-                            <Redirect to={'/404'} />
+                            <Redirect to={'/404/'} />
                             :
                             // Loading extract content
                             <div className={classes.cardContainer}>
