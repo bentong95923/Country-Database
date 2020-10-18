@@ -392,7 +392,7 @@ export const CountryDetails = withStyles(styles)(
             const alpha3CodeProps = props.match.params.alpha3Code;
             if (alpha3CodeProps !== alpha3CodeProps.toUpperCase() || alpha3CodeProps !== this.state.alpha3Code) {
                 if (alpha3CodeProps.length === 3) {
-                    props.history.push("/" + URI_NAME_DETAILS + "/" + this.state.alpha3Code.toUpperCase());
+                    props.history.push("/" + URI_NAME_DETAILS + "/" + this.state.alpha3Code.toUpperCase() + "/");
                 }
             }
         }
