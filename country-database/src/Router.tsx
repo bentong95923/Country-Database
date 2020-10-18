@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Background from './components/Background';
 import { CountryDetails } from './components/CountryDetails';
 
@@ -22,6 +22,10 @@ const theme = createMuiTheme({
     }
 });
 
+const redirectToUrlWithTrailingSlash = (props: any) => {
+    return <Redirect to={`${props.location.pathname}/`} />;
+}
+
 export const AppRouter: React.StatelessComponent<{}> = () => {
     return (
         <BrowserRouter>
@@ -31,6 +35,7 @@ export const AppRouter: React.StatelessComponent<{}> = () => {
                     <main>
                         {/* Switch will try to match the url to each route from top to bottom. */}
                         <Switch>
+                            <Route exact={true} strict={true} path="/:url*" render={redirectToUrlWithTrailingSlash} />
                             <Route exact={true} path="/" component={Home} />
                             <Route exact={true} path={"/" + URI_NAME_DETAILS + "/:alpha3Code/"} component={CountryDetails} />
                             {/* Path not matched will redirect back to home page */}
