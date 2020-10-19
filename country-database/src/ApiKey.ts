@@ -8,4 +8,4 @@
 // Pixabay API key for image search
 export const API_KEY_PIXABAY = "***REMOVED***";
 // Google Maps Api Key (Private)
-export const API_KEY_GOOGLE = "***REMOVED***";
+***REMOVED***

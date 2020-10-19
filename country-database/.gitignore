@@ -10,7 +10,7 @@
 /build
 
 # api key (important!)
-/src/ApiKey.tsx
+/src/ApiKey.ts
 
 # misc
 .DS_Store
