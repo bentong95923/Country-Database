@@ -6,7 +6,7 @@ import SearchBar from './components/SearchBar';
 
 import { createStyles, Theme, withStyles } from '@material-ui/core';
 import { Helmet } from 'react-helmet';
-import { APP_SEO_DESC, SEOImage } from 'src/AppSEO';
+import { APP_INTRO, APP_SEO_DESC, SEOImage } from 'src/AppSEO';
 
 // Interface
 interface IHome {
@@ -99,7 +99,7 @@ export const Home = withStyles(styles)(
                             itemProp="image"
                             content={SEOImage}
                         />
-                        <title>{APP_TITLE}</title>
+                        <title>{`${APP_INTRO} | ${APP_TITLE}`}</title>
                     </Helmet>
                     <div style={this.state.styleForSmallScreen} className={classes.appDefaultStyle}>
                         <div
